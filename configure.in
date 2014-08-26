@@ -5,7 +5,7 @@
 AC_INIT(src/ixlib_base.hh)
 
 ix_ixlib_major_version=0
-ix_ixlib_minor_version=90
+ix_ixlib_minor_version=91
 ix_ixlib_micro_version=0
 
 IXLIB_BINARY_IFACE_VERSION=0
@@ -54,4 +54,4 @@ CXXFLAGS=-g)
 
 AM_CONFIG_HEADER(ixlib_config.hh)
 AC_OUTPUT([ixlib-config po/Makefile.in intl/Makefile Makefile src/Makefile test/Makefile],
-  [chmod +x ixlib-config])
+  [chmod +x ixlib-config; ln -s ixlib_config.hh config.h])

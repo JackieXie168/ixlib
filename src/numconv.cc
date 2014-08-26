@@ -29,7 +29,7 @@ static string numChars = IXLIB_NUMCHARS;
 string ixion::float2dec(double value, unsigned int precision) {
   char buf[precision+10];
   string cmd("%.");
-  cmd += unsigned2dec(precision) + "e";
+  cmd += unsigned2dec(precision) + "g";
   sprintf((char *)&buf,cmd.c_str(),value);
   return string(buf);
   }

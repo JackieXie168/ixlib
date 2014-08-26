@@ -155,6 +155,14 @@ namespace ixion {
 
 
 
+  template <class T, int DIM>
+  coord_vector<T,DIM> operator*(T scalar,coord_vector<T,DIM> const &vec) {
+    return vec*scalar;
+    }
+
+
+
+
 // rectangle -----------------------------------------------------------------
   template <class T>
   struct rectangle {

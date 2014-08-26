@@ -4,7 +4,6 @@ ixlib is a small c++ tools library based upon the standard template library.
 It provides 
 
 * an exception handling framework [ixlib_exbase.hh]
-* basic integer types with bit size (such as "TUnsigned16") [ixlib_base.hh]
 * garbage collection [ixlib_garbage.hh]
 * automatic array management [ixlib_array.hh]
 * planar geometry (rectangles, regions) [ixlib_geometry.hh]
@@ -21,8 +20,9 @@ hides in its own namespace and it is written in such a way that the header
 file will suffice as documentation. If not, tell me, because that's a bug.
 You can use every component of ixlib separately without incurring extra 
 cost. Furthermore, every component of ixlib has been thoroughly tested
-and is considered production-quality code. All but the garbage collector
-interfaces are frozen.
+and is considered production-quality code. See the TODO section of this
+file for things that may change in future versions. Most of this
+involves the garbage collector.
 
 Using ixlib is as easy as abc. To compile, just type
 
@@ -63,3 +63,15 @@ differences in conventions STL <-> ixlib:
 T... = typedef'ed simple type
 methods and functions named java-like
 -------------------------------------------------------------------------------
+TODO:
+-----
+
+* ref's and polymorphism? I'd like to allow something like
+  
+  ref<superclass> u = ...
+  ref<subclass> v = u;
+  
+  This is impossible with the current garbage collector/refcounter,
+  which is silly. Anyone?
+
+* convert matrix to refs.

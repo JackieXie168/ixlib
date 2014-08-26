@@ -66,9 +66,16 @@ namespace ixion {
           string				Name; 
   
         public:
-          map<string,string> 		Attributes;
-          vector<tag *>			Children;
-          vector<string>			Text;
+	  typedef map<string,string>		attribute_map;
+	  typedef vector<tag *>			children_list;
+	  typedef vector<string>		text_list;
+	  
+          attribute_map 			Attributes;
+          children_list				Children;
+          text_list				Text;
+	  
+	  typedef children_list::iterator 	iterator;
+	  typedef children_list::const_iterator const_iterator;
   
           tag() {
             Text.push_back("");
@@ -82,8 +89,8 @@ namespace ixion {
           void appendTag(tag *tag) {
             insertTag(Text.end(),tag);
             }
-          void insertTag(vector<tag *>::iterator before,tag *tag);
-          void insertTag(vector<string>::iterator before,tag *tag);
+          void insertTag(children_list::iterator before,tag *tag);
+          void insertTag(text_list::iterator before,tag *tag);
           tag *findTag(string const &name);
           
           void setName(string const &name) {
@@ -91,6 +98,19 @@ namespace ixion {
             }
           string getName() const {
             return Name;
+            }
+	  
+          iterator begin() {
+            return Children.begin();
+            }
+          const_iterator begin() const {
+            return Children.begin();
+            }
+          iterator end() {
+            return Children.end();
+            }
+          const_iterator end() const {
+            return Children.end();
             }
   
         protected:

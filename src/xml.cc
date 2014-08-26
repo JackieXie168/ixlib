@@ -72,11 +72,8 @@ char *xml_exception::getText() const {
 // tag -----------------------------------------------------------------------
 xml_file::tag::tag(xml_file::tag const &source)
 : Name(source.Name),Attributes(source.Attributes),Text(source.Text) {
-  vector<tag *>::const_iterator first = source.Children.begin(),
-                           	 last = source.Children.end();
-  
-  while (first != last) {
-    tag *tg = new tag(**first++);
+  FOREACH_CONST(first,source,tag) {
+    tag *tg = new tag(**first);
     EX_MEMCHECK(tg)
     Children.push_back(tg);
     }
@@ -88,9 +85,8 @@ xml_file::tag::tag(xml_file::tag const &source)
   
   
 xml_file::tag::~tag() {
-  vector<tag *>::iterator first = Children.begin(),last = Children.end();
-  
-  while (first != last) delete *first++;
+  FOREACH_CONST(first,*this,tag) 
+    delete *first;
   }
   
   
@@ -98,7 +94,7 @@ xml_file::tag::~tag() {
   
 void xml_file::tag::insertTag(vector<tag *>::iterator before,tag *tag) {
   TSize index = before-Children.begin();
-  vector<string>::iterator pos = Text.begin() + index;
+  text_list::iterator pos = Text.begin() + index;
   
   Children.insert(before,tag);
   Text.insert(pos,"");
@@ -114,7 +110,7 @@ void xml_file::tag::insertTag(vector<string>::iterator before,tag *tg) {
     Text.insert(Text.begin(),"");
     }
   else {
-    vector<tag *>::iterator pos = Children.begin() + index - 1;
+    children_list::iterator pos = Children.begin() + index - 1;
 
     Children.insert(pos,tg);
     Text.insert(before,"");
@@ -125,13 +121,8 @@ void xml_file::tag::insertTag(vector<string>::iterator before,tag *tg) {
 
   
 xml_file::tag *xml_file::tag::findTag(string const &name) {
-  vector<tag *>::const_iterator first = Children.begin(),
-  			   	 last = Children.end();
-				 
-  while (first != last) {
+  FOREACH_CONST(first,*this,tag) 
     if ((*first)->Name == name) return *first;
-    first++;
-    }				
   return NULL;
   }
   
@@ -264,10 +255,10 @@ void xml_file::tag::write(ostream &ostr, TSize indent) {
     
   ostr << (str + ">") << endl;
   
-  vector<tag *>::const_iterator firsttag = Children.begin(),
-  				 lasttag = Children.end();
-  vector<string>::const_iterator firsttext = Text.begin(),
-  				   lasttext = Text.end();
+  children_list::const_iterator firsttag = Children.begin(),
+  				lasttag = Children.end();
+  text_list::const_iterator firsttext = Text.begin(),
+  			    lasttext = Text.end();
   
   while (firsttag != lasttag) {
     if (*firsttext != "") ostr << string(indent+2,' ') << (*firsttext) << endl;

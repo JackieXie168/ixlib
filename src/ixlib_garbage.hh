@@ -27,7 +27,22 @@
 
 
 namespace ixion {
-  template<class T,class Allocator = allocator<T> >
+  template<class T>
+  class delete_deallocator {
+    public:
+      void operator()(T const *instance) {
+        delete instance;
+	}
+    };
+  template<class T>
+  class delete_array_deallocator {
+    public:
+      void operator()(T const *instance) {
+        delete[] instance;
+	}
+    };
+
+  template<class T,class Deallocator = delete_deallocator<T> >
   class reference_manager;
 
 
@@ -50,10 +65,19 @@ namespace ixion {
       ~ref() {
         Manager.removeReference(Instance);
 	}
+	
+      ref &operator=(ref const &src) {
+        set(src.get());
+        return *this;
+        }
+      ref &operator=(T *ptr) {
+        set(ptr);
+        return *this;
+        }
       
       // smart pointer nitty-gritty
       T &operator*() const {
-        return Instance;
+        return *Instance;
 	}
       T *operator->() const {
         return Instance;
@@ -84,12 +108,6 @@ namespace ixion {
     
   
   
-  #define IXLIB_GARBAGE_MAKE_MANAGER(TYPE) \
-    ixion::reference_manager<TYPE> ixion::ref<TYPE>::Manager;
-
-
-
-
   template<class T>
   class dynamic_ref {
       reference_manager<T> 	&Manager;
@@ -147,7 +165,7 @@ namespace ixion {
   
   
   
-  template<class T,class Allocator>
+  template<class T,class Deallocator>
   class reference_manager {
     protected:
       struct instance_data {
@@ -166,11 +184,11 @@ namespace ixion {
             }
 	};
       hash_map<T const *,instance_data,pointer_hash>	Instances;
-      Allocator						Alloc;
+      Deallocator					Dealloc;
       
     public:
-      reference_manager(Allocator const &alloc = Allocator())
-        : Alloc(alloc) {
+      reference_manager(Deallocator const &dealloc = Deallocator())
+        : Dealloc(dealloc) {
 	}
     
     protected:
@@ -183,13 +201,19 @@ namespace ixion {
         TSize refc = --Instances[instance].ReferenceCount;
 	if (refc == 0) {
 	  Instances.erase(instance);
-	  Alloc.deallocate(const_cast<T *>(instance),1);
+	  Dealloc(instance);
 	  }
         }
       
       friend class dynamic_ref<T>;
       friend class ref<T>;
     };
+
+
+
+
+  #define IXLIB_GARBAGE_DECLARE_MANAGER(TYPE) \
+    ixion::reference_manager<TYPE> ixion::ref<TYPE>::Manager;
   }
 
 

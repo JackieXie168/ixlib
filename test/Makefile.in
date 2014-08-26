@@ -316,28 +316,6 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-testcmdline.o: testcmdline.cc ../src/ixlib_cmdline.hh \
-	../src/ixlib_string.hh ../src/ixlib_base.hh ../ixlib_config.hh \
-	../src/ixlib_exgen.hh ../src/ixlib_exbase.hh test.hh
-testgeo.o: testgeo.cc ../src/ixlib_geometry.hh ../src/ixlib_base.hh \
-	../ixlib_config.hh ../src/ixlib_exgen.hh ../src/ixlib_exbase.hh \
-	../src/ixlib_numeric.hh ../src/ixlib_geometry_impl.hh test.hh
-testmat.o: testmat.cc ../src/ixlib_matrix_impl.hh \
-	../src/ixlib_numeric.hh ../src/ixlib_base.hh ../ixlib_config.hh \
-	../src/ixlib_exgen.hh ../src/ixlib_exbase.hh \
-	../src/ixlib_matrix.hh ../src/ixlib_array.hh test.hh
-testnumconv.o: testnumconv.cc ../src/ixlib_numconv.hh \
-	../src/ixlib_string.hh ../src/ixlib_base.hh ../ixlib_config.hh \
-	../src/ixlib_exgen.hh ../src/ixlib_exbase.hh test.hh
-testre.o: testre.cc ../src/ixlib_re.hh ../src/ixlib_exgen.hh \
-	../src/ixlib_exbase.hh ../src/ixlib_base.hh ../ixlib_config.hh \
-	../src/ixlib_string.hh test.hh
-teststring.o: teststring.cc ../src/ixlib_string.hh ../src/ixlib_base.hh \
-	../ixlib_config.hh ../src/ixlib_exgen.hh ../src/ixlib_exbase.hh \
-	test.hh
-testtextfile.o: testtextfile.cc ../src/ixlib_textfile.hh \
-	../src/ixlib_string.hh ../src/ixlib_base.hh ../ixlib_config.hh \
-	../src/ixlib_exgen.hh ../src/ixlib_exbase.hh test.hh
 
 info-am:
 info: info-am

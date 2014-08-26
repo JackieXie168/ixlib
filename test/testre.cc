@@ -92,5 +92,12 @@ BEGIN_TEST
   TEST(re.countBackrefs() == 7)
   TEST(re.match("gunjimbo"))
   
-  // todo: nested backrefs
+  re = "^([^ \t]*)[ \t]+(.+)$";
+  TEST(re.match("lctrl alt delete"))
+  TEST(re.getBackref(0) == "lctrl")
+  TEST(re.getBackref(1) == "alt delete")
+  
+  // this used to hang
+  re = ".*\\.so$";
+  TEST(!re.match("glunko"))
 END_TEST

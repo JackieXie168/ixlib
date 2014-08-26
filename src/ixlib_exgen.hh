@@ -34,6 +34,7 @@
 #define EC_INVALIDOP                    9
 #define EC_DIMENSIONMISMATCH		10
 #define EC_CANCELLED			11
+#define EC_EMPTYSET			12
 
 #define ECMEM_GENERAL                   0
 #define ECMEM_CONVENTIONAL              1

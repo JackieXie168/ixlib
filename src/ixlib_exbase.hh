@@ -32,9 +32,9 @@
 
 // throw macro ----------------------------------------------------------------
 #define EX_THROW(TYPE,CODE)\
-  throw TYPE##_exception(CODE,NULL,__FILE__,__LINE__);
+  throw ::ixion::TYPE##_exception(CODE,NULL,__FILE__,__LINE__);
 #define EX_THROWINFO(TYPE,CODE,INFO)\
-  throw TYPE##_exception(CODE,(char const *) INFO,__FILE__,__LINE__);
+  throw ::ixion::TYPE##_exception(CODE,(char const *) INFO,__FILE__,__LINE__);
 #define EX_CATCHCODE(TYPE,CODE,HANDLER)\
   catch (TYPE##_exception &ex) { \
     if (ex.Error != CODE) throw; \

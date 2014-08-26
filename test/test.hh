@@ -33,7 +33,7 @@ int main() {\
   return errcount; \
   } \
   catch (exception &ex) { \
-    cout << ex.what(); \
+    cout << ex.what() << endl; \
     return 1; \
     } \
   catch (exception &e) { \

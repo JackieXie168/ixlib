@@ -16,9 +16,11 @@ basic_objects=base.cc exbase.cc exgen.cc exio.cc \
 
 advanced_headers=ixlib_cmdline.hh \
   ixlib_geometry.hh ixlib_geometry_impl.hh \
+  ixlib_polygon.hh ixlib_polygon_impl.hh \
   ixlib_matrix.hh ixlib_matrix_impl.hh \
   ixlib_textfile.hh ixlib_scanner.hh ixlib_token_lex.hh \
-  ixlib_token_xml.hh ixlib_scanxml.hh ixlib_xml.hh
+  ixlib_token_xml.hh ixlib_scanxml.hh ixlib_xml.hh \
+  ixlib_drawing_functions.hh
 
 advanced_objects=cmdline.cc textfile.cc scanner.cc lex.xml.cc xml.cc
 

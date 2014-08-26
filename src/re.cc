@@ -102,12 +102,14 @@ TSize regex_string::backref_stack::count() {
 string regex_string::backref_stack::get(TIndex number,string const &candidate) const {
   TIndex level = 0,next_index = 0;
   TIndex start;
+  TIndex startlevel;
   
   internal_stack::const_iterator first = Stack.begin(),last = Stack.end();
   while (first != last) {
     if (first->Type == backref_entry::OPEN) {
       if (number == next_index) {
         start = first->Index;
+	startlevel = level;
  	level++;
         break;
         }
@@ -129,7 +131,7 @@ string regex_string::backref_stack::get(TIndex number,string const &candidate) c
       level++;
     if (first->Type == backref_entry::CLOSE) {
       level--;
-      if (number == level)
+      if (startlevel == level)
         return candidate.substr(start,first->Index - start);
       }
     first++;

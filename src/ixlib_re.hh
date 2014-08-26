@@ -17,7 +17,7 @@
 //
 //    What is there is compatible with perl5. However, not everything is
 //    there. Here's what's missing:
-//	* 
+//
 //	* \Q-\E,\b,\B,\A,\Z,\z
 //	* discerning between line and string
 //	* (?#comments)
@@ -220,7 +220,7 @@ namespace ixion {
           return 1;
           }
         bool match(backref_stack &brstack,string const &candidate,TIndex at) { 
-          return matchNext(brstack,candidate,at+1); 
+          return at < candidate.size() && matchNext(brstack,candidate,at+1); 
           }
       };
   

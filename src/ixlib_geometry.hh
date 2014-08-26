@@ -156,7 +156,7 @@ namespace ixion {
 
 
   template <class T, int DIM>
-  coord_vector<T,DIM> operator*(T scalar,coord_vector<T,DIM> const &vec) {
+  inline coord_vector<T,DIM> operator*(T scalar,coord_vector<T,DIM> const &vec) {
     return vec*scalar;
     }
 
@@ -234,6 +234,7 @@ namespace ixion {
       A += p; B += p;
       }
   
+    void unite(rectangle const &rect);
     void intersect(rectangle const &rect);
   
     template <class TP>

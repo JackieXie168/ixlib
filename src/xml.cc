@@ -3,6 +3,18 @@
 // ----------------------------------------------------------------------------
 //  (c) Copyright 1999 by iXiONmedia, all rights reserved.
 // ----------------------------------------------------------------------------
+// still unsupported parts of xml:
+// * character references (&#...; and &#x...;)
+// * character descriptions &...;
+//   - apos = ', quot = ", amp = &, lt = <
+// * CDATA sections
+// * Processing Instructions
+// * DTDs
+//   - normalization
+//   - validation
+// * entities
+// * xml:space
+// * unicode, #feff mark
 
 
 
@@ -23,13 +35,6 @@ using namespace ixion;
 
 
 
-// Exception throw macro ------------------------------------------------------
-#define EXXML_THROW(CODE,TOKEN)\
-  throw xml_exception(CODE,(TOKEN).Line,NULL);
-
-
-
-
 // Plain text rendering table -------------------------------------------------
 static char *(PlainText[]) ={
   N_("Syntax error"),
@@ -39,6 +44,7 @@ static char *(PlainText[]) ={
   N_("Unexpected end of input"),
   N_("Close tag expected"),
   N_("Close tag has different name"),
+  N_("Unterminated comment"),
   };
 
 

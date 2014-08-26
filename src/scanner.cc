@@ -7,9 +7,10 @@
 
 
 
-#include <ixlib_scanner.hh>
+#include <FlexLexer.h>
 #include <ixlib_numconv.hh>
 #include <ixlib_token_lex.hh>
+#include <ixlib_scanner.hh>
 
 
 
@@ -58,16 +59,21 @@ char *scanner_exception::getText() const {
 // scanner --------------------------------------------------------------------
 scanner::scanner(FlexLexer &lexer)
 : Lexer(lexer) {
-  CurrentToken.Type = Lexer.yylex();
-  CurrentToken.Line = Lexer.lineno();
-  CurrentToken.Text = Lexer.YYText();
   }
 
 
 
 
-bool scanner::reachedEOF() const {
-  return (CurrentToken.Type == TT_EOF);
+scanner::token_list scanner::scan() {
+  CurrentToken.Type = Lexer.yylex();
+  CurrentToken.Line = Lexer.lineno();
+  CurrentToken.Text = Lexer.YYText();
+
+  token_list tokenlist;
+  while (!reachedEOF()) {
+    tokenlist.push_back(getNextToken());
+    }
+  return tokenlist;
   }
 
 
@@ -91,10 +97,10 @@ scanner::token scanner::getNextToken() {
 
 
 
-scanner::token_list scanner::scan() {
-  token_list tokenlist;
-  while (!reachedEOF()) {
-    tokenlist.push_back(getNextToken());
-    }
-  return tokenlist;
+bool scanner::reachedEOF() const {
+  return (CurrentToken.Type == TT_EOF);
   }
+
+
+
+

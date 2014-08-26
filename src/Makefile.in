@@ -109,7 +109,7 @@ basic_headers = ixlib_base.hh ixlib_array.hh ixlib_garbage.hh   ixlib_exbase.hh 
 basic_objects = base.cc exbase.cc exgen.cc exio.cc   string.cc numconv.cc numeric.cc re.cc 
 
 
-advanced_headers = ixlib_cmdline.hh   ixlib_geometry.hh ixlib_geometry_impl.hh   ixlib_matrix.hh ixlib_matrix_impl.hh   ixlib_textfile.hh ixlib_scanner.hh ixlib_token_lex.hh   ixlib_token_xml.hh ixlib_scanxml.hh ixlib_xml.hh
+advanced_headers = ixlib_cmdline.hh   ixlib_geometry.hh ixlib_geometry_impl.hh   ixlib_polygon.hh ixlib_polygon_impl.hh   ixlib_matrix.hh ixlib_matrix_impl.hh   ixlib_textfile.hh ixlib_scanner.hh ixlib_token_lex.hh   ixlib_token_xml.hh ixlib_scanxml.hh ixlib_xml.hh   ixlib_drawing_functions.hh
 
 
 advanced_objects = cmdline.cc textfile.cc scanner.cc lex.xml.cc xml.cc
@@ -316,7 +316,10 @@ exgen.lo exgen.o : exgen.cc ixlib_exgen.hh ixlib_exbase.hh ixlib_base.hh \
 	../ixlib_config.hh ixlib_numconv.hh ixlib_string.hh
 exio.lo exio.o : exio.cc ixlib_exio.hh ixlib_exbase.hh ixlib_base.hh \
 	../ixlib_config.hh
-lex.xml.lo lex.xml.o : lex.xml.cc ixlib_token_xml.hh ixlib_token_lex.hh
+lex.xml.lo lex.xml.o : lex.xml.cc ixlib_xml.hh ixlib_exbase.hh \
+	ixlib_base.hh ../ixlib_config.hh ixlib_scanner.hh \
+	ixlib_string.hh ixlib_exgen.hh ixlib_token_xml.hh \
+	ixlib_token_lex.hh
 numconv.lo numconv.o : numconv.cc ixlib_exgen.hh ixlib_exbase.hh \
 	ixlib_base.hh ../ixlib_config.hh ixlib_numconv.hh \
 	ixlib_string.hh
@@ -325,9 +328,9 @@ numeric.lo numeric.o : numeric.cc ixlib_numeric.hh ixlib_base.hh \
 re.lo re.o : re.cc ixlib_exgen.hh ixlib_exbase.hh ixlib_base.hh \
 	../ixlib_config.hh ixlib_numeric.hh ixlib_numconv.hh \
 	ixlib_string.hh ixlib_re.hh
-scanner.lo scanner.o : scanner.cc ixlib_scanner.hh ixlib_base.hh \
-	../ixlib_config.hh ixlib_exbase.hh ixlib_string.hh \
-	ixlib_exgen.hh ixlib_numconv.hh ixlib_token_lex.hh
+scanner.lo scanner.o : scanner.cc ixlib_numconv.hh ixlib_base.hh \
+	../ixlib_config.hh ixlib_string.hh ixlib_exgen.hh \
+	ixlib_exbase.hh ixlib_token_lex.hh ixlib_scanner.hh
 string.lo string.o : string.cc ixlib_string.hh ixlib_base.hh \
 	../ixlib_config.hh ixlib_exgen.hh ixlib_exbase.hh
 textfile.lo textfile.o : textfile.cc ixlib_textfile.hh

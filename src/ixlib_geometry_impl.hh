@@ -15,6 +15,17 @@
 
 // rectangle -----------------------------------------------------------------
 template <class T>
+void ixion::rectangle<T>::unite(rectangle const &rect) {
+  A[0] = NUM_MIN(A[0],rect.A[0]);
+  A[1] = NUM_MIN(A[1],rect.A[1]);
+  B[0] = NUM_MAX(B[0],rect.B[0]);
+  B[1] = NUM_MAX(B[1],rect.B[1]);
+  }
+
+
+
+
+template <class T>
 void ixion::rectangle<T>::intersect(rectangle<T> const &rect) {
   A[0] = NUM_MAX(A[0],rect.A[0]);
   A[1] = NUM_MAX(A[1],rect.A[1]);

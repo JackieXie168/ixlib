@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2000-08-21 02:02+0200\n"
+"POT-Creation-Date: 2000-09-14 16:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -62,7 +62,11 @@ msgstr ""
 msgid "Operation cancelled"
 msgstr ""
 
-#: src/exgen.cc:64
+#: src/exgen.cc:34
+msgid "Unable to operate on empty set"
+msgstr ""
+
+#: src/exgen.cc:65
 msgid "Unable to allocate memory"
 msgstr ""
 

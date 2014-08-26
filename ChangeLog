@@ -1,3 +1,37 @@
+2000-09-15  Andreas Kloeckner  <ak@ixion.net>
+
+	* released version 0.93.0
+	
+	* README: made this one more fun to read.
+
+	* src/ixlib_polygon_impl.hh: added file.
+
+	* src/ixlib_polygon.hh: added file.
+
+	* src/ixlib_drawing_functions.hh: added file.
+
+2000-09-14  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_exgen.hh: added EC_EMPTYSET
+
+	* src/ixlib_geometry.hh: added rectangle<T>::unite
+
+2000-09-07  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_re.hh (any_char_matcher): nasty any_char_matcher bug
+		at end of strings fixed
+
+	* src/lex.xml.yy: improved error reporting about unterminated comments
+		reverted the change to comment handling
+
+	* src/ixlib_exbase.hh : added namespace component
+
+	* configure.in: bumped version to 0.93
+
+	* src/re.cc: fixed bug with multiple backrefs
+
+	* test/testre.cc (TEST): added regression test case for bug
+
 2000-08-21  Andreas Kloeckner  <ak@ixion.net>
 
 	* src/re.cc: added special character classes

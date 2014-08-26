@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ixlib\n"
-"POT-Creation-Date: 2000-08-21 02:02+0200\n"
+"POT-Creation-Date: 2000-09-14 16:23+0200\n"
 "PO-Revision-Date: 2000-05-28\n"
 "Last-Translator: Andreas Kloeckner <ak@ixion.net>\n"
 "MIME-Version: 1.0\n"
@@ -60,7 +60,12 @@ msgstr "Dimension unpassend"
 msgid "Operation cancelled"
 msgstr "Operation abgebrochen"
 
-#: src/exgen.cc:64
+#: src/exgen.cc:34
+#, fuzzy
+msgid "Unable to operate on empty set"
+msgstr "Nicht genug Speicher"
+
+#: src/exgen.cc:65
 msgid "Unable to allocate memory"
 msgstr "Nicht genug Speicher"
 

@@ -31,6 +31,7 @@ static char *(PlainText[]) = {
   N_("Invalid operation"),
   N_("Dimension mismatch"),
   N_("Operation cancelled"),
+  N_("Unable to operate on empty set"),
   };
 
 

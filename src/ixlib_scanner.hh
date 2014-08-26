@@ -22,7 +22,11 @@
 #include <ixlib_exbase.hh>
 #include <vector>
 #include <ixlib_string.hh>
-#include <FlexLexer.h>
+
+
+
+
+class FlexLexer;
 
 
 
@@ -48,23 +52,23 @@ namespace ixion {
   class scanner {
     public:
       struct token {
-        TIndex        Type;
-        TIndex        Line;
-        string       Text;
+        TIndex        	Type;
+        TIndex        	Line;
+        string       	Text;
         };
   
       typedef vector<token>		token_list;
       typedef vector<token>::iterator	token_iterator;
   
       scanner(FlexLexer &lexer);
-    
-      bool reachedEOF() const;
-      token getNextToken();
       token_list scan();
     
     protected:
       FlexLexer	&Lexer;
       token	CurrentToken;	
+
+      token getNextToken();
+      bool reachedEOF() const;
     };
   }
 

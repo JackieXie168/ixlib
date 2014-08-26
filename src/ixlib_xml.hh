@@ -37,6 +37,7 @@
 #define ECXML_UNEXPECTEDEND	4
 #define ECXML_CLOSETAGEXPECTED	5
 #define ECXML_CLOSETAGNAME	6
+#define ECXML_UNTERMCOMMENT	7
 
 
 
@@ -51,6 +52,13 @@ namespace ixion {
     xml_exception(TErrorCode error, TIndex line = 0, char const *info = 0);
     virtual char *getText() const;
     };
+
+
+
+
+// Exception throw macro ------------------------------------------------------
+#define EXXML_THROW(CODE,TOKEN)\
+  throw xml_exception(CODE,(TOKEN).Line,NULL);
 
 
 

@@ -14,45 +14,45 @@ INCLUDES = -I..
 
 
 # Source files ----------------------------------------------------------------
-basic_headers=ixlib_base.hh ixlib_array.hh ixlib_garbage.hh \
-  ixlib_exbase.hh ixlib_exgen.hh ixlib_exio.hh \
-  ixlib_string.hh ixlib_re.hh ixlib_re_impl.hh \
-  ixlib_numconv.hh ixlib_numeric.hh \
-  ixlib_random.hh ixlib_ring_queue.hh
+basic_headers=ixlib_base.hpp ixlib_array.hpp ixlib_garbage.hpp \
+  ixlib_exbase.hpp ixlib_exgen.hpp ixlib_exio.hpp \
+  ixlib_string.hpp ixlib_re.hpp ixlib_re_impl.hpp \
+  ixlib_numconv.hpp ixlib_numeric.hpp \
+  ixlib_random.hpp ixlib_ring_queue.hpp
 
-basic_objects=base.cc exbase.cc exgen.cc exio.cc \
-  string.cc numconv.cc numeric.cc re.cc
+basic_objects=base.cpp exbase.cpp exgen.cpp exio.cpp \
+  string.cpp numconv.cpp numeric.cpp re.cpp
 
-advanced_headers=ixlib_cmdline.hh \
-  ixlib_geometry.hh ixlib_geometry_impl.hh \
-  ixlib_polygon.hh ixlib_polygon_impl.hh \
-  ixlib_matrix.hh ixlib_matrix_impl.hh \
-  ixlib_textfile.hh ixlib_scanner.hh ixlib_token_lex.hh \
-  ixlib_xml.hh \
-  ixlib_javascript.hh \
-  ixlib_drawing_functions.hh 
+advanced_headers=ixlib_cmdline.hpp \
+  ixlib_geometry.hpp ixlib_geometry_impl.hpp \
+  ixlib_polygon.hpp ixlib_polygon_impl.hpp \
+  ixlib_matrix.hpp ixlib_matrix_impl.hpp \
+  ixlib_textfile.hpp ixlib_scanner.hpp ixlib_token_lex.hpp \
+  ixlib_xml.hpp \
+  ixlib_javascript.hpp \
+  ixlib_drawing_functions.hpp 
 
-advanced_objects=cmdline.cc textfile.cc scanner.cc xml.cc \
-  js_value.cc js_expression.cc js_declaration.cc \
-  js_instruction.cc js_array.cc js_library.cc \
-  js_interpreter.cc
+advanced_objects=cmdline.cpp textfile.cpp scanner.cpp xml.cpp \
+  js_value.cpp js_expression.cpp js_declaration.cpp \
+  js_instruction.cpp js_array.cpp js_library.cpp \
+  js_interpreter.cpp
 
-internal_headers=ixlib_token_xml.hh ixlib_scanxml.hh ixlib_scanjs.hh \
-  ixlib_js_internals.hh ixlib_token_javascript.hh \
-  ixlib_i18n.hh 
+internal_headers=ixlib_token_xml.hpp ixlib_scanxml.hpp ixlib_scanjs.hpp \
+  ixlib_js_internals.hpp ixlib_token_javascript.hpp \
+  ixlib_i18n.hpp 
 
-internal_objects=lex.xml.cc lex.javascript.cc
+internal_objects=lex.xml.cpp lex.javascript.cpp
 
 # Generated sources -----------------------------------------------------------
-lex.xml.cc: lex.xml.yy
+lex.xml.cpp: lex.xml.yy
 	$(LEX) $< 
 
-lex.javascript.cc: lex.javascript.yy
+lex.javascript.cpp: lex.javascript.yy
 	$(LEX) $< 
 
-BUILT_SOURCES=lex.xml.cc lex.javascript.cc 
+BUILT_SOURCES=lex.xml.cpp lex.javascript.cpp 
 
-CLEANFILES=lex.xml.cc lex.javascript.cc
+CLEANFILES=lex.xml.cpp lex.javascript.cpp
 
 EXTRA_DIST=lex.xml.yy lex.javascript.yy flex-gcc3-patch.ed
 

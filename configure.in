@@ -2,11 +2,11 @@
 # Initialize everything
 # -----------------------------------------------------------------------------
 
-AC_INIT(src/ixlib_base.hh)
+AC_INIT(src/ixlib_base.hpp)
 
 ix_ixlib_major_version=0
 ix_ixlib_minor_version=96
-ix_ixlib_micro_version=2
+ix_ixlib_micro_version=3
 
 IXLIB_BINARY_IFACE_VERSION=6
 IXLIB_BINARY_REVISION=$ix_ixlib_minor_version
@@ -28,20 +28,16 @@ AC_DEFINE_UNQUOTED(IXLIB_MICRO_VERSION,$ix_ixlib_micro_version,
 # Checks 
 # -----------------------------------------------------------------------------
 
-ALL_LINGUAS="de"
-
 # Not for c++, yet (2001-03-11)
 # AC_LIBTOOL_WIN32_DLL
 
-AM_PROG_LEX
 AC_PROG_CC
 AC_ISC_POSIX
 AC_PROG_CXX
 AM_PROG_LIBTOOL
-AM_GNU_GETTEXT
+AM_PROG_LEX
 
-CFLAGS="-I\$(top_srcdir)/intl"
-CXXFLAGS="-I\$(top_srcdir)/intl -I\$(top_srcdir)/src"
+CXXFLAGS="-I\$(top_srcdir)/src"
 
 IX_CXX_SUPPORTS_CLASS_TEMPLATES
 IX_CXX_SUPPORTS_EXCEPTIONS
@@ -63,6 +59,7 @@ INSTALL="$INSTALL -p"
 # Output
 # -----------------------------------------------------------------------------
 
-AM_CONFIG_HEADER(ixlib_config.hh)
-AC_OUTPUT([ixlib.lsm ixlib-config po/Makefile.in intl/Makefile Makefile src/Makefile test/Makefile],
-  [chmod +x ixlib-config; ln -s ixlib_config.hh config.h])
+AM_CONFIG_HEADER(ixlib_config.hpp)
+AC_OUTPUT([ixlib.lsm ixlib-config 
+	   Makefile src/Makefile test/Makefile old_headers/Makefile],
+  [chmod +x ixlib-config  ])

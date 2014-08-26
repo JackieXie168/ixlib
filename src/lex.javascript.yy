@@ -1,10 +1,10 @@
 /* -------- definitions ------- */
 
-%option c++ yylineno noyywrap prefix="js" outfile="lex.javascript.cc" batch
+%option c++ yylineno noyywrap prefix="js" outfile="lex.javascript.cpp" batch
 
 %{
-#include <ixlib_js_internals.hh>
-#include <ixlib_token_javascript.hh>
+#include <ixlib_js_internals.hpp>
+#include <ixlib_token_javascript.hpp>
 
 using namespace ixion;
 using namespace javascript;
@@ -25,7 +25,8 @@ ESCAPE_SIMPLE	\\['"?\\abfnrtv]
 ESCAPE_OCTAL	\\{DIGIT_OCT}{1,3}
 ESCAPE_HEX	\\x{DIGIT_HEX}{1,2}
 ESCAPE		{ESCAPE_SIMPLE}|{ESCAPE_OCTAL}|{ESCAPE_HEX}
-S_CHAR		[^"\\\n]|{ESCAPE}
+SQ_S_CHAR	[^'\\\n]|{ESCAPE}
+DQ_S_CHAR	[^"\\\n]|{ESCAPE}
 
 SIGN		\+|\-
 SIGNopt		{SIGN}?
@@ -47,7 +48,7 @@ LIT_OCTAL	0{DIGIT_OCT}*
 LIT_HEX		0[xX]{DIGIT_HEX}+
 LIT_INT		({LIT_DECIMAL}|{LIT_OCTAL}|{LIT_HEX})
 
-LIT_STRING	\"{S_CHAR}*\"|\'{S_CHAR}*\'
+LIT_STRING	\"{DQ_S_CHAR}*\"|\'{SQ_S_CHAR}*\'
 
 LIT_FRACTION	{DIGIT_SEQ}?\.{DIGIT_SEQ}|{DIGIT_SEQ}\.
 LIT_EXPONENT	[eE]{SIGNopt}{DIGIT_SEQ}

@@ -12,23 +12,23 @@ check_PROGRAMS=teststring testnumconv testre testcmdline testtextfile \
 noinst_PROGRAMS=javascript
 
 EXTRA_DIST=src.txt frobnitz.par runem test.js invertmap.js \
-  test-big.xml test-structure.xml
+  test-big.xml test-structure.xml aarray.js
 
 noinst_SCRIPTS=runem
 
-teststring_SOURCES=teststring.cc test.hh
-testnumconv_SOURCES=testnumconv.cc test.hh
-testre_SOURCES=testre.cc test.hh
-testcmdline_SOURCES=testcmdline.cc test.hh
-testtextfile_SOURCES=testtextfile.cc test.hh
-# testscanner_SOURCES=testscanner.cc
-testgeo_SOURCES=testgeo.cc test.hh
-testxml_SOURCES=testxml.cc test.hh
-testmat_SOURCES=testmat.cc test.hh
-testjs_SOURCES=testjs.cc test.hh
-testgarbage_SOURCES=testgarbage.cc test.hh
+teststring_SOURCES=teststring.cpp test.hpp
+testnumconv_SOURCES=testnumconv.cpp test.hpp
+testre_SOURCES=testre.cpp test.hpp
+testcmdline_SOURCES=testcmdline.cpp test.hpp
+testtextfile_SOURCES=testtextfile.cpp test.hpp
+# testscanner_SOURCES=testscanner.cpp
+testgeo_SOURCES=testgeo.cpp test.hpp
+testxml_SOURCES=testxml.cpp test.hpp
+testmat_SOURCES=testmat.cpp test.hpp
+testjs_SOURCES=testjs.cpp test.hpp
+testgarbage_SOURCES=testgarbage.cpp test.hpp
 
-javascript_SOURCES=javascript.cc
+javascript_SOURCES=javascript.cpp aarray.cpp
 
 check-local:
 	./runem $(check_PROGRAMS)

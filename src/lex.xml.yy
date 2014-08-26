@@ -1,10 +1,15 @@
 /* -------- definitions ------- */
 
-%option c++ yylineno debug noyywrap prefix="xml" outfile="lex.xml.cc" batch
+%option c++ yylineno debug noyywrap prefix="xml" outfile="lex.xml.cpp" batch
 
 %{
-#include <ixlib_xml.hh>
-#include <ixlib_token_xml.hh>
+#include <ixlib_xml.hpp>
+#include <ixlib_token_xml.hpp>
+
+
+
+
+using namespace std;
 %}
 
 WHITESPACE      [ \t\n\r]

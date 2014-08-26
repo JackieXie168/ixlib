@@ -4,7 +4,7 @@
 # (c) iXiONmedia 1999
 # -----------------------------------------------------------------------------
 
-SUBDIRS=intl src test po 
+SUBDIRS=src test old_headers
 
 mrproper:
 	find -name '*.bck' -exec rm '{}' \;
@@ -27,11 +27,13 @@ update-web-site:
 
 update-web: update-web-doc update-web-site
 
-include_HEADERS=ixlib_config.hh
+include_HEADERS=ixlib_config.hpp
 
 bin_SCRIPTS=ixlib-config
 
 m4datadir=$(datadir)/aclocal
 m4data_DATA=ixlib.m4
 
-EXTRA_DIST=ixlib.m4 ABOUT-NLS doxygen.cfg ixlib.doc ixlib.lsm.in
+EXTRA_DIST= config.rpath mkinstalldirs  config.rpath mkinstalldirs  config.rpath ixlib.m4 ABOUT-NLS doxygen.cfg ixlib.doc ixlib.lsm.in
+
+ACLOCAL_AMFLAGS = -I m4

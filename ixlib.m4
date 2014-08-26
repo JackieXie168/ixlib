@@ -56,8 +56,8 @@ dnl
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <ixlib_base.hh>
-#include <ixlib_config.hh>
+#include <ixlib_base.hpp>
+#include <ixlib_config.hpp>
 using namespace ixion;
 
 int 

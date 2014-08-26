@@ -124,8 +124,13 @@ template foo_class<int>; // explicit instation for ints
 Q: Does ixlib work with gcc 3.0?
 A: Yes.
 
+Q: Does ixlib work with gcc 3.2?
+A: Yes.
+
 Q: Does it work with older gccs?
-A: It should, down to 2.95.
+A: It should, down to 2.95.x. However, a bug has been introduced into 
+gcc 2.95.4 that causes function returns to SIGABRT, so don't use
+gcc 2.95.4 with ixlib. A workaround is not known, upgrade to gcc 3.2.
 
 Q: How can I find out about the usage of a certain component?
 A: Just try the appropriate test in the test/ directory. (e.g.

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ixlib\n"
-"POT-Creation-Date: 2000-08-16 01:35+0200\n"
+"POT-Creation-Date: 2000-08-21 02:02+0200\n"
 "PO-Revision-Date: 2000-05-28\n"
 "Last-Translator: Andreas Kloeckner <ak@ixion.net>\n"
 "MIME-Version: 1.0\n"
@@ -160,22 +160,22 @@ msgstr "Ungueltiger Chunk"
 msgid "CRC error"
 msgstr "CRC-Fehler"
 
-#: src/re.cc:26
+#: src/re.cc:27
 msgid "Invalid quantifier"
 msgstr "Ungueltiger Quantifizierer"
 
-#: src/re.cc:27
+#: src/re.cc:28
 msgid "Unbalanced backreference"
 msgstr "Unausgewogener Rueckgriff"
 
-#: src/re.cc:28
+#: src/re.cc:29
 msgid "Invalid escape sequence"
 msgstr "Ungueltige Escape-Sequenz"
 
-#: src/re.cc:29
+#: src/re.cc:30
 msgid "Invalid backreference"
 msgstr "Ungueltiger Rueckgriff"
 
-#: src/re.cc:30
+#: src/re.cc:31
 msgid "Unterminated character class"
 msgstr "Nicht beendete Zeichenklasse"

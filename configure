@@ -543,7 +543,7 @@ fi
 
 
 ix_ixlib_major_version=0
-ix_ixlib_minor_version=91
+ix_ixlib_minor_version=92
 ix_ixlib_micro_version=0
 
 IXLIB_BINARY_IFACE_VERSION=0

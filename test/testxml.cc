@@ -9,17 +9,18 @@
 
 #include <fstream>
 #include <iostream>
-#include <ixlib_xml.hh>
-#include "test.hh"
-#include <ixlib_string.hh>
 #include <vector>
+#include <ixlib_xml.hh>
+#include <ixlib_string.hh>
+#include "test.hh"
 
 
 
 
+using namespace ixion;
 BEGIN_TEST
-  vector<xString>	list;
-  xString		s;
+  vector<string>	list;
+  string		s;
   
   list.push_back("hallo");
   cout << list.size() << " " << list.back() << endl;
@@ -28,7 +29,7 @@ BEGIN_TEST
 
   ifstream istr("test.xml");
   
-  xXMLFile xml;
+  xml_file xml;
   xml.read(istr);
 
   ofstream ostr("test.xml.new");

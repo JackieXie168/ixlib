@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2000-08-16 01:35+0200\n"
+"POT-Creation-Date: 2000-08-21 02:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -162,22 +162,22 @@ msgstr ""
 msgid "CRC error"
 msgstr ""
 
-#: src/re.cc:26
+#: src/re.cc:27
 msgid "Invalid quantifier"
 msgstr ""
 
-#: src/re.cc:27
+#: src/re.cc:28
 msgid "Unbalanced backreference"
 msgstr ""
 
-#: src/re.cc:28
+#: src/re.cc:29
 msgid "Invalid escape sequence"
 msgstr ""
 
-#: src/re.cc:29
+#: src/re.cc:30
 msgid "Invalid backreference"
 msgstr ""
 
-#: src/re.cc:30
+#: src/re.cc:31
 msgid "Unterminated character class"
 msgstr ""

@@ -13,10 +13,15 @@
 
 
 
+using namespace ixion;
+
+
+
+
 BEGIN_TEST
   char *myargv[] = { "frobnitz", "sucker.cc", "--quick-frob", 
     "--traditional","--style=sloppy","--style=quick","@frobnitz.par" };
-  xCommandLine cmdline(7,myargv);
+  command_line cmdline(7,myargv);
   TEST(~cmdline == 6)
   TEST(cmdline[2] == "--traditional")
   TEST(cmdline.getCommand() == "frobnitz");

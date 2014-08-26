@@ -1,4 +1,40 @@
-Release 0.90alpha
------------------
+2000-08-21  Andreas Kloeckner  <ak@ixion.net>
 
-* Initial Unix release (Port from DOS)
+	* src/re.cc: added special character classes
+
+2000-08-20  Andreas Kloeckner  <ak@ixion.net>
+
+	* regression tests available: make check
+
+	* test/testxml.cc: compilation fixes
+
+	* test/Makefile.am: removed testscanner
+
+	* test/testtextfile.cc: compilation fixes
+
+	* test/testcmdline.cc: compilation fixes
+
+	* test/testnumconv.cc: compilation fixes
+
+	* test/teststring.cc: compilation fixes
+
+	* configure.in: Bumped version number to 0.92.0
+
+	* src/re.cc and corresponding header: code cleanup and
+	  partial rewrite. now supports quantified backrefs and is
+	  *at least* 10-20 times faster on quantifiers.
+
+2000-08-19  Andreas Kloeckner  <Andreas Kloeckner <ak@ixion.net>
+
+	* Initial public 0.91.0 release.
+
+2000-08-17  Andreas Kloeckner  <Andreas Kloeckner <ak@ixion.net>
+
+	* configure fixes
+	* fixes to the garbage collector
+	* added scalar*vector operator
+	* made xml classes easier to use
+
+2000-08-16  Andreas Kloeckner  <Andreas Kloeckner <ak@ixion.net>
+
+	* Initial non-public 0.90.0 release.

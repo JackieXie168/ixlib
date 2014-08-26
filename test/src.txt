@@ -1,3 +1,6 @@
+--------->>> [] wichtig!
+
+
 // ----------------------------------------------------------------------------
 //  Description      : Command line parsing tests tests.
 // ----------------------------------------------------------------------------
@@ -6,16 +9,10 @@
 
 
 
-
-#include <iostream>
-#include <fstream>
+#include <iostream.h>
+#include <fstream.h>
 #include <ixlib_textfile.hh>
 #include "test.hh"
-
-
-
-
-using namespace ixion;
 
 
 
@@ -23,7 +20,7 @@ using namespace ixion;
 BEGIN_TEST
   ifstream input("src.txt");
   ofstream output("dst.txt");
-  text_file textfile;
+  xTextFile textfile;
   
   input >> textfile;
   output << textfile;

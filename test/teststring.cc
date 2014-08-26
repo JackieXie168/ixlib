@@ -15,46 +15,64 @@
 
 
 
+using namespace ixion;
+
+
+
+
 BEGIN_TEST
-  vector<xString> vec;
+  vector<string> vec;
   vec.push_back("A"); vec.push_back("B"); vec.push_back("C");
   TEST(concat(vec.begin(),vec.end(),"-") == "A-B-C")
   
-  xString weenie = "Gosh. I'm a weenie.";
-  weenie.find_replace(xString("Gosh."),xString("Josh."));
+  // test string replace routines
+  string weenie = "Gosh. I'm a weenie.";
+  weenie = findReplace(weenie,string("Gosh."),"Josh.");
   TEST(weenie == "Josh. I'm a weenie.") 
 
   weenie = "I'm a helpless helping weenie.";
-  weenie.find_replace(xString("help"),xString("rest"));
+  weenie = findReplace(weenie,string("help"),"rest");
   TEST(weenie == "I'm a restless resting weenie.") 
 
   weenie = "I'm a helpless helping weenie.";
-  weenie.find_replace("weenie.","woonie.");
+  weenie = findReplace(weenie,string("weenie."),"woonie.");
+  TEST(weenie == "I'm a helpless helping woonie.")
+
+  // test char * replace routines
+  weenie = "Gosh. I'm a weenie.";
+  weenie = findReplace(weenie,string("Gosh."),"Josh.");
+  TEST(weenie == "Josh. I'm a weenie.") 
+
+  weenie = "I'm a helpless helping weenie.";
+  weenie = findReplace(weenie,string("help"),"rest");
+  TEST(weenie == "I'm a restless resting weenie.") 
+
+  weenie = "I'm a helpless helping weenie.";
+  weenie = findReplace(weenie,string("weenie."),"woonie.");
   TEST(weenie == "I'm a helpless helping woonie.")
 
   weenie = "I'm a helpless helping weenie.";
-  weenie.find_replace('e','o');
+  weenie = findReplace(weenie,'e','o');
   TEST(weenie == "I'm a holploss holping woonio.") 
   
-  // next ist test 8
   weenie = "       gimme a four-letter word";
-  TEST(strRemoveLeading(weenie) == "gimme a four-letter word")
-  TEST(strRemoveTrailing(weenie) == "       gimme a four-letter word")
-  TEST(strRemoveLeadingTrailing(weenie) == "gimme a four-letter word")
+  TEST(removeLeading(weenie) == "gimme a four-letter word")
+  TEST(removeTrailing(weenie) == "       gimme a four-letter word")
+  TEST(removeLeadingTrailing(weenie) == "gimme a four-letter word")
   
   weenie = "gimme a four-letter word       ";
-  TEST(strRemoveLeading(weenie) == "gimme a four-letter word       ")
-  TEST(strRemoveTrailing(weenie) == "gimme a four-letter word")
-  TEST(strRemoveLeadingTrailing(weenie) == "gimme a four-letter word")
+  TEST(removeLeading(weenie) == "gimme a four-letter word       ")
+  TEST(removeTrailing(weenie) == "gimme a four-letter word")
+  TEST(removeLeadingTrailing(weenie) == "gimme a four-letter word")
 
   weenie = "       gimme a four-letter word       ";
-  TEST(strRemoveLeading(weenie) == "gimme a four-letter word       ")
-  TEST(strRemoveTrailing(weenie) == "       gimme a four-letter word")
-  TEST(strRemoveLeadingTrailing(weenie) == "gimme a four-letter word")
+  TEST(removeLeading(weenie) == "gimme a four-letter word       ")
+  TEST(removeTrailing(weenie) == "       gimme a four-letter word")
+  TEST(removeLeadingTrailing(weenie) == "gimme a four-letter word")
   
   weenie = "      ";
-  TEST(strRemoveLeading(weenie) == "")
-  TEST(strRemoveTrailing(weenie) == "")
-  TEST(strRemoveLeadingTrailing(weenie) == "")
+  TEST(removeLeading(weenie) == "")
+  TEST(removeTrailing(weenie) == "")
+  TEST(removeLeadingTrailing(weenie) == "")
   
 END_TEST

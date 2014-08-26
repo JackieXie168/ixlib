@@ -104,18 +104,22 @@ l = @l@
 LDADD = ../src/libixion.la
 CXXFLAGS = -I../src -g
 
-check_PROGRAMS = teststring testnumconv testre testcmdline testtextfile   testscanner testgeo testxml testmat
+check_PROGRAMS = teststring testnumconv testre testcmdline testtextfile   testgeo testxml testmat
 
 
-teststring_SOURCES = teststring.cc
-testnumconv_SOURCES = testnumconv.cc
-testre_SOURCES = testre.cc
-testcmdline_SOURCES = testcmdline.cc frobnitz.par
-testtextfile_SOURCES = testtextfile.cc
-testscanner_SOURCES = testscanner.cc
-testgeo_SOURCES = testgeo.cc
-testxml_SOURCES = testxml.cc test.xml
-testmat_SOURCES = testmat.cc
+EXTRA_DIST = test.xml src.txt frobnitz.par runem
+
+noinst_SCRIPTS = runem
+
+teststring_SOURCES = teststring.cc test.hh
+testnumconv_SOURCES = testnumconv.cc test.hh
+testre_SOURCES = testre.cc test.hh
+testcmdline_SOURCES = testcmdline.cc test.hh
+testtextfile_SOURCES = testtextfile.cc test.hh
+# testscanner_SOURCES=testscanner.cc
+testgeo_SOURCES = testgeo.cc test.hh
+testxml_SOURCES = testxml.cc test.hh
+testmat_SOURCES = testmat.cc test.hh
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../ixlib_config.hh
 CONFIG_CLEAN_FILES = 
@@ -144,10 +148,6 @@ testtextfile_OBJECTS =  testtextfile.o
 testtextfile_LDADD = $(LDADD)
 testtextfile_DEPENDENCIES =  ../src/libixion.la
 testtextfile_LDFLAGS = 
-testscanner_OBJECTS =  testscanner.o
-testscanner_LDADD = $(LDADD)
-testscanner_DEPENDENCIES =  ../src/libixion.la
-testscanner_LDFLAGS = 
 testgeo_OBJECTS =  testgeo.o
 testgeo_LDADD = $(LDADD)
 testgeo_DEPENDENCIES =  ../src/libixion.la
@@ -160,10 +160,17 @@ testmat_OBJECTS =  testmat.o
 testmat_LDADD = $(LDADD)
 testmat_DEPENDENCIES =  ../src/libixion.la
 testmat_LDFLAGS = 
+SCRIPTS =  $(noinst_SCRIPTS)
+
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@
+CFLAGS = @CFLAGS@
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 DIST_COMMON =  Makefile.am Makefile.in
 
 
@@ -171,8 +178,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-SOURCES = $(teststring_SOURCES) $(testnumconv_SOURCES) $(testre_SOURCES) $(testcmdline_SOURCES) $(testtextfile_SOURCES) $(testscanner_SOURCES) $(testgeo_SOURCES) $(testxml_SOURCES) $(testmat_SOURCES)
-OBJECTS = $(teststring_OBJECTS) $(testnumconv_OBJECTS) $(testre_OBJECTS) $(testcmdline_OBJECTS) $(testtextfile_OBJECTS) $(testscanner_OBJECTS) $(testgeo_OBJECTS) $(testxml_OBJECTS) $(testmat_OBJECTS)
+SOURCES = $(teststring_SOURCES) $(testnumconv_SOURCES) $(testre_SOURCES) $(testcmdline_SOURCES) $(testtextfile_SOURCES) $(testgeo_SOURCES) $(testxml_SOURCES) $(testmat_SOURCES)
+OBJECTS = $(teststring_OBJECTS) $(testnumconv_OBJECTS) $(testre_OBJECTS) $(testcmdline_OBJECTS) $(testtextfile_OBJECTS) $(testgeo_OBJECTS) $(testxml_OBJECTS) $(testmat_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
@@ -252,10 +259,6 @@ testtextfile: $(testtextfile_OBJECTS) $(testtextfile_DEPENDENCIES)
 	@rm -f testtextfile
 	$(CXXLINK) $(testtextfile_LDFLAGS) $(testtextfile_OBJECTS) $(testtextfile_LDADD) $(LIBS)
 
-testscanner: $(testscanner_OBJECTS) $(testscanner_DEPENDENCIES)
-	@rm -f testscanner
-	$(CXXLINK) $(testscanner_LDFLAGS) $(testscanner_OBJECTS) $(testscanner_LDADD) $(LIBS)
-
 testgeo: $(testgeo_OBJECTS) $(testgeo_DEPENDENCIES)
 	@rm -f testgeo
 	$(CXXLINK) $(testgeo_LDFLAGS) $(testgeo_OBJECTS) $(testgeo_LDADD) $(LIBS)
@@ -316,6 +319,30 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
+testcmdline.o: testcmdline.cc ../src/ixlib_cmdline.hh \
+	../src/ixlib_string.hh ../src/ixlib_base.hh ../ixlib_config.hh \
+	../src/ixlib_exgen.hh ../src/ixlib_exbase.hh test.hh
+testgeo.o: testgeo.cc ../src/ixlib_geometry.hh ../src/ixlib_base.hh \
+	../ixlib_config.hh ../src/ixlib_exgen.hh ../src/ixlib_exbase.hh \
+	../src/ixlib_numeric.hh ../src/ixlib_geometry_impl.hh test.hh
+testmat.o: testmat.cc ../src/ixlib_matrix_impl.hh \
+	../src/ixlib_numeric.hh ../src/ixlib_base.hh ../ixlib_config.hh \
+	../src/ixlib_exgen.hh ../src/ixlib_exbase.hh \
+	../src/ixlib_matrix.hh ../src/ixlib_array.hh test.hh
+testnumconv.o: testnumconv.cc ../src/ixlib_numconv.hh \
+	../src/ixlib_base.hh ../ixlib_config.hh ../src/ixlib_string.hh \
+	../src/ixlib_exgen.hh ../src/ixlib_exbase.hh test.hh
+testre.o: testre.cc ../src/ixlib_re.hh ../src/ixlib_exgen.hh \
+	../src/ixlib_exbase.hh ../src/ixlib_base.hh ../ixlib_config.hh \
+	../src/ixlib_string.hh test.hh
+teststring.o: teststring.cc ../src/ixlib_string.hh ../src/ixlib_base.hh \
+	../ixlib_config.hh ../src/ixlib_exgen.hh ../src/ixlib_exbase.hh \
+	test.hh
+testtextfile.o: testtextfile.cc ../src/ixlib_textfile.hh test.hh \
+	../src/ixlib_exbase.hh ../src/ixlib_base.hh ../ixlib_config.hh
+testxml.o: testxml.cc ../src/ixlib_xml.hh ../src/ixlib_exbase.hh \
+	../src/ixlib_base.hh ../ixlib_config.hh ../src/ixlib_scanner.hh \
+	../src/ixlib_string.hh ../src/ixlib_exgen.hh test.hh
 
 info-am:
 info: info-am
@@ -338,7 +365,7 @@ install-am: all-am
 install: install-am
 uninstall-am:
 uninstall: uninstall-am
-all-am: Makefile
+all-am: Makefile $(SCRIPTS)
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install

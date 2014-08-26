@@ -7,7 +7,8 @@
 
 
 
-#include <ctype.h>
+#include <stack>
+#include <cctype>
 #include <ixlib_exgen.hh>
 #include <ixlib_numeric.hh>
 #include <ixlib_numconv.hh>
@@ -49,8 +50,112 @@ char *regex_exception::getText() const {
 
 
 
+// regex_string::backref_stack ------------------------------------------------
+void regex_string::backref_stack::open(TIndex index) {
+  backref_entry entry = { backref_entry::OPEN,index };
+  Stack.push_back(entry);
+  }
+
+
+
+
+void regex_string::backref_stack::close(TIndex index) {
+  backref_entry entry = { backref_entry::CLOSE,index };
+  Stack.push_back(entry);
+  }
+
+
+
+
+regex_string::backref_stack::rewind_info 
+regex_string::backref_stack::getRewindInfo() const {
+  return Stack.size();
+  }
+
+
+
+
+void regex_string::backref_stack::rewind(rewind_info ri) {
+  Stack.erase(Stack.begin()+ri,Stack.end());
+  }
+
+
+
+
+void regex_string::backref_stack::clear() {
+  Stack.clear();
+  }
+
+
+
+
+TSize regex_string::backref_stack::count() {
+  TSize result = 0;
+  FOREACH_CONST(first,Stack,internal_stack)
+    if (first->Type == backref_entry::OPEN) result++;
+  return result;
+  }
+
+
+
+
+string regex_string::backref_stack::get(TIndex number,string const &candidate) const {
+  TIndex level = 0,next_index = 0;
+  TIndex start;
+  
+  internal_stack::const_iterator first = Stack.begin(),last = Stack.end();
+  while (first != last) {
+    if (first->Type == backref_entry::OPEN) {
+      if (number == next_index) {
+        start = first->Index;
+ 	level++;
+        break;
+        }
+      next_index++;
+      level++;
+      }
+    if (first->Type == backref_entry::CLOSE) 
+      level--;
+    first++;
+    }
+  
+  if (first == last)
+    EX_THROW(regex,ECRE_INVBACKREF)
+
+  first++;
+    
+  while (first != last) {
+    if (first->Type == backref_entry::OPEN) 
+      level++;
+    if (first->Type == backref_entry::CLOSE) {
+      level--;
+      if (number == level)
+        return candidate.substr(start,first->Index - start);
+      }
+    first++;
+    }
+  EX_THROW(regex,ECRE_UNBALBACKREF)
+  }
+
+
+
+
 // regex_string::matcher ------------------------------------------------------
-TSize regex_string::matcher::collectMatchLength() const {
+regex_string::matcher::matcher()
+  : Next(NULL) { 
+  }
+
+
+
+
+regex_string::matcher::~matcher() { 
+  if (Next && DeleteNext) delete Next;
+  }
+
+
+
+
+TSize regex_string::matcher::subsequentMatchLength() const {
   TSize totalml = 0;
   matcher const *object = this;
   while (object) {
@@ -63,80 +168,246 @@ TSize regex_string::matcher::collectMatchLength() const {
 
 
 
-// regex_string::quantifier ---------------------------------------------------
-bool regex_string::quantifier::match(regex_string::backref_heap &brheap,
-string const &candidate,TIndex at) {
-  // Maximum: There should be at least one character in each match, we'd
-  // run to Baghdad otherwise.
-  TSize maxcount =  candidate.size() - at;
-  if (MaxValid) maxcount = NUM_MIN(maxcount,MaxCount);
-  
-  TSize matchcount = 0;
-  if (Greedy) {
-    matchcount = maxcount+1; 
-    while (matchcount>MinCount) {
-      matchcount--;
-      if (matchCount(brheap,candidate,at,matchcount)) return true;
-      }
+TSize regex_string::matcher::minimumSubsequentMatchLength() const  {
+  TSize totalml = 0;
+  matcher const *object = this;
+  while (object) {
+    totalml += object->minimumMatchLength();
+    object = object->Next;
     }
-  else {
-    matchcount = MinCount;
-    while (matchcount <= maxcount) {
-      if (matchCount(brheap,candidate,at,matchcount)) return true;
-      matchcount++;
-      }
-    }
-  return false;
+  return totalml;
   }
 
 
 
 
-bool regex_string::quantifier::matchCount(regex_string::backref_heap &brheap,
-string const &candidate,TIndex at,TSize matchcount) {
-  MatchLength = 0;
-  while (matchcount--) {
-    if (!matchQuantified(brheap,candidate,at+MatchLength)) return false;
-    MatchLength += getQuantifiedMatchLength();
-    }
+// regex_string::quantifier ---------------------------------------------------
+regex_string::quantifier::quantifier(bool greedy,TSize mincount)
+  : Greedy(greedy),MaxValid(false),MinCount(mincount) { 
+  }
 
-  return matchNext(brheap,candidate,at+MatchLength);
+
+
+
+regex_string::quantifier::quantifier(bool greedy,TSize mincount,TSize maxcount)
+  : Greedy(greedy),MaxValid(true),MinCount(mincount),MaxCount(maxcount) { 
+  }
+
+
+
+
+regex_string::quantifier::~quantifier() { 
+  if (Quantified) 
+    delete Quantified; 
+  }
+
+
+
+
+TSize regex_string::quantifier::minimumMatchLength() const {
+  if (Quantified) 
+    return MinCount * Quantified->minimumMatchLength();
+  else 
+    return 0;
+  }
+
+
+
+
+bool regex_string::quantifier::match(backref_stack &brstack,string const &candidate,TIndex at) {
+  // this routine does speculative matching, so it must pay close attention
+  // to rewind the backref stack appropriately.
+  // NB: matchNext does the rewinding automatically, whereas speculative
+  // matches of the quantified portion must be rewound.
+  
+  // There should be at least one character in each match, we'd
+  // run to Baghdad otherwise.
+  
+  if (!Quantified) 
+    return matchNext(brstack,candidate,at);
+  
+  // calculate accurate maximum match count
+  TSize quant_min = Quantified->minimumSubsequentMatchLength();
+  if (quant_min == 0) quant_min = 1;
+  
+  TSize max_count = candidate.size() - at;
+  if (Next) max_count -= Next->minimumSubsequentMatchLength();
+  max_count = max_count/quant_min + 1;
+  
+  if (MaxValid) max_count = NUM_MIN(max_count,MaxCount);
+  
+  // check that at least MinCount matches take place (non-speculative)
+  TIndex idx = at;
+  for (TSize c = 1;c <= MinCount;c++)
+    if (Quantified->match(brstack,candidate,idx))
+      idx += Quantified->subsequentMatchLength();
+    else 
+      return false;
+  
+  // determine number of remaining matches
+  TSize remcount = max_count-MinCount;
+  
+  // test for the remaining matches in a way that depends on Greedy flag
+  if (Greedy) {
+    // try to gobble up as many matches of quantified part as possible
+    // (speculative)
+    
+    stack<backtrack_stack_entry> successful_indices;
+    { backtrack_stack_entry entry = { idx,brstack.getRewindInfo() };
+      successful_indices.push(entry);
+      }
+    
+    while (Quantified->match(brstack,candidate,idx) && successful_indices.size()-1 < remcount) {
+      idx += Quantified->subsequentMatchLength();
+      backtrack_stack_entry entry = { idx,brstack.getRewindInfo() };
+      successful_indices.push(entry);
+      }
+    
+    // backtrack until rest of string also matches
+    while (successful_indices.size() && !matchNext(brstack,candidate,successful_indices.top().Index)) {
+      brstack.rewind(successful_indices.top().RewindInfo);
+      successful_indices.pop();
+      }
+    
+    if (successful_indices.size()) {
+      MatchLength = successful_indices.top().Index - at;
+      return true;
+      }
+    else return false;
+    }
+  else {
+    for (TSize c = 0;c <= remcount;c++) {
+      if (matchNext(brstack,candidate,idx)) {
+        MatchLength = idx-at;
+        return true;
+        }
+      // following part runs once too much, effectively: 
+      // if c == remcount, idx may be increased, but the search fails anyway
+      // => no problem
+      if (Quantified->match(brstack,candidate,idx))
+        idx += Quantified->subsequentMatchLength();
+      else 
+        return false;
+      }
+    return false;
+    }
+  }
+
+
+
+
+// regex_string::string_matcher -----------------------------------------------
+regex_string::string_matcher::string_matcher(string const &matchstr)
+  : MatchStr(matchstr) { 
+  MatchLength = MatchStr.size(); 
+  }
+
+
+
+
+bool regex_string::string_matcher::match(backref_stack &brstack,string const &candidate,TIndex at) {
+  if (at+MatchStr.size() > candidate.size()) return false;
+  return (string(candidate,at,MatchStr.size()) == MatchStr) &&
+    matchNext(brstack,candidate,at+MatchStr.size());
   }
 
 
 
 
 // regex_string::class_matcher ------------------------------------------------
-void regex_string::class_matcher::expandClass() {
-  if (!CharClass.size()) return;
-  string finalclass(1,CharClass[0]);
-  char lastchar = CharClass[0];
-
-  for (TIndex index = 1;index < CharClass.size();index++) {
-    if ((CharClass[index] == XSTRRE_CLASSRANGE) && (index < CharClass.size()-1)) {
-      for (char ch = lastchar+1;ch < CharClass[index+1];ch++)
-        finalclass += ch;
-      }
-    else finalclass += CharClass[index];
-    lastchar = CharClass[index];
+regex_string::class_matcher::class_matcher(string const &cls)
+  : Negated(false) {
+  MatchLength = 1;
+  
+  if (cls.size() && cls[0] == XSTRRE_CLASSNEG) {
+    expandClass(cls.substr(1));
+    Negated = true;
     }
-  CharClass = finalclass;
+  else
+    expandClass(cls);
+  }
+
+
+
+
+bool regex_string::class_matcher::match(backref_stack &brstack,string const &candidate,TIndex at) {
+  if (at >= candidate.size()) return false;
+  
+  bool result = Set[candidate[at]];
+  if (Negated) result = !result;
+  
+  return result && matchNext(brstack,candidate,at+1);
+  }
+
+
+
+
+void regex_string::class_matcher::expandClass(string const &cls) {
+  memset(&Set,0,sizeof(Set));
+  
+  if (cls.size() == 0) return;
+  Set[cls[0]] = true;
+  char lastchar = cls[0];
+
+  for (TIndex index = 1;index < cls.size();index++) {
+    if ((cls[index] == XSTRRE_CLASSRANGE) && (index < cls.size()-1)) {
+      for (char ch = lastchar+1;ch < cls[index+1];ch++)
+        Set[ch] = true;
+      }
+    else Set[cls[index]] = true;
+    lastchar = cls[index];
+    }
+  }
+
+
+
+
+// regex_string::special_class_matcher ----------------------------------------
+regex_string::special_class_matcher::special_class_matcher(type tp)
+  : Type(tp) {
+  MatchLength = 1;
+  }
+
+
+
+
+bool regex_string::special_class_matcher::match(backref_stack &brstack,string const &candidate,TIndex at) {
+  if (at >= candidate.size()) return false;
+        enum type { DIGIT,NONDIGIT,ALNUM,NONALNUM,SPACE,NONSPACE };
+  
+  bool result;
+  switch (Type) {
+    case DIGIT: result = isdigit(candidate[at]);
+      break;
+    case NONDIGIT: result = !isdigit(candidate[at]);
+      break;
+    case ALNUM: result = isalnum(candidate[at]);
+      break;
+    case NONALNUM: result = !isalnum(candidate[at]);
+      break;
+    case SPACE: result = isspace(candidate[at]);
+      break;
+    case NONSPACE: result = !isspace(candidate[at]);
+      break;
+    default:
+      EX_THROW(regex,ECRE_INVESCAPE)
+    }
+  
+  return result && matchNext(brstack,candidate,at+1);
   }
 
 
 
 
 // regex_string::backref_open_matcher ------------------------------------------
-bool regex_string::backref_open_matcher::match(regex_string::backref_heap &brheap,
-string const &candidate,TIndex at) {
-  backref backref;
-  backref.checkpoint(at);
+bool regex_string::backref_open_matcher::match(backref_stack &brstack,string const &candidate,TIndex at) {
+  backref_stack::rewind_info ri = brstack.getRewindInfo();
+  brstack.open(at);
+  
+  bool result = matchNext(brstack,candidate,at);
 
-  brheap.push_back(backref);
-
-  bool result = matchNext(brheap,candidate,at);
-
-  if (!result) { brheap.pop_back(); }
+  if (!result)
+    brstack.rewind(ri);
   return result;
   }
 
@@ -144,11 +415,23 @@ string const &candidate,TIndex at) {
 
 
 // regex_string::backref_close_matcher -----------------------------------------
-bool regex_string::backref_close_matcher::match(regex_string::backref_heap &brheap,
-string const &candidate,TIndex at) {
-  if (brheap.size() == 0) EX_THROW(regex,ECRE_UNBALBACKREF)
-  brheap.back().makeReady(at);
-  return matchNext(brheap,candidate,at);
+bool regex_string::backref_close_matcher::match(backref_stack &brstack,string const &candidate,TIndex at) {
+  backref_stack::rewind_info ri = brstack.getRewindInfo();
+  brstack.close(at);
+  
+  bool result = matchNext(brstack,candidate,at);
+
+  if (!result)
+    brstack.rewind(ri);
+  return result;
+  }
+
+
+
+
+// regex_string::alternative_matcher::connector -------------------------------
+bool regex_string::alternative_matcher::connector::match(backref_stack &brstack,string const &candidate,TIndex at) {
+  return matchNext(brstack,candidate,at);
   }
 
 
@@ -165,7 +448,33 @@ regex_string::alternative_matcher::~alternative_matcher() {
 
 
 
-void regex_string::alternative_matcher::operator+=(matcher *mat) {
+TSize regex_string::alternative_matcher::minimumMatchLength() const {
+  TSize result = 0;
+  bool is_first = true;
+  FOREACH_CONST(first,AltList,wAltList)
+    if (is_first) {
+      result = (*first)->minimumMatchLength();
+      is_first = true;
+      }
+    else {
+      TSize current = (*first)->minimumMatchLength();
+      if (current < result) result = current;
+      }
+  return result;
+  }
+
+
+
+
+void regex_string::alternative_matcher::setNext(matcher *next,bool deletenext = true) {
+  matcher::setNext(next);
+  Connector.setNext(next,false);
+  }
+
+
+
+
+void regex_string::alternative_matcher::addAlternative(matcher *mat) {
   AltList.push_back(mat);
   matcher *searchlast = mat,*last = NULL;
   while (searchlast) {
@@ -178,11 +487,10 @@ void regex_string::alternative_matcher::operator+=(matcher *mat) {
 
 
 
-bool regex_string::alternative_matcher::match(regex_string::backref_heap &brheap,
-string const &candidate,TIndex at) {
+bool regex_string::alternative_matcher::match(backref_stack &brstack,string const &candidate,TIndex at) {
   vector<matcher *>::iterator first = AltList.begin(),last = AltList.end();
   while (first != last) {
-    if ((*first)->match(brheap,candidate,at)) {
+    if ((*first)->match(brstack,candidate,at)) {
       MatchLength = 0;
       matcher const *object = *first;
       while (object != &Connector) {
@@ -200,14 +508,20 @@ string const &candidate,TIndex at) {
 
 
 // regex_string::backref_matcher ----------------------------------------------
-bool regex_string::backref_matcher::match(backref_heap &brheap,
-string const &candidate,TIndex at) {
-  string matchstr = brheap[Backref].get(candidate);
+regex_string::backref_matcher::backref_matcher(TIndex backref)
+  : Backref(backref) { 
+  }
+
+
+
+
+bool regex_string::backref_matcher::match(backref_stack &brstack,string const &candidate,TIndex at) {
+  string matchstr = brstack.get(Backref,candidate);
   MatchLength = matchstr.size();
 
   if (at+matchstr.size() > candidate.size()) return false;
   return (candidate.substr(at,matchstr.size()) == matchstr) &&
-    matchNext(brheap,candidate,at+matchstr.size());
+    matchNext(brstack,candidate,at+matchstr.size());
   }
 
 
@@ -216,13 +530,13 @@ string const &candidate,TIndex at) {
 // regex_string ---------------------------------------------------------------
 bool regex_string::match(string const &candidate,TIndex from) {
   LastCandidate = candidate;
-  BackrefHeap.clear();
+  BackrefStack.clear();
   if (!ParsedRegex) parse();
   if (!ParsedRegex) return true;
   for (TIndex index = from;index < candidate.size();index++)
-    if (ParsedRegex->match(BackrefHeap,candidate,index)) {
+    if (ParsedRegex->match(BackrefStack,candidate,index)) {
       MatchIndex = index;
-      MatchLength = ParsedRegex->collectMatchLength();
+      MatchLength = ParsedRegex->subsequentMatchLength();
       return true;
       }
   return false;
@@ -233,11 +547,11 @@ bool regex_string::match(string const &candidate,TIndex from) {
 
 bool regex_string::matchAt(string const &candidate,TIndex at) {
   LastCandidate = candidate;
-  BackrefHeap.clear();
+  BackrefStack.clear();
   if (!ParsedRegex) parse();
-  if (ParsedRegex->match(BackrefHeap,candidate,at)) {
+  if (ParsedRegex->match(BackrefStack,candidate,at)) {
     MatchIndex = at;
-    MatchLength = ParsedRegex->collectMatchLength();
+    MatchLength = ParsedRegex->subsequentMatchLength();
     return true;
     }
   return false;
@@ -246,30 +560,23 @@ bool regex_string::matchAt(string const &candidate,TIndex at) {
 
 
 
-string regex_string::replaceAll(string const &candidate,
-string const &replacement,TIndex from) {
+string regex_string::replaceAll(string const &candidate,string const &replacement,TIndex from) {
   string result;
   string tempreplacement;
 
   LastCandidate = candidate;
-  BackrefHeap.clear();
-
   if (!ParsedRegex) parse();
 
   for (TIndex index = from;index < candidate.size();) {
-    if (ParsedRegex->match(BackrefHeap,candidate,index)) {
-      TIndex matchlength = ParsedRegex->collectMatchLength();
+    BackrefStack.clear();
+    if (ParsedRegex->match(BackrefStack,candidate,index)) {
+      TIndex matchlength = ParsedRegex->subsequentMatchLength();
       tempreplacement = replacement;
 
-      vector<backref>::iterator first = BackrefHeap.begin(),
-        last = BackrefHeap.end();
-      TSize brindex = 0;
-      while (first != last) {
-        tempreplacement = findReplace(tempreplacement,XSTRRE_BACKREF+unsigned2dec(brindex),
-          BackrefHeap[index].get(LastCandidate));
-        first++;
-	brindex++;
-        }
+      TSize backrefs = BackrefStack.count();
+      for (TIndex i = 0;i < backrefs;i++)
+        tempreplacement = findReplace(tempreplacement,XSTRRE_BACKREF+unsigned2dec(i),
+          BackrefStack.get(i,LastCandidate));
 
       result += tempreplacement;
       index += matchlength;
@@ -305,8 +612,23 @@ regex_string::matcher *regex_string::parseRegex(string const &expr) {
           ch = expr[index++];
           if (isdigit(ch))
             object = new backref_matcher(ch-'0');
-          else
-            object = new string_matcher(string(1,ch));
+          else {
+	    switch (ch) {
+	      case 'd': object = new special_class_matcher(special_class_matcher::DIGIT);
+	        break;
+	      case 'D': object = new special_class_matcher(special_class_matcher::NONDIGIT);
+	        break;
+	      case 'w': object = new special_class_matcher(special_class_matcher::ALNUM);
+	        break;
+	      case 'W': object = new special_class_matcher(special_class_matcher::NONALNUM);
+	        break;
+	      case 's': object = new special_class_matcher(special_class_matcher::SPACE);
+	        break;
+	      case 'S': object = new special_class_matcher(special_class_matcher::NONSPACE);
+	        break;
+	      default: object = new string_matcher(string(1,ch));
+	      }
+	    }
           EX_MEMCHECK(object)
           break;
         }
@@ -329,23 +651,22 @@ regex_string::matcher *regex_string::parseRegex(string const &expr) {
             alternative = new alternative_matcher;
             EX_MEMCHECK(alternative)
             }
-          (*alternative) += firstobject;
+          alternative->addAlternative(firstobject);
           firstobject = NULL;
           lastobject = NULL;
           break;
           }
-      case XSTRRE_CLASSSTART:
-        try {
+      case XSTRRE_CLASSSTART: {
           TIndex classend = expr.find(XSTRRE_CLASSSTOP,index);
+          if (classend == string::npos)
+            EX_THROW(regex,ECRE_UNTERMCLASS)
           object = new class_matcher(expr.substr(index,classend-index));
           EX_MEMCHECK(object)
-
+  
           index = classend+1;
+          break;
           }
-        EX_CONVERT(generic,EC_ITEMNOTFOUND,regex,ECRE_UNTERMCLASS)
-        break;
       case XSTRRE_BACKREFSTART: {
-          quantified = false;
           matcher *parsed;
 
           TSize brlevel = 1;
@@ -387,7 +708,7 @@ regex_string::matcher *regex_string::parseRegex(string const &expr) {
       case XSTRRE_BACKREFSTOP:
         EX_THROW(regex,ECRE_UNBALBACKREF)
       default:
-        object = new string_matcher(string(1,expr[index-1]));
+        object = new string_matcher(expr.substr(index-1,1));
         EX_MEMCHECK(object)
         break;
       }
@@ -405,6 +726,8 @@ regex_string::matcher *regex_string::parseRegex(string const &expr) {
         }
       }
 
+    // we need this for the alternative matcher, which also inserts
+    // its connector
     matcher *searchlast = quantifier ? quantifier : object;
     while (searchlast) {
       lastobject = searchlast;
@@ -412,7 +735,7 @@ regex_string::matcher *regex_string::parseRegex(string const &expr) {
       }
     }
   if (alternative) {
-    (*alternative) += firstobject;
+    alternative->addAlternative(firstobject);
     return alternative;
     }
   else return firstobject;
@@ -456,8 +779,8 @@ regex_string::quantifier *regex_string::parseQuantifier(string const &expr,TInde
         TIndex rangeindex = quantspec.find(XSTRREQ_RANGE);
         if (rangeindex == quantspec.size()-1) {
           min = evalUnsigned(
-	    quantspec.substr(0,rangeindex)+
-	    quantspec.substr(rangeindex+1));
+            quantspec.substr(0,rangeindex)+
+            quantspec.substr(rangeindex+1));
           quant = new quantifier(isGreedy(expr,at),min);
           }
         else {

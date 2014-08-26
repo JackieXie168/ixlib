@@ -8,17 +8,21 @@ LDADD=../src/libixion.la
 CXXFLAGS=-I../src -g
 
 check_PROGRAMS=teststring testnumconv testre testcmdline testtextfile \
-  testscanner testgeo testxml testmat
+  testgeo testxml testmat
 
-teststring_SOURCES=teststring.cc
-testnumconv_SOURCES=testnumconv.cc
-testre_SOURCES=testre.cc
-testcmdline_SOURCES=testcmdline.cc frobnitz.par
-testtextfile_SOURCES=testtextfile.cc
-testscanner_SOURCES=testscanner.cc
-testgeo_SOURCES=testgeo.cc
-testxml_SOURCES=testxml.cc test.xml
-testmat_SOURCES=testmat.cc
+EXTRA_DIST=test.xml src.txt frobnitz.par runem
+
+noinst_SCRIPTS=runem
+
+teststring_SOURCES=teststring.cc test.hh
+testnumconv_SOURCES=testnumconv.cc test.hh
+testre_SOURCES=testre.cc test.hh
+testcmdline_SOURCES=testcmdline.cc test.hh
+testtextfile_SOURCES=testtextfile.cc test.hh
+# testscanner_SOURCES=testscanner.cc
+testgeo_SOURCES=testgeo.cc test.hh
+testxml_SOURCES=testxml.cc test.hh
+testmat_SOURCES=testmat.cc test.hh
 
 check-local:
 	./runem $(check_PROGRAMS)

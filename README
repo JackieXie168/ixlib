@@ -24,6 +24,9 @@ and is considered production-quality code. See the TODO section of this
 file for things that may change in future versions. Most of this
 involves the garbage collector.
 
+ixlib now has some regression tests, execute them after building by
+doing "make check".
+
 Using ixlib is as easy as abc. To compile, just type
 
 c++ -c my_program.cc `ixlib-config --cflags`

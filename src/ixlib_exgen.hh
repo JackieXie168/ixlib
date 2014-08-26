@@ -1,9 +1,6 @@
 // ----------------------------------------------------------------------------
 //  Description      : Generic exceptions
 // ----------------------------------------------------------------------------
-//  Remarks          : none.
-//
-// ----------------------------------------------------------------------------
 //  (c) Copyright 1996 by iXiONmedia, all rights reserved.
 // ----------------------------------------------------------------------------
 
@@ -35,12 +32,10 @@
 #define EC_DIMENSIONMISMATCH		10
 #define EC_CANCELLED			11
 #define EC_EMPTYSET			12
+#define EC_CANNOTREMOVEFROMGC		13
+#define EC_REMAININGREF			14
 
 #define ECMEM_GENERAL                   0
-#define ECMEM_CONVENTIONAL              1
-#define ECMEM_EXTENDED                  2
-#define ECMEM_EMS                       3
-#define ECMEM_SWAP                      4
 
 
 

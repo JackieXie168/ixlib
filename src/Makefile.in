@@ -16,8 +16,6 @@
 # (c) Andreas Kloeckner 2000. See COPYING for license.
 # -----------------------------------------------------------------------------
 
-# Source files ----------------------------------------------------------------
-
 
 SHELL = @SHELL@
 
@@ -103,7 +101,12 @@ USE_NLS = @USE_NLS@
 VERSION = @VERSION@
 l = @l@
 
-basic_headers = ixlib_base.hh ixlib_array.hh ixlib_garbage.hh   ixlib_exbase.hh ixlib_exgen.hh ixlib_exio.hh   ixlib_string.hh ixlib_re.hh   ixlib_numconv.hh ixlib_numeric.hh   ixlib_random.hh
+localedir = $(datadir)/locale
+DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
+INCLUDES = -I..
+
+# Source files ----------------------------------------------------------------
+basic_headers = ixlib_base.hh ixlib_array.hh ixlib_garbage.hh   ixlib_exbase.hh ixlib_exgen.hh ixlib_exio.hh   ixlib_string.hh ixlib_re.hh   ixlib_numconv.hh ixlib_numeric.hh   ixlib_random.hh ixlib_ring_queue.hh
 
 
 basic_objects = base.cc exbase.cc exgen.cc exio.cc   string.cc numconv.cc numeric.cc re.cc
@@ -115,7 +118,7 @@ advanced_headers = ixlib_cmdline.hh   ixlib_geometry.hh ixlib_geometry_impl.hh  
 advanced_objects = cmdline.cc textfile.cc scanner.cc xml.cc   js_value.cc js_expression.cc js_instruction.cc js_array.cc js_library.cc   js_interpreter.cc
 
 
-internal_headers = ixlib_token_xml.hh ixlib_scanxml.hh ixlib_scanjs.hh   ixlib_js_internals.hh ixlib_token_javascript.hh
+internal_headers = ixlib_token_xml.hh ixlib_scanxml.hh ixlib_scanjs.hh   ixlib_js_internals.hh ixlib_token_javascript.hh   ixlib_i18n.hh 
 
 
 internal_objects = lex.xml.cc lex.javascript.cc
@@ -132,7 +135,8 @@ lib_LTLIBRARIES = libixion.la
 libixion_la_SOURCES = $(basic_headers) $(basic_objects)    $(advanced_headers) $(advanced_objects)    $(internal_headers) $(internal_objects)
 
 libixion_la_LIBADD = @LEXLIB@
-libixion_la_LDFLAGS = -version-info @IXLIB_BINARY_IFACE_VERSION@:@IXLIB_BINARY_REVISION@:@IXLIB_BINARY_AGE@
+libixion_la_LDFLAGS = -version-info @IXLIB_BINARY_IFACE_VERSION@:@IXLIB_BINARY_REVISION@:@IXLIB_BINARY_AGE@   -no-undefined
+
 
 include_HEADERS = $(basic_headers) $(advanced_headers)
 noinst_HEADERS = $(internal_headers)
@@ -141,8 +145,6 @@ CONFIG_HEADER = ../ixlib_config.hh
 CONFIG_CLEAN_FILES = 
 LTLIBRARIES =  $(lib_LTLIBRARIES)
 
-
-DEFS = @DEFS@ -I. -I$(srcdir) -I..
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
@@ -313,16 +315,17 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-base.lo base.o : base.cc ixlib_base.hh ../ixlib_config.hh
+base.lo base.o : base.cc ixlib_base.hh ../ixlib_config.hh ixlib_i18n.hh
 cmdline.lo cmdline.o : cmdline.cc ixlib_textfile.hh ixlib_numeric.hh \
 	ixlib_base.hh ../ixlib_config.hh ixlib_exgen.hh ixlib_exbase.hh \
 	ixlib_cmdline.hh ixlib_string.hh
 exbase.lo exbase.o : exbase.cc ixlib_exbase.hh ixlib_base.hh \
 	../ixlib_config.hh
-exgen.lo exgen.o : exgen.cc ixlib_exgen.hh ixlib_exbase.hh ixlib_base.hh \
-	../ixlib_config.hh ixlib_numconv.hh ixlib_string.hh
-exio.lo exio.o : exio.cc ixlib_exio.hh ixlib_exbase.hh ixlib_base.hh \
-	../ixlib_config.hh
+exgen.lo exgen.o : exgen.cc ixlib_i18n.hh ixlib_exgen.hh ixlib_exbase.hh \
+	ixlib_base.hh ../ixlib_config.hh ixlib_numconv.hh \
+	ixlib_string.hh
+exio.lo exio.o : exio.cc ixlib_i18n.hh ixlib_exio.hh ixlib_exbase.hh \
+	ixlib_base.hh ../ixlib_config.hh
 js_array.lo js_array.o : js_array.cc ixlib_js_internals.hh \
 	ixlib_javascript.hh ixlib_string.hh ixlib_base.hh \
 	../ixlib_config.hh ixlib_exgen.hh ixlib_exbase.hh \
@@ -337,9 +340,9 @@ js_instruction.lo js_instruction.o : js_instruction.cc \
 	ixlib_base.hh ../ixlib_config.hh ixlib_exgen.hh ixlib_exbase.hh \
 	ixlib_garbage.hh ixlib_scanner.hh ixlib_token_javascript.hh \
 	ixlib_token_lex.hh
-js_interpreter.lo js_interpreter.o : js_interpreter.cc ixlib_base.hh \
-	../ixlib_config.hh ixlib_scanjs.hh ixlib_numconv.hh \
-	ixlib_string.hh ixlib_exgen.hh ixlib_exbase.hh \
+js_interpreter.lo js_interpreter.o : js_interpreter.cc ixlib_i18n.hh \
+	ixlib_base.hh ../ixlib_config.hh ixlib_scanjs.hh \
+	ixlib_numconv.hh ixlib_string.hh ixlib_exgen.hh ixlib_exbase.hh \
 	ixlib_js_internals.hh ixlib_javascript.hh ixlib_garbage.hh \
 	ixlib_scanner.hh ixlib_token_javascript.hh ixlib_token_lex.hh
 js_library.lo js_library.o : js_library.cc ixlib_js_internals.hh \
@@ -347,8 +350,8 @@ js_library.lo js_library.o : js_library.cc ixlib_js_internals.hh \
 	../ixlib_config.hh ixlib_exgen.hh ixlib_exbase.hh \
 	ixlib_garbage.hh ixlib_scanner.hh ixlib_numconv.hh \
 	ixlib_random.hh
-js_value.lo js_value.o : js_value.cc ixlib_numconv.hh ixlib_base.hh \
-	../ixlib_config.hh ixlib_string.hh ixlib_exgen.hh \
+js_value.lo js_value.o : js_value.cc ixlib_i18n.hh ixlib_numconv.hh \
+	ixlib_base.hh ../ixlib_config.hh ixlib_string.hh ixlib_exgen.hh \
 	ixlib_exbase.hh ixlib_re.hh ixlib_js_internals.hh \
 	ixlib_javascript.hh ixlib_garbage.hh ixlib_scanner.hh \
 	ixlib_token_javascript.hh ixlib_token_lex.hh
@@ -366,20 +369,20 @@ numconv.lo numconv.o : numconv.cc ixlib_exgen.hh ixlib_exbase.hh \
 	ixlib_string.hh
 numeric.lo numeric.o : numeric.cc ixlib_numeric.hh ixlib_base.hh \
 	../ixlib_config.hh ixlib_exgen.hh ixlib_exbase.hh
-re.lo re.o : re.cc ixlib_exgen.hh ixlib_exbase.hh ixlib_base.hh \
-	../ixlib_config.hh ixlib_numeric.hh ixlib_numconv.hh \
-	ixlib_string.hh ixlib_re.hh
-scanner.lo scanner.o : scanner.cc ixlib_numconv.hh ixlib_base.hh \
-	../ixlib_config.hh ixlib_string.hh ixlib_exgen.hh \
+re.lo re.o : re.cc ixlib_i18n.hh ixlib_exgen.hh ixlib_exbase.hh \
+	ixlib_base.hh ../ixlib_config.hh ixlib_numeric.hh \
+	ixlib_numconv.hh ixlib_string.hh ixlib_re.hh
+scanner.lo scanner.o : scanner.cc ixlib_i18n.hh ixlib_numconv.hh \
+	ixlib_base.hh ../ixlib_config.hh ixlib_string.hh ixlib_exgen.hh \
 	ixlib_exbase.hh ixlib_token_lex.hh ixlib_scanner.hh
 string.lo string.o : string.cc ixlib_numconv.hh ixlib_base.hh \
 	../ixlib_config.hh ixlib_string.hh ixlib_exgen.hh \
 	ixlib_exbase.hh
 textfile.lo textfile.o : textfile.cc ixlib_textfile.hh
-xml.lo xml.o : xml.cc ixlib_xml.hh ixlib_exbase.hh ixlib_base.hh \
-	../ixlib_config.hh ixlib_scanner.hh ixlib_string.hh \
-	ixlib_exgen.hh ixlib_numconv.hh ixlib_token_xml.hh \
-	ixlib_token_lex.hh ixlib_scanxml.hh
+xml.lo xml.o : xml.cc ixlib_i18n.hh ixlib_xml.hh ixlib_exbase.hh \
+	ixlib_base.hh ../ixlib_config.hh ixlib_scanner.hh \
+	ixlib_string.hh ixlib_exgen.hh ixlib_numconv.hh \
+	ixlib_token_xml.hh ixlib_token_lex.hh ixlib_scanxml.hh
 
 info-am:
 info: info-am

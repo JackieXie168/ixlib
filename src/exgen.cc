@@ -7,6 +7,7 @@
 
 
 
+#include "ixlib_i18n.hh"
 #include <ixlib_exgen.hh>
 #include <ixlib_numconv.hh>
 
@@ -32,6 +33,15 @@ static char *(PlainText[]) = {
   N_("Dimension mismatch"),
   N_("Operation cancelled"),
   N_("Unable to operate on empty set"),
+  N_("Unable to remove GC entry"),
+  N_("Unable to protect non-freeable entry")
+  };
+
+
+
+
+static char *(MemPlainText[]) = { 
+  N_("Unable to allocate memory"),
   };
 
 
@@ -62,6 +72,6 @@ memory_exception::memory_exception(TErrorCode error,TSize bytesmissing,
 
 
 char const *memory_exception::getText() const {
-  return _("Unable to allocate memory");
+  return _(MemPlainText[Error]);
   }
 

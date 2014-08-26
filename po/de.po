@@ -5,182 +5,520 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ixlib\n"
-"POT-Creation-Date: 2000-09-14 16:23+0200\n"
-"PO-Revision-Date: 2000-05-28\n"
+"POT-Creation-Date: 2001-03-23 21:07+0100\n"
+"PO-Revision-Date: 2001-03-18\n"
 "Last-Translator: Andreas Kloeckner <ak@ixion.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: ENCODING\n"
 
-#: src/exgen.cc:22
+#: src/exgen.cc:23
 msgid "Unable to evaluate expression"
 msgstr "Ausdruck nicht auswertbar"
 
-#: src/exgen.cc:23
+#: src/exgen.cc:24
 msgid "Function not yet implemented"
 msgstr "Funktion nicht implementiert"
 
-#: src/exgen.cc:24
+#: src/exgen.cc:25
 msgid "General error"
 msgstr "Allgemeiner Fehler"
 
-#: src/exgen.cc:25
+#: src/exgen.cc:26
 msgid "NULL pointer encountered"
 msgstr "NULL-Zeiger entdeckt"
 
-#: src/exgen.cc:26
+#: src/exgen.cc:27
 msgid "Invalid parameter"
 msgstr "Ungueltiger Parameter"
 
-#: src/exgen.cc:27
+#: src/exgen.cc:28
 msgid "Index out of range"
 msgstr "Index ausserhalb des zulaessigen Bereichs"
 
-#: src/exgen.cc:28
+#: src/exgen.cc:29
 msgid "Buffer overrun"
 msgstr "Puffer-Ueberlauf"
 
-#: src/exgen.cc:29
+#: src/exgen.cc:30
 msgid "Buffer underrun"
 msgstr "Puffer-Unterlauf"
 
-#: src/exgen.cc:30
+#: src/exgen.cc:31
 msgid "Item not found"
 msgstr "Element nicht gefunden"
 
-#: src/exgen.cc:31
+#: src/exgen.cc:32 src/js_interpreter.cc:53
 msgid "Invalid operation"
 msgstr "Ungueltige Operation"
 
-#: src/exgen.cc:32
+#: src/exgen.cc:33
 msgid "Dimension mismatch"
 msgstr "Dimension unpassend"
 
-#: src/exgen.cc:33
+#: src/exgen.cc:34
 msgid "Operation cancelled"
 msgstr "Operation abgebrochen"
 
-#: src/exgen.cc:34
-#, fuzzy
+#: src/exgen.cc:35
 msgid "Unable to operate on empty set"
-msgstr "Nicht genug Speicher"
+msgstr "Operation auf leerer Menge nicht moeglich"
 
-#: src/exgen.cc:65
+#: src/exgen.cc:36
+msgid "Unable to remove GC entry"
+msgstr "GC-Eintrag nicht entfernbar"
+
+#: src/exgen.cc:37
+msgid "Unable to protect non-freeable entry"
+msgstr "Nicht-freigebbarer GC-Eintrag jetzt schutzlos"
+
+#: src/exgen.cc:44
 msgid "Unable to allocate memory"
 msgstr "Nicht genug Speicher"
 
-#: src/exio.cc:22
+#: src/exio.cc:23
 msgid "Unmatched wildcard"
 msgstr "Ungematchtes Jokerzeichen"
 
-#: src/exio.cc:23
+#: src/exio.cc:24
 msgid "Parameter error: wildcard"
 msgstr "Parameterfehler: Wildcard"
 
-#: src/exio.cc:24
+#: src/exio.cc:25
 msgid "Path syntax error"
 msgstr "Pfadsyntax-Fehler"
 
-#: src/exio.cc:25
+#: src/exio.cc:26
 msgid "Path relative or invalid"
 msgstr "Pfad relativ oder ungueltig"
 
-#: src/exio.cc:26
+#: src/exio.cc:27
 msgid "Seek error"
 msgstr "Zugriffsfehler"
 
-#: src/exio.cc:27
-msgid "Read request across EOF"
-msgstr "Lesezugriff ueber Dateiende"
-
 #: src/exio.cc:28
-msgid "Write request across EOF"
-msgstr "Schreibzugriff ueber Dateiende"
+msgid "Read request across EOF"
+msgstr "Lesezugriff über Dateiende"
 
 #: src/exio.cc:29
+msgid "Write request across EOF"
+msgstr "Schreibzugriff über Dateiende"
+
+#: src/exio.cc:30
 msgid "Write protection violation"
 msgstr "Schreibschutz-Verletzung"
 
-#: src/exio.cc:30
+#: src/exio.cc:31
 msgid "File clipping violation"
 msgstr "Dateiende-Verletzung"
 
-#: src/exio.cc:31
+#: src/exio.cc:32
 msgid "Internal error"
 msgstr "Interner Fehler"
 
-#: src/exio.cc:32
+#: src/exio.cc:33
 msgid "No such file or directory"
 msgstr "Datei oder Verzeichnis nicht gefunden"
 
-#: src/exio.cc:33
+#: src/exio.cc:34
 msgid "Access denied"
 msgstr "Zugriff verweigert"
 
-#: src/exio.cc:34
+#: src/exio.cc:35
 msgid "File exists"
 msgstr "Datei existiert bereits"
 
-#: src/exio.cc:35
+#: src/exio.cc:36
 msgid "Too many open files"
 msgstr "Zu viele offene Dateien"
 
-#: src/exio.cc:36
+#: src/exio.cc:37
 msgid "Out of media space"
 msgstr "Kein Platz mehr auf dem Medium"
 
-#: src/exio.cc:37
+#: src/exio.cc:38
 msgid "File too big"
 msgstr "Datei zu gross"
 
-#: src/exio.cc:38
+#: src/exio.cc:39
 msgid "Hardware failure"
 msgstr "Hardware-Versagen"
 
-#: src/exio.cc:39
+#: src/exio.cc:40
 msgid "Path inaccessible"
 msgstr "Pfad unzugreifbar"
 
-#: src/exio.cc:40
+#: src/exio.cc:41
 msgid "Continuity violation"
 msgstr "Kontinuitaetsverletzung"
 
-#: src/exio.cc:41
+#: src/exio.cc:42
 msgid "Not supported"
 msgstr "Nicht unterstuetzt"
 
-#: src/exio.cc:42
+#: src/exio.cc:43
 msgid "Invalid file format"
 msgstr "Ungueltiges Dateiformat"
 
-#: src/exio.cc:43
+#: src/exio.cc:44
 msgid "Invalid replacement sequence"
 msgstr "Ungueltige Ersetzungssequenz"
 
-#: src/exio.cc:44
+#: src/exio.cc:45
 msgid "Invalid chunk"
 msgstr "Ungueltiger Chunk"
 
-#: src/exio.cc:45
+#: src/exio.cc:46
 msgid "CRC error"
 msgstr "CRC-Fehler"
 
-#: src/re.cc:27
+#: src/js_interpreter.cc:32
+msgid "instead of "
+msgstr "anstatt "
+
+#: src/js_interpreter.cc:51 src/xml.cc:48
+msgid "Unterminated comment"
+msgstr "Nicht beendeter Kommentar"
+
+#: src/js_interpreter.cc:52
+msgid "Cannot convert"
+msgstr "Konvertierung nicht moeglich"
+
+#: src/js_interpreter.cc:54
+msgid "Unexpected token encountered"
+msgstr "Unerwartetes Token entdeckt"
+
+#: src/js_interpreter.cc:55
+msgid "Unexpected end of file"
+msgstr "Unerwartetes Dateiende"
+
+#: src/js_interpreter.cc:56
+msgid "Cannot modify rvalue"
+msgstr "RValue nicht aenderbar"
+
+#: src/js_interpreter.cc:57
+msgid "Unknown identifier"
+msgstr "Unbekannter Bezeichner"
+
+#: src/js_interpreter.cc:58
+msgid "Unknown operator"
+msgstr "Unbekannter Operator"
+
+#: src/js_interpreter.cc:59
+msgid "Invalid non-local exit"
+msgstr "Unbekannter nicht-lokaler Ausgang"
+
+#: src/js_interpreter.cc:60
+msgid "Invalid number of arguments"
+msgstr "Ungueltige Argumenteanzahl"
+
+#: src/js_interpreter.cc:61
+msgid "Invalid token encountered"
+msgstr "Ungueltiges Token entdeckt"
+
+#: src/js_interpreter.cc:62
+msgid "Cannot redeclare identifier"
+msgstr "Bezeichner kann nicht redeklariert werden"
+
+#: src/js_interpreter.cc:215
+msgid "'(' in switch statement"
+msgstr "'(' in switch-Anweisung"
+
+#: src/js_interpreter.cc:219
+msgid "')' in switch statement"
+msgstr "')' in switch-Anweisung"
+
+#: src/js_interpreter.cc:222
+msgid "'{' in switch statement"
+msgstr "'{' in switch-Anweisung"
+
+#: src/js_interpreter.cc:251
+msgid "':' in case label"
+msgstr "':' in case-Label"
+
+#: src/js_interpreter.cc:264
+msgid "':' in default label"
+msgstr "':' in default-Label"
+
+#: src/js_interpreter.cc:277
+msgid "'}' in switch statement"
+msgstr "'}' in switch-Anweisung"
+
+#: src/js_interpreter.cc:288
+msgid "var keyword"
+msgstr "Schlüsselwort 'var'"
+
+#: src/js_interpreter.cc:291 src/js_interpreter.cc:311
+#: src/js_interpreter.cc:337 src/js_interpreter.cc:357
+msgid "variable identifier"
+msgstr "Variablenbezeichner"
+
+#: src/js_interpreter.cc:334
+msgid "const keyword"
+msgstr "Schlüsselwort 'const'"
+
+#: src/js_interpreter.cc:342 src/js_interpreter.cc:361
+msgid "initializer for constant"
+msgstr "Konstanten-Initialisierer"
+
+#: src/js_interpreter.cc:412
+msgid "function identifier"
+msgstr "Funktionsbezeichner"
+
+#: src/js_interpreter.cc:416
+msgid "'(' in function declaration"
+msgstr "'(' in Funktionsdeklaration"
+
+#: src/js_interpreter.cc:422
+msgid "parameter identifier"
+msgstr "Parameter-Bezeichner"
+
+#: src/js_interpreter.cc:430
+msgid "')' in function declaration"
+msgstr "')' in Funktionsdeklaration"
+
+#: src/js_interpreter.cc:433
+msgid "'{' in function definition"
+msgstr "'{' in Funktionsdefinition"
+
+#: src/js_interpreter.cc:447
+msgid "'(' in if statement"
+msgstr "'(' in if-Anweisung"
+
+#: src/js_interpreter.cc:451
+msgid "')' in if statement"
+msgstr "')' in if-Anweisung"
+
+#: src/js_interpreter.cc:468
+msgid "'(' in while statement"
+msgstr "'(' in while-Anweisung"
+
+#: src/js_interpreter.cc:472
+msgid "')' in while statement"
+msgstr "')' in while-Anweisung"
+
+#: src/js_interpreter.cc:489
+msgid "'while' in do-while"
+msgstr "'while' in do-while-Anweisung"
+
+#: src/js_interpreter.cc:492
+msgid "'(' in do-while statement"
+msgstr "')' in do-while-Anweisung"
+
+#: src/js_interpreter.cc:496
+msgid "')' in do-while statement"
+msgstr "')' in do-while-Anweisung"
+
+#: src/js_interpreter.cc:510
+msgid "'(' in for statement"
+msgstr "'(' in for-Anweisung"
+
+#: src/js_interpreter.cc:524 src/js_interpreter.cc:548
+msgid "')' in for statement"
+msgstr "')' in for-Anweisung"
+
+#. for (;;) ...
+#: src/js_interpreter.cc:538 src/js_interpreter.cc:543
+msgid "';' in for statement"
+msgstr "';' in for-Anweisung"
+
+#: src/js_interpreter.cc:580
+msgid "break label"
+msgstr "break-Marke"
+
+#: src/js_interpreter.cc:596
+msgid "continue label"
+msgstr "continue-Marke"
+
+#: src/js_interpreter.cc:674
+msgid "'(' in 'new' expression"
+msgstr "'(' in new-Ausdruck"
+
+#: src/js_interpreter.cc:686
+msgid "')' in 'new' expression"
+msgstr "')' in new-Ausdruck"
+
+#: src/js_interpreter.cc:774
+msgid "')' in function call"
+msgstr "')' in Funktionsaufruf"
+
+#: src/js_interpreter.cc:802
+msgid "']' in subscript"
+msgstr "']' in Indizierung"
+
+#: src/js_value.cc:29
+msgid "to string from "
+msgstr "in String aus "
+
+#: src/js_value.cc:36
+msgid "to int from "
+msgstr "in Ganzzahl aus"
+
+#: src/js_value.cc:43
+msgid "to float from "
+msgstr "in Fließkomma aus "
+
+#: src/js_value.cc:50
+msgid "to boolean from "
+msgstr "in Boolean aus "
+
+#: src/js_value.cc:69
+msgid "duplication of "
+msgstr "Duplizierung von "
+
+#: src/js_value.cc:77
+msgid "lookup of "
+msgstr "Lookup von "
+
+#: src/js_value.cc:77 src/js_value.cc:116 src/js_value.cc:125
+#: src/js_value.cc:133 src/js_value.cc:141
+msgid " on "
+msgstr " auf "
+
+#: src/js_value.cc:85
+msgid "subscript on "
+msgstr "Indizierung auf "
+
+#: src/js_value.cc:93
+msgid "call on "
+msgstr "Funktionsaufruf auf "
+
+#: src/js_value.cc:101
+msgid "construction on "
+msgstr "Konstruktion auf "
+
+#: src/js_value.cc:108
+msgid "assignment to "
+msgstr "Zuweisung an "
+
+#: src/js_value.cc:194
+msgid "prefix ++"
+msgstr "Präfix ++"
+
+#: src/js_value.cc:195 src/js_value.cc:197
+msgid "postfix ++"
+msgstr "Postfix ++"
+
+#: src/js_value.cc:196
+msgid "prefix --"
+msgstr "Präfix --"
+
+#: src/js_value.cc:199
+msgid "unary +"
+msgstr "Unäres +"
+
+#: src/js_value.cc:200
+msgid "unary -"
+msgstr "Unäres -"
+
+#: src/js_value.cc:249
+msgid "undefined"
+msgstr "undefined"
+
+#: src/js_value.cc:250
+msgid "null"
+msgstr "null"
+
+#: src/js_value.cc:251
+msgid "integer"
+msgstr "Ganzzahl"
+
+#: src/js_value.cc:252
+msgid "floating point"
+msgstr "Fließkomma"
+
+#: src/js_value.cc:253
+msgid "string"
+msgstr "String"
+
+#: src/js_value.cc:254
+msgid "function"
+msgstr "Funktion"
+
+#: src/js_value.cc:255
+msgid "object"
+msgstr "Objekt"
+
+#: src/js_value.cc:256
+msgid "built-in object"
+msgstr "eingebautes Objekt"
+
+#: src/js_value.cc:257
+msgid "host object"
+msgstr "Host-Objekt"
+
+#: src/js_value.cc:258
+msgid "scope"
+msgstr "Gültigkeitsbereich"
+
+#: src/js_value.cc:259
+msgid "bound method"
+msgstr "gebundene Methode"
+
+#: src/js_value.cc:260
+msgid "type"
+msgstr "Typ"
+
+#: src/js_value.cc:261
+msgid "unknown value type"
+msgstr "unbekannter Wertetyp"
+
+#: src/js_value.cc:1148
+msgid "by assignment"
+msgstr "durch Zuweisung"
+
+#: src/re.cc:28
 msgid "Invalid quantifier"
 msgstr "Ungueltiger Quantifizierer"
 
-#: src/re.cc:28
-msgid "Unbalanced backreference"
-msgstr "Unausgewogener Rueckgriff"
-
 #: src/re.cc:29
+msgid "Unbalanced backreference"
+msgstr "Unausgeglichene Backreference"
+
+#: src/re.cc:30
 msgid "Invalid escape sequence"
 msgstr "Ungueltige Escape-Sequenz"
 
-#: src/re.cc:30
-msgid "Invalid backreference"
-msgstr "Ungueltiger Rueckgriff"
-
 #: src/re.cc:31
+msgid "Invalid backreference"
+msgstr "Ungueltige Backreference"
+
+#: src/re.cc:32
 msgid "Unterminated character class"
 msgstr "Nicht beendete Zeichenklasse"
+
+#: src/scanner.cc:26
+msgid "Unknown token"
+msgstr "Unbekanntes Token"
+
+#: src/scanner.cc:27
+msgid "End of input"
+msgstr "Ende der Eingabe"
+
+#: src/xml.cc:41
+msgid "Syntax error"
+msgstr "Syntax-Fehler"
+
+#: src/xml.cc:42
+msgid "No text expected in this context"
+msgstr "Kein Text in diesem Kontext erwartet"
+
+#: src/xml.cc:43
+msgid "No literal expected in this context"
+msgstr "Kein Literal in diesem Kontext erwartet"
+
+#: src/xml.cc:44
+msgid "Literal expected"
+msgstr "Literal erwartet"
+
+#: src/xml.cc:45
+msgid "Unexpected end of input"
+msgstr "Unerwartetes Eingabeende"
+
+#: src/xml.cc:46
+msgid "Close tag expected"
+msgstr "Schließendes Tag erwartet"
+
+#: src/xml.cc:47
+msgid "Close tag has different name"
+msgstr "Abweichender Name in schließendem Tag"

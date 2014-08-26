@@ -1,10 +1,5 @@
 // ----------------------------------------------------------------------------
-//  Description      : scanner for xTextFile
-// ----------------------------------------------------------------------------
-//  Remarks          :
-//    - if more than one TokenRule match, the one that has the lowes
-//      index in the TokenRuleTable is valid.
-//
+//  Description      : scanner wrapper for FlexLexer
 // ----------------------------------------------------------------------------
 //  (c) Copyright 1999 by iXiONmedia, all rights reserved.
 // ----------------------------------------------------------------------------

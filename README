@@ -27,6 +27,9 @@ C++ under DOS. (puke!)
 Have fun!
 Andreas
 
+ATTENTION! In version 0.95.0, there's been a change to the JavaScript 
+interface! See the ChangeLog for details.
+
 -------------------------------------------------------------------------------
 1. What is ixlib?
 -------------------------------------------------------------------------------
@@ -34,14 +37,15 @@ Andreas
 ixlib is a small c++ tools library based upon the standard template
 library.  It provides
 
-* a javascript interpreter (ECMAscript 4, strict mode) [ixlib_javascript.hh]
+* a javascript interpreter (subset of ECMAscript 4, strict mode) 
+  [ixlib_javascript.hh]
 * an exception handling framework [ixlib_exbase.hh]
 * garbage collection [ixlib_garbage.hh]
 * automatic array management [ixlib_array.hh]
 * planar geometry (rectangles, regions) [ixlib_geometry.hh]
   polygons (rasterization, convex hull, smoothing, removal of crossings) 
   [ixlib_polygon.hh]
-  rasterization [ixlib_drawing_functions.hh]
+* rasterization [ixlib_drawing_functions.hh]
 * matrices (including linear system solver, Cholesky and LU decomposition,
   determinants, inversion, Gauss and Gauss-Jordan elimination)
   [ixlib_matrix.hh]
@@ -63,6 +67,8 @@ Some of the guidelines I tried to follow are:
 * conform to standards (XML, ECMAscript)
 * do not duplicate or mimic STL functionality (e.g. no separate
   string class), that is be strictly an STL-add-on
+* provide a complete internationalization framework for localized
+  texts and error messages
 
 Furthermore, every component of ixlib has been thoroughly tested and
 is considered production-quality code. Almost all of the interfaces
@@ -145,23 +151,17 @@ is exercised in that file.
 5. Documentation
 -------------------------------------------------------------------------------
 
-ixlib tries very hard to be self-documenting. Unless there's bitter
-need for it, I do not plan on writing documentation. However, I'd be
-glad to include any documentation or questions from other people
-(hint,hint :-).
+ixlib now has (doxygen-generated) documentation. It can be built via
+"make documentation" in the package root directory, and can the be
+found the "doc" directory.
+
+If you don't want to install doxygen, you can get a documentation tarball
+or view the same HTML documentation on-line at the ixlib homepage.
 
 -------------------------------------------------------------------------------
 6. TODO
 -------------------------------------------------------------------------------
-* ref's and polymorphism? I'd like to allow something like
-  
-  ref<superclass> u = ...
-  ref<subclass> v = u;
-  
-  This is impossible with the current garbage collector/refcounter,
-  which is silly. Anyone?
-  
-  ref<const T> isn't really feasible/interoperable with ref<T>
+* ref<const T> isn't really feasible/interoperable with ref<T>
 
 * convert matrix to refs.
 

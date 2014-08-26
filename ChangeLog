@@ -1,3 +1,99 @@
+2001-03-23  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/Makefile.am (libixion_la_LIBADD): small win32 build fix
+	  (libintl related)
+
+	* src/js_value.cc: function parameters were involuntarily passed by
+	  reference, fixed
+
+	* src/js_value.cc: added toInt to float and toFloat to int types
+
+        * src/js_value.cc: 1/5.0 works correctly now, returning 0.2 instead
+	  of 0.
+
+	* src/js_interpreter.cc: removed no_free_ref to RootScope,
+	  eliminating deep binding issues related to that.
+	  !!! ATTENTION !!! This also breaks source compatibility.
+          interpreter.RootScope is now a ref!
+
+	* src/ixlib_garbage.hh: added warning exceptions to
+	  no_free_ref, proper operation is now verified
+          (also required some changes to the reference_manager)
+
+	* src/ixlib_ring_queue.hh: added
+
+2001-03-21  Andreas Kloeckner  <ak@ixion.net>
+
+	* doxygen.cfg: made ixlib generate (some) documentation via doxygen.
+
+2001-03-17  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_garbage.hh: fixed bug in gc 
+	  (self-assignment of single ref)
+          and another one
+          (not declaring an explicit copy constructor on a ref,
+          even if covered by a constructor template, is fatal)
+
+2001-03-16  Andreas Kloeckner  <ak@ixion.net>
+
+	* added proper lexical scoping to javascript
+
+	* src/ixlib_garbage.hh: introduced a form of polymorphism,
+	  this needs some experimentation. source compatibility is
+	  maintained.
+
+2001-03-15  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/base.cc: added ixlibInitI18n() to allow ixlib's messages
+	  to be properly internationalized if desired.
+
+	* added correct German translations for all of ixlib's strings
+
+	* fixed some javascript brokenness introduced by code cleanup.
+
+2001-03-13  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/js_instruction.cc: prevented identifier redeclaration
+
+	* javascript code: cleanups, added constness
+          !!!CAUTION!!! This breaks binary and source compatibility
+          All calls to make[Constant]Int/Float/String must be changed
+          to makeConstant() or makeValue(). This is a good thing(tm) :)
+	  Further, all calls that formerly included a "want_lvalue" 
+          parameter have this parameter removed. Remove it also, or
+	  else virtual function lookup will fail to find your 
+          overrided functions!
+
+	* configure.in: bumped version to 0.95.0
+	  also bumped up interface version of shared library, to 
+	  guarantee breaking binary compatibility and forcing recompiles
+	  (as otherwise strange segfaults may result)
+
+2001-02-26  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_i18n.hh: libintl.h header doesn't need to be publicly
+	  available any more. (win32 build fix)
+
+2001-02-24  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/js_library.cc: win32 build fixes (constants, fp_classify)
+
+2001-02-22  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/js_library.cc: added non-compliant (but needed)
+	  Math.initRandom() method
+
+	* src/ixlib_random.hh: float_random.init() is now
+	  really random, the equal distribution of the random
+	  numbers has been verified
+
+	* src/ixlib_garbage.hh: added scheme to release objects
+	  out of the gc arena
+
+2001-02-12  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/js_value.cc: added diagnostic for lookup on nulls
+
 2001-01-12  Andreas Kloeckner  <ak@ixion.net>
 
 	* released version 0.94.0
@@ -19,12 +115,12 @@
 
 2000-11-17  Andreas Kloeckner  <ak@ixion.net>
 
-	* src/ixlib_numconv.hh (ixion): added "default base"
-		parameter to eval* numconv functions
+	* src/ixlib_numconv.hh: added "default base"
+	  parameter to eval* numconv functions
 
 2000-11-06  Andreas Kloeckner  <ak@ixion.net>
 
-	* src/ixlib_garbage.hh (ixion): reimplemented hashing in
+	* src/ixlib_garbage.hh: reimplemented hashing in
 	  garbage collector for speed gain
 
 2000-11-04  Andreas Kloeckner  <ak@ixion.net>
@@ -35,7 +131,7 @@
 
 2000-09-17  Andreas Kloeckner  <ak@ixion.net>
 
-	* configure.in (ix_ixlib_micro_version): Bumped version to 0.93.1
+	* configure.in: Bumped version to 0.93.1
 
 	* src/ixlib_polygon_impl.hh: Fixed broken Graham's scan
 
@@ -75,7 +171,7 @@
 
 	* src/ixlib_exbase.hh : added namespace component
 
-	* configure.in: bumped version to 0.93
+	* configure.in: bumped version to 0.93.0
 
 	* src/re.cc: fixed bug with multiple backrefs
 

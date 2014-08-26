@@ -7,6 +7,7 @@
 
 
 
+#include "ixlib_i18n.hh"
 #include <ixlib_exio.hh>
 
 

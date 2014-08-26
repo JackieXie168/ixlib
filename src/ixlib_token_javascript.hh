@@ -1,9 +1,6 @@
 // ----------------------------------------------------------------------------
 //  Description      : Token definitions for Javascript scanner
 // ----------------------------------------------------------------------------
-//  Remarks          :
-//
-// ----------------------------------------------------------------------------
 //  (c) Copyright 2000 by iXiONmedia, all rights reserved.
 // ----------------------------------------------------------------------------
 
@@ -38,6 +35,7 @@
 #define TT_JS_BREAK			(TT_USER + 13)
 #define TT_JS_DEFAULT			(TT_USER + 14)
 #define TT_JS_IN			(TT_USER + 15)
+#define TT_JS_CONST			(TT_USER + 16)
 
 // operators
 #define TT_JS_NEW			(TT_USER + 1024)

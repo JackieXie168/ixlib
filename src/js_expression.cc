@@ -29,7 +29,7 @@ constant::constant(ref<value> val)
 
 ref<value> 
 constant::
-evaluate(context const &ctx,bool want_lvalue) const {
+evaluate(context const &ctx) const {
   return Value;
   }
 
@@ -46,7 +46,7 @@ unary_operator::unary_operator(value::operator_id opt,ref<expression> opn)
 
 ref<value> 
 unary_operator::
-evaluate(context const &ctx,bool want_lvalue) const {
+evaluate(context const &ctx) const {
   return Operand->evaluate(ctx)->operatorUnary(Operator);
   }
 
@@ -64,7 +64,7 @@ modifying_unary_operator(value::operator_id opt,ref<expression> opn)
 
 ref<value> 
 modifying_unary_operator::
-evaluate(context const &ctx,bool want_lvalue) const {
+evaluate(context const &ctx) const {
   return Operand->evaluate(ctx)->operatorUnaryModifying(Operator);
   }
 
@@ -79,7 +79,7 @@ binary_operator::binary_operator(value::operator_id opt,ref<expression> opn1,ref
 
 
   
-ref<value> binary_operator::evaluate(context const &ctx,bool want_lvalue) const {
+ref<value> binary_operator::evaluate(context const &ctx) const {
   return Operand1->evaluate(ctx)->operatorBinary(Operator,*Operand2,ctx);
   }
 
@@ -97,7 +97,7 @@ modifying_binary_operator(value::operator_id opt,ref<expression> opn1,ref<expres
   
 ref<value> 
 modifying_binary_operator::
-evaluate(context const &ctx,bool want_lvalue) const {
+evaluate(context const &ctx) const {
   return Operand1->evaluate(ctx)->operatorBinaryModifying(Operator,*Operand2,ctx);
   }
 
@@ -115,11 +115,11 @@ ternary_operator(ref<expression> opn1,ref<expression> opn2,ref<expression> opn3)
 
 ref<value> 
 ternary_operator::
-evaluate(context const &ctx,bool want_lvalue) const {
+evaluate(context const &ctx) const {
   if (Operand1->evaluate(ctx)->toBoolean())
-    return Operand2->evaluate(ctx,want_lvalue);
+    return Operand2->evaluate(ctx);
   else
-    return Operand3->evaluate(ctx,want_lvalue);
+    return Operand3->evaluate(ctx);
   }
 
 
@@ -133,9 +133,9 @@ subscript_operation::subscript_operation(ref<expression> opn1,ref<expression> op
 
 
   
-ref<value> subscript_operation::evaluate(context const &ctx,bool want_lvalue) const {
+ref<value> subscript_operation::evaluate(context const &ctx) const {
   ref<value> op2 = Operand2->evaluate(ctx);
-  return Operand1->evaluate(ctx)->subscript(*op2,want_lvalue);
+  return Operand1->evaluate(ctx)->subscript(*op2);
   }
 
 
@@ -156,11 +156,11 @@ lookup_operation::lookup_operation(ref<expression> opn,string const &id)
 
 
 
-ref<value> lookup_operation::evaluate(context const &ctx,bool want_lvalue) const {
-  ref<value> scope = ctx.CurrentScope;
+ref<value> lookup_operation::evaluate(context const &ctx) const {
+  ref<value> scope(ctx.CurrentScope);
   if (Operand.get() != NULL)
     scope = Operand->evaluate(ctx);
-  return scope->lookup(Identifier,want_lvalue);
+  return scope->lookup(Identifier);
   }
 
 
@@ -176,8 +176,8 @@ assignment(ref<expression> opn1,ref<expression> opn2)
 
   
 ref<value> 
-assignment::evaluate(context const &ctx,bool want_lvalue) const {
-  return Operand1->evaluate(ctx,true)->assign(Operand2->evaluate(ctx)->duplicate());
+assignment::evaluate(context const &ctx) const {
+  return Operand1->evaluate(ctx)->assign(Operand2->evaluate(ctx)->duplicate());
   }
 
 
@@ -191,7 +191,7 @@ function_call::function_call(ref<expression> fun,parameter_expression_list const
 
 
 
-ref<value> function_call::evaluate(context const &ctx,bool want_lvalue) const {
+ref<value> function_call::evaluate(context const &ctx) const {
   ref<value> func_value = Function->evaluate(ctx);
   
   value::parameter_list pvalues;
@@ -213,7 +213,7 @@ construction::construction(ref<expression> cls,parameter_expression_list const &
 
 
 
-ref<value> construction::evaluate(context const &ctx,bool want_lvalue) const {
+ref<value> construction::evaluate(context const &ctx) const {
   ref<value> class_value = Class->evaluate(ctx);
   
   value::parameter_list pvalues;

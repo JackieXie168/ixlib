@@ -1,12 +1,6 @@
 // ----------------------------------------------------------------------------
 //  Description      : Garbage collection
 // ----------------------------------------------------------------------------
-//  Remarks          : "Normal" reference management works with exactly one
-//                     reference manager per type which can be implicitly
-//                     identified, whereas dynamic management allows
-//                     more than one manager.
-//
-// ----------------------------------------------------------------------------
 //  (c) Copyright 2000 by iXiONmedia, all rights reserved.
 // ----------------------------------------------------------------------------
 
@@ -86,28 +80,70 @@ namespace ixion {
 
 
 
-  template<class T>
+  template<class T,class T_Managed = T>
+  class ref;
+  template<class T,class T_Managed = T>
   class no_free_ref;
-  
-  
-  
-  
-  template<class T>
-  class ref : public ref_base<T>{
-    protected:
-      static reference_manager<T> 	Manager;
-      
+
+
+
+
+  template<class T_Managed>
+  class reference_manager_keeper {
     public:
+    // *** FIXME should be private, but cannot be
+    // (partial specializations cannot be declared friends)
+      static reference_manager<T_Managed> 	Manager;
+    };
+
+
+
+
+
+  /**
+  An object that acts like a reference-counted pointer to an object.
+  The corresponding reference_manager is identified implicitly through
+  static references.
+  
+  Example:
+  <code>
+    IXLIB_GARBAGE_DECLARE_MANAGER(int)
+    
+    int main() {
+      ref<int> my_int = new int(5);
+      *my_int = 17;
+      ref<int> another_int = my_int;
+      *another_int = 12;
+      
+      *my_int == 12; // true
+      }
+    </code>
+  */
+  template<class T,class T_Managed>
+  class ref : public ref_base<T>{
+    public:
+      // we have to have an explicit copy constructor, otherwise the
+      // compiler generates one, which is *ahem* - fatal
       ref(ref const &src)
         : ref_base<T>(src) {
-	Manager.addReference(Instance);
+	reference_manager_keeper<T_Managed>::Manager.addReference(Instance);
+	}
+      template<class T2>
+      ref(ref<T2,T_Managed> const &src)
+        : ref_base<T>(src.get()) {
+	reference_manager_keeper<T_Managed>::Manager.addReference(Instance);
+	}
+      template<class T2>
+      ref(no_free_ref<T2,T_Managed> const &src)
+        : ref_base<T>(src.get()) {
+	reference_manager_keeper<T_Managed>::Manager.addReference(Instance);
 	}
       ref(T *instance = NULL)
         : ref_base<T>(instance) {
-	Manager.addReference(instance);
+	reference_manager_keeper<T_Managed>::Manager.addReference(Instance);
 	}
       ~ref() {
-        Manager.freeReference(Instance);
+        reference_manager_keeper<T_Managed>::Manager.freeReference(Instance);
 	}
 	
       ref &operator=(ref const &src) {
@@ -121,35 +157,67 @@ namespace ixion {
       
       // methods
       void release() {
-        T *oldinst = Instance;
-	Manager.freeReference(Instance);
+	reference_manager_keeper<T_Managed>::Manager.freeReference(Instance);
 	Instance = NULL;
 	}
       void set(T *instance) {
-	Manager.freeReference(Instance);
+        if (instance == Instance) return;
+	
+	reference_manager_keeper<T_Managed>::Manager.freeReference(Instance);
 	Instance = instance;
-	Manager.addReference(Instance);
+	reference_manager_keeper<T_Managed>::Manager.addReference(Instance);
         }
-
-      friend class no_free_ref<T>;
+      T *releaseFromGCArena() {
+        T *oldinst = Instance;
+	reference_manager_keeper<T_Managed>::Manager.forgetReference(Instance);
+	Instance = NULL;
+	return oldinst;
+        }
     };
 
 
 
 
-  template<class T>
+  /**
+  An object that acts like a reference-counted pointer to an object.
+  However, the referenced object is not freed if the no_free_ref
+  is the last reference to the object to go out of scope. 
+  
+  This is useful to pass objects allocated e.g. on the stack along 
+  inside ref's, while making sure they aren't freed. 
+  (which would most probably lead to disaster)
+  
+  no_free_ref's are mostly a hack, but there are situations where you cannot
+  avoid them. But even so, you should try not to use them where possible.
+  
+  The corresponding reference_manager is identified implicitly through
+  static references.
+  */
+  template<class T,class T_Managed>
   class no_free_ref : public ref_base<T>{
     public:
+      // we have to have an explicit copy constructor, otherwise the
+      // compiler generates one, which is *ahem* - fatal
       no_free_ref(no_free_ref const &src)
         : ref_base<T>(src) {
-	ref<T>::Manager.addReference(Instance);
+	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(Instance);
+	}
+      template<class T2>
+      no_free_ref(ref<T2,T_Managed> const &src)
+        : ref_base<T>(src.get()) {
+	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(Instance);
+	}
+      template<class T2>
+      no_free_ref(no_free_ref<T2,T_Managed> const &src)
+        : ref_base<T>(src.get()) {
+	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(Instance);
 	}
       no_free_ref(T *instance = NULL)
         : ref_base<T>(instance) {
-	ref<T>::Manager.addReference(instance);
+	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(Instance);
 	}
       ~no_free_ref() {
-        ref<T>::Manager.removeReference(Instance);
+        reference_manager_keeper<T_Managed>::Manager.removeNoFreeReference(Instance);
 	}
 	
       // assignment
@@ -164,20 +232,31 @@ namespace ixion {
       
       // methods
       void release() {
-        T *oldinst = Instance;
-	ref<T>::Manager.removeReference(Instance);
+	reference_manager_keeper<T_Managed>::Manager.removeNoFreeReference(Instance);
 	Instance = NULL;
 	}
       void set(T *instance) {
-	ref<T>::Manager.removeReference(Instance);
+        if (instance == Instance) return;
+	
+	reference_manager_keeper<T_Managed>::Manager.removeNoFreeReference(Instance);
 	Instance = instance;
-	ref<T>::Manager.addReference(Instance);
+	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(Instance);
+        }
+      T *releaseFromGCArena() {
+        T *oldinst = Instance;
+	reference_manager_keeper<T_Managed>::Manager.forgetReference(Instance);
+	Instance = NULL;
+	return oldinst;
         }
     };
 
 
 
 
+  /**
+  An object that acts like a reference-counted pointer to an object.
+  The corresponding reference_manager is identified explicitly.
+  */
   template<class T>
   class dynamic_ref : public ref_base<T> {
     protected:
@@ -207,17 +286,21 @@ namespace ixion {
         }
 
       // methods
-      T *release() {
-        T *oldinst = Instance;
+      void release() {
 	Manager.freeReference(Instance);
 	Instance = NULL;
-	return oldinst;
 	}
-      T *set(T *instance) {
-        T *oldinst = Instance;
+      void set(T *instance) {
+        if (instance == Instance) return;
+	
 	Manager.freeReference(Instance);
 	Instance = instance;
 	Manager.addReference(Instance);
+        }
+      T *releaseFromGCArena() {
+        T *oldinst = Instance;
+	Manager.forgetReference(Instance);
+	Instance = NULL;
 	return oldinst;
         }
     };
@@ -225,6 +308,20 @@ namespace ixion {
   
   
   
+  /**
+  An object that acts like a reference-counted pointer to an object.
+  However, the referenced object is not freed if the no_free_ref
+  is the last reference to the object to go out of scope. 
+  
+  This is useful to pass objects allocated e.g. on the stack along 
+  inside ref's, while making sure they aren't freed. 
+  (which would most probably lead to disaster)
+  
+  no_free_ref's are mostly a hack, but there are situations where you cannot
+  avoid them. But even so, you should try not to use them where possible.
+  
+  The corresponding reference_manager is identified explicitly.
+  */
   template<class T>
   class no_free_dynamic_ref : public ref_base<T> {
     protected:
@@ -233,14 +330,14 @@ namespace ixion {
     public:
       no_free_dynamic_ref(no_free_dynamic_ref const &src)
         : ref_base<T>(src),Manager(src.Manager) {
-	Manager.addReference(Instance);
+	Manager.addNoFreeReference(Instance);
 	}
       no_free_dynamic_ref(reference_manager<T> &mgr,T *instance = NULL)
         : ref_base<T>(instance),Manager(mgr) {
-	Manager.addReference(Instance);
+	Manager.addNoFreeReference(Instance);
 	}
       ~no_free_dynamic_ref() {
-        Manager.removeReference(Instance);
+        Manager.removeNoFreeReference(Instance);
 	}
       
       // assignment
@@ -254,17 +351,21 @@ namespace ixion {
         }
 
       // methods
-      T *release() {
-        T *oldinst = Instance;
-	Manager.removeReference(Instance);
+      void release() {
+	Manager.removeNoFreeReference(Instance);
 	Instance = NULL;
-	return oldinst;
 	}
-      T *set(T *instance) {
-        T *oldinst = Instance;
-	Manager.removeReference(Instance);
+      void set(T *instance) {
+        if (instance == Instance) return;
+	
+	Manager.removeNoFreeReference(Instance);
 	Instance = instance;
-	Manager.addReference(Instance);
+	Manager.addNoFreeReference(Instance);
+        }
+      T *releaseFromGCArena() {
+        T *oldinst = Instance;
+	Manager.forgetReference(Instance);
+	Instance = NULL;
 	return oldinst;
         }
     };
@@ -278,7 +379,7 @@ namespace ixion {
     
       struct instance_data {
 	T const		*Instance;
-        TSize 		ReferenceCount;
+        TSize 		ReferenceCount,NoFreeReferenceCount;
 	instance_data	*Next,*Previous;
 	};
       
@@ -299,7 +400,9 @@ namespace ixion {
 	  Instances[hv] = NULL;
 	}
     
-    protected:
+    // *** FIXME should be
+    // protected:
+    // but cannot because partial specializations cannot be declared friends
       void addReference(T const *instance) {
         if (!instance) return;
 	instance_data *data = getHashEntry(instance);
@@ -308,17 +411,31 @@ namespace ixion {
       void freeReference(T const *instance) {
         if (!instance) return;
 	instance_data *data = getHashEntry(instance);
-	if (--data->ReferenceCount == 0) {
+	if (--data->ReferenceCount == 0 && data->NoFreeReferenceCount == 0) {
 	  removeHashEntry(data);
 	  Dealloc(instance);
 	  }
         }
-      void removeReference(T const *instance) {
+      void addNoFreeReference(T const *instance) {
         if (!instance) return;
 	instance_data *data = getHashEntry(instance);
-	if (--data->ReferenceCount == 0) {
-	  removeHashEntry(data);
+        data->NoFreeReferenceCount++;
+        }
+      void removeNoFreeReference(T const *instance) {
+        if (!instance) return;
+	instance_data *data = getHashEntry(instance);
+	if (--data->NoFreeReferenceCount == 0) {
+	  if (data->ReferenceCount != 0)
+            EXGEN_THROW(EC_REMAININGREF)
+          removeHashEntry(data);
 	  }
+        }
+      void forgetReference(T const *instance) {
+        if (!instance) return;
+	instance_data *data = getHashEntry(instance);
+	if (data->ReferenceCount != 1) 
+	  EXGEN_THROW(EC_CANNOTREMOVEFROMGC)
+        removeHashEntry(data);
         }
 	
     private:
@@ -340,6 +457,7 @@ namespace ixion {
 	
 	data->Instance = instance;
 	data->ReferenceCount = 0;
+	data->NoFreeReferenceCount = 0;
 	data->Previous = NULL;
 	data->Next = link;
 	if (link) link->Previous = data;
@@ -359,18 +477,13 @@ namespace ixion {
 	  delete data;
 	  }
         }
-	
-      friend class ref<T>;
-      friend class no_free_ref<T>;
-      friend class dynamic_ref<T>;
-      friend class no_free_dynamic_ref<T>;
     };
 
 
 
 
   #define IXLIB_GARBAGE_DECLARE_MANAGER(TYPE) \
-    ixion::reference_manager<TYPE> ixion::ref<TYPE>::Manager;
+    ixion::reference_manager<TYPE> ixion::reference_manager_keeper<TYPE>::Manager;
   }
 
 

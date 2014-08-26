@@ -7,7 +7,10 @@
 
 
 
+#include <clocale>
 #include <ixlib_base.hh>
+#include <ixlib_config.hh>
+#include <ixlib_i18n.hh>
 
 
 
@@ -28,4 +31,15 @@ int ixion::ixlibGetMinorVersion() {
 
 int ixion::ixlibGetMicroVersion() {
   return IXLIB_MICRO_VERSION;
+  }
+
+
+
+
+void ixion::ixlibInitI18n() {
+  #ifndef WIN32
+  setlocale(LC_MESSAGES,"");
+  bindtextdomain(PACKAGE,LOCALEDIR);
+  textdomain(PACKAGE);
+  #endif
   }

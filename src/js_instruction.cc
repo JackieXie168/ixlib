@@ -27,19 +27,47 @@ variable_declaration::variable_declaration(string const &id,ref<expression> def_
 
 
 
-ref<value> variable_declaration::evaluate(context const &ctx,bool want_lvalue) const {
+ref<value> variable_declaration::evaluate(context const &ctx) const {
+  if (ctx.CurrentScope->hasMember(Identifier))
+    EXJS_THROWINFO(ECJS_CANNOT_REDECLARE,Identifier.c_str())
+  
   ref<value> def;
   if (DefaultValue.get() != NULL) def = DefaultValue->evaluate(ctx)->duplicate();
   else def = makeNull();
   
-  ctx.CurrentScope->addMember(Identifier,def);
-  return ref<value>(ctx.CurrentScope->lookup(Identifier,true));
+  ref<value> lv = makeLValue(def);
+  ctx.CurrentScope->addMember(Identifier,lv);
+  return lv;
   }
 
 
 
 
-// function_declaration -------------------------------------------
+// constant_declaration -------------------------------------------------------
+constant_declaration::constant_declaration(string const &id,ref<expression> def_value)
+  : Identifier(id),DefaultValue(def_value) {
+  }
+
+
+
+
+ref<value> constant_declaration::evaluate(context const &ctx) const {
+  if (ctx.CurrentScope->hasMember(Identifier))
+    EXJS_THROWINFO(ECJS_CANNOT_REDECLARE,Identifier.c_str())
+
+  ref<value> def;
+  if (DefaultValue.get() != NULL) def = DefaultValue->evaluate(ctx)->duplicate();
+  else def = makeNull();
+  
+  ref<value> cns = wrapConstant(def);
+  ctx.CurrentScope->addMember(Identifier,cns);
+  return cns;
+  }
+
+
+
+
+// function_declaration -------------------------------------------------------
 function_declaration::
 function_declaration(string const &id,parameter_name_list const &pnames,
 ref<expression> body)
@@ -49,8 +77,11 @@ ref<expression> body)
 
 
 
-ref<value> function_declaration::evaluate(context const &ctx,bool want_lvalue) const {
-  ref<value> fun = new function(ParameterNameList,Body);
+ref<value> function_declaration::evaluate(context const &ctx) const {
+  if (ctx.CurrentScope->hasMember(Identifier))
+    EXJS_THROWINFO(ECJS_CANNOT_REDECLARE,Identifier.c_str())
+
+  ref<value> fun = new function(ParameterNameList,Body,ctx.CurrentScope);
   EX_MEMCHECK(fun.get())
   ctx.CurrentScope->addMember(Identifier,fun);
   return ref<value>(NULL);
@@ -61,7 +92,7 @@ ref<value> function_declaration::evaluate(context const &ctx,bool want_lvalue) c
 
 // instruction_list -----------------------------------------------------------
 ref<value> 
-instruction_list::evaluate(context const &ctx,bool want_lvalue) const {
+instruction_list::evaluate(context const &ctx) const {
   ref<value> result;
   FOREACH_CONST(first,ExpressionList,expression_list)
     result = (*first)->evaluate(ctx);
@@ -79,16 +110,17 @@ void instruction_list::add(ref<expression> expr) {
 
 
 // scoped_instruction_list ----------------------------------------
-ref<value> scoped_instruction_list::evaluate(context const &ctx,bool want_lvalue) const {
-  list_scope scope;
-  scope.unite(ctx.CurrentScope);
-  no_free_ref<value> scope_ref(&scope);
-  context inner_context(ctx,&scope);
-  ref<value> result = instruction_list::evaluate(inner_context,want_lvalue);
+ref<value> scoped_instruction_list::evaluate(context const &ctx) const {
+  ref<list_scope,value> scope = new list_scope;
+  EX_MEMCHECK(scope.get())
+  scope->unite(ctx.CurrentScope);
+  context inner_context(scope);
+
+  ref<value> result = instruction_list::evaluate(inner_context);
   if (result.get()) return result->duplicate();
   return ref<value>(NULL);
+
   // ATTENTION: this is a scope cancellation point.
-  // Therefore any values passed out must be made lvalue-free, i.e. duplicated
   }
 
 
@@ -102,7 +134,7 @@ js_if::js_if(ref<expression> cond,ref<expression> ifex,ref<expression> ifnotex)
 
 
 
-ref<value> js_if::evaluate(context const &ctx,bool want_lvalue) const {
+ref<value> js_if::evaluate(context const &ctx) const {
   if (Conditional->evaluate(ctx)->toBoolean())
     return IfExpression->evaluate(ctx);
   else 
@@ -130,7 +162,7 @@ js_while::js_while(ref<expression> cond,ref<expression> loopex,string const &lab
 
 
 
-ref<value> js_while::evaluate(context const &ctx,bool want_lvalue) const {
+ref<value> js_while::evaluate(context const &ctx) const {
   ref<value> result;
   while (Conditional->evaluate(ctx)->toBoolean()) {
     try {
@@ -168,7 +200,7 @@ js_do_while::js_do_while(ref<expression> cond,ref<expression> loopex,string cons
 
 
 
-ref<value> js_do_while::evaluate(context const &ctx,bool want_lvalue) const {
+ref<value> js_do_while::evaluate(context const &ctx) const {
   ref<value> result;
   do {
     try {
@@ -208,12 +240,17 @@ js_for::js_for(ref<expression> init,ref<expression> cond,ref<expression> update,
 
 
 
-ref<value> js_for::evaluate(context const &ctx,bool want_lvalue) const {
+ref<value> js_for::evaluate(context const &ctx) const {
+  ref<list_scope,value> scope = new list_scope;
+  EX_MEMCHECK(scope.get())
+  scope->unite(ctx.CurrentScope);
+  context inner_context(scope);
+
   ref<value> result;
-  for (Initialization->evaluate(ctx);Conditional->evaluate(ctx)->toBoolean();
-  Update->evaluate(ctx)) {
+  for (Initialization->evaluate(inner_context);Conditional->evaluate(inner_context)->toBoolean();
+  Update->evaluate(inner_context)) {
     try {
-      result = LoopExpression->evaluate(ctx);
+      result = LoopExpression->evaluate(inner_context);
       }
     catch (break_exception &be) {
       if (!be.HasLabel || (HasLabel && be.HasLabel && be.Label == Label))
@@ -248,21 +285,21 @@ js_for_in::js_for_in(ref<expression> iter,ref<expression> array,ref<expression> 
 
 
 
-ref<value> js_for_in::evaluate(context const &ctx,bool want_lvalue) const {
-  list_scope scope;
-  scope.unite(ctx.CurrentScope);
-  no_free_ref<value> scope_ref(&scope);
-  context inner_context(ctx,&scope);
+ref<value> js_for_in::evaluate(context const &ctx) const {
+  ref<list_scope,value> scope = new list_scope;
+  EX_MEMCHECK(scope.get())
+  scope->unite(ctx.CurrentScope);
+  context inner_context(scope);
 
   ref<value> result;
-  ref<value> iterator = Iterator->evaluate(inner_context,true);
+  ref<value> iterator = Iterator->evaluate(inner_context);
   ref<value> array = Array->evaluate(inner_context);
   
-  TSize size = array->lookup("length",false)->toInt();
+  TSize size = array->lookup("length")->toInt();
   
   for (TIndex i = 0;i < size;i++) {
     try {
-      iterator->assign(array->subscript(*makeConstantInt(i),false));
+      iterator->assign(array->subscript(*makeConstant(i)));
       result = LoopExpression->evaluate(inner_context);
       }
     catch (break_exception &be) {
@@ -278,8 +315,8 @@ ref<value> js_for_in::evaluate(context const &ctx,bool want_lvalue) const {
     }
   if (result.get()) return result->duplicate();
   return ref<value>(NULL);
+
   // ATTENTION: this is a scope cancellation point.
-  // Therefore any values passed out must be made lvalue-free, i.e. duplicated
   }
 
 
@@ -293,7 +330,7 @@ js_return::js_return(unsigned line,ref<expression> retval)
 
 
 
-ref<value> js_return::evaluate(context const &ctx,bool want_lvalue) const {
+ref<value> js_return::evaluate(context const &ctx) const {
   ref<value> retval;
   if (ReturnValue.get())
     retval = ReturnValue->evaluate(ctx);
@@ -321,7 +358,7 @@ js_break::js_break(unsigned line,string const &label)
 
 
 
-ref<value> js_break::evaluate(context const &ctx,bool want_lvalue) const {
+ref<value> js_break::evaluate(context const &ctx) const {
   break_exception be;
   be.HasLabel = HasLabel;
   be.Label = Label;
@@ -347,7 +384,7 @@ js_continue::js_continue(unsigned line,string const &label)
 
 
 
-ref<value> js_continue::evaluate(context const &ctx,bool want_lvalue) const {
+ref<value> js_continue::evaluate(context const &ctx) const {
   continue_exception ce;
   ce.HasLabel = HasLabel;
   ce.Label = Label;
@@ -367,9 +404,9 @@ break_label::break_label(string const &label,ref<expression> expr)
 
 
 ref<value> 
-break_label::evaluate(context const &ctx,bool want_lvalue) const {
+break_label::evaluate(context const &ctx) const {
   try {
-    return Expression->evaluate(ctx,want_lvalue);
+    return Expression->evaluate(ctx);
     }
   catch (break_exception &be) {
     if (be.HasLabel && be.Label == Label) return ref<value>(NULL);
@@ -397,19 +434,19 @@ js_switch::js_switch(ref<expression> discriminant,string const &label)
 
 ref<value> 
 js_switch::
-evaluate(context const &ctx,bool want_lvalue) const {
-  list_scope scope;
-  scope.unite(ctx.CurrentScope);
-  no_free_ref<value> scope_ref(&scope);
-  context inner_context(ctx,&scope);
+evaluate(context const &ctx) const {
+  ref<list_scope,value> scope = new list_scope;
+  EX_MEMCHECK(scope.get())
+  scope->unite(ctx.CurrentScope);
+  context inner_context(scope);
   
-  ref<value> discr = Discriminant->evaluate(inner_context,want_lvalue);
+  ref<value> discr = Discriminant->evaluate(inner_context);
   
   case_list::const_iterator expr,def;
   bool expr_found = false,def_found = false;
   FOREACH_CONST(first,CaseList,case_list) {
     if (first->DiscriminantValue.get()) {
-      if (first->DiscriminantValue->evaluate(inner_context,want_lvalue)->
+      if (first->DiscriminantValue->evaluate(inner_context)->
       operatorBinary(value::OP_EQUAL,*Discriminant,inner_context)->toBoolean()) {
         expr = first;
 	expr_found = true;
@@ -435,7 +472,7 @@ evaluate(context const &ctx,bool want_lvalue) const {
 
     ref<value> result;
     while (exec != last) {
-      result = exec->Expression->evaluate(inner_context,want_lvalue);
+      result = exec->Expression->evaluate(inner_context);
       exec++;
       }
     if (result.get()) return result->duplicate();
@@ -449,7 +486,6 @@ evaluate(context const &ctx,bool want_lvalue) const {
     }
   
   // ATTENTION: this is a scope cancellation point.
-  // Therefore any values passed out must be made lvalue-free, i.e. duplicated
   }
 
 

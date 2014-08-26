@@ -103,7 +103,7 @@ l = @l@
 
 LDADD = ../src/libixion.la
 
-check_PROGRAMS = teststring testnumconv testre testcmdline testtextfile   testgeo testxml testmat testjs
+check_PROGRAMS = teststring testnumconv testre testcmdline testtextfile   testgeo testxml testmat testjs testgarbage
 
 
 noinst_PROGRAMS = javascript
@@ -122,6 +122,7 @@ testgeo_SOURCES = testgeo.cc test.hh
 testxml_SOURCES = testxml.cc test.hh
 testmat_SOURCES = testmat.cc test.hh
 testjs_SOURCES = testjs.cc test.hh
+testgarbage_SOURCES = testgarbage.cc test.hh
 
 javascript_SOURCES = javascript.cc
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -170,6 +171,10 @@ testjs_OBJECTS =  testjs.o
 testjs_LDADD = $(LDADD)
 testjs_DEPENDENCIES =  ../src/libixion.la
 testjs_LDFLAGS = 
+testgarbage_OBJECTS =  testgarbage.o
+testgarbage_LDADD = $(LDADD)
+testgarbage_DEPENDENCIES =  ../src/libixion.la
+testgarbage_LDFLAGS = 
 javascript_OBJECTS =  javascript.o
 javascript_LDADD = $(LDADD)
 javascript_DEPENDENCIES =  ../src/libixion.la
@@ -193,8 +198,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-SOURCES = $(teststring_SOURCES) $(testnumconv_SOURCES) $(testre_SOURCES) $(testcmdline_SOURCES) $(testtextfile_SOURCES) $(testgeo_SOURCES) $(testxml_SOURCES) $(testmat_SOURCES) $(testjs_SOURCES) $(javascript_SOURCES)
-OBJECTS = $(teststring_OBJECTS) $(testnumconv_OBJECTS) $(testre_OBJECTS) $(testcmdline_OBJECTS) $(testtextfile_OBJECTS) $(testgeo_OBJECTS) $(testxml_OBJECTS) $(testmat_OBJECTS) $(testjs_OBJECTS) $(javascript_OBJECTS)
+SOURCES = $(teststring_SOURCES) $(testnumconv_SOURCES) $(testre_SOURCES) $(testcmdline_SOURCES) $(testtextfile_SOURCES) $(testgeo_SOURCES) $(testxml_SOURCES) $(testmat_SOURCES) $(testjs_SOURCES) $(testgarbage_SOURCES) $(javascript_SOURCES)
+OBJECTS = $(teststring_OBJECTS) $(testnumconv_OBJECTS) $(testre_OBJECTS) $(testcmdline_OBJECTS) $(testtextfile_OBJECTS) $(testgeo_OBJECTS) $(testxml_OBJECTS) $(testmat_OBJECTS) $(testjs_OBJECTS) $(testgarbage_OBJECTS) $(javascript_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
@@ -299,6 +304,10 @@ testjs: $(testjs_OBJECTS) $(testjs_DEPENDENCIES)
 	@rm -f testjs
 	$(CXXLINK) $(testjs_LDFLAGS) $(testjs_OBJECTS) $(testjs_LDADD) $(LIBS)
 
+testgarbage: $(testgarbage_OBJECTS) $(testgarbage_DEPENDENCIES)
+	@rm -f testgarbage
+	$(CXXLINK) $(testgarbage_LDFLAGS) $(testgarbage_OBJECTS) $(testgarbage_LDADD) $(LIBS)
+
 javascript: $(javascript_OBJECTS) $(javascript_DEPENDENCIES)
 	@rm -f javascript
 	$(CXXLINK) $(javascript_LDFLAGS) $(javascript_OBJECTS) $(javascript_LDADD) $(LIBS)
@@ -351,13 +360,17 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-javascript.o: javascript.cc ../src/ixlib_javascript.hh \
-	../src/ixlib_string.hh ../src/ixlib_base.hh ../ixlib_config.hh \
-	../src/ixlib_exgen.hh ../src/ixlib_exbase.hh \
-	../src/ixlib_garbage.hh ../src/ixlib_scanner.hh
+javascript.o: javascript.cc ../ixlib_config.hh \
+	../src/ixlib_javascript.hh ../src/ixlib_string.hh \
+	../src/ixlib_base.hh ../src/ixlib_exgen.hh \
+	../src/ixlib_exbase.hh ../src/ixlib_garbage.hh \
+	../src/ixlib_scanner.hh
 testcmdline.o: testcmdline.cc ../src/ixlib_cmdline.hh \
 	../src/ixlib_string.hh ../src/ixlib_base.hh ../ixlib_config.hh \
 	../src/ixlib_exgen.hh ../src/ixlib_exbase.hh test.hh
+testgarbage.o: testgarbage.cc ../src/ixlib_garbage.hh \
+	../src/ixlib_exgen.hh ../src/ixlib_exbase.hh \
+	../src/ixlib_base.hh ../ixlib_config.hh test.hh
 testgeo.o: testgeo.cc ../src/ixlib_geometry.hh ../src/ixlib_base.hh \
 	../ixlib_config.hh ../src/ixlib_exgen.hh ../src/ixlib_exbase.hh \
 	../src/ixlib_numeric.hh ../src/ixlib_geometry_impl.hh test.hh

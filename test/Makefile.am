@@ -7,7 +7,7 @@
 LDADD=../src/libixion.la
 
 check_PROGRAMS=teststring testnumconv testre testcmdline testtextfile \
-  testgeo testxml testmat testjs
+  testgeo testxml testmat testjs testgarbage
 
 noinst_PROGRAMS=javascript
 
@@ -25,6 +25,7 @@ testgeo_SOURCES=testgeo.cc test.hh
 testxml_SOURCES=testxml.cc test.hh
 testmat_SOURCES=testmat.cc test.hh
 testjs_SOURCES=testjs.cc test.hh
+testgarbage_SOURCES=testgarbage.cc test.hh
 
 javascript_SOURCES=javascript.cc
 

@@ -1,30 +1,8 @@
 // ----------------------------------------------------------------------------
 //  Description      : Javascript interpreter
 // ----------------------------------------------------------------------------
-//  Remarks          : none.
-//
-// ----------------------------------------------------------------------------
 //  (c) Copyright 2000 by iXiONmedia, all rights reserved.
 // ----------------------------------------------------------------------------
-// This code tries to be an implementation of ECMAScript 4, as available at 
-// http://www.mozilla.org/js/
-// Note that ES4 is still in the process of standardization. 
-//
-// It is meant to behave like an ES4 interpreter in strict mode, none
-// of the backward-compatible braindead-isms like newline semicolon
-// insertion and other stuff will ever be implemented.
-//
-// This is the list of its shortcomings:
-// * exceptions
-// * proper error reporting with line numbers
-// * classes,namespaces,packages
-// * constness
-// * Number/String constructor and class methods
-// * real regexp's
-// * the methods listed in FIXME's (js_library.cc js_value.cc)
-// * cannot cross-assign predefined methods [won't be]
-// * Grammatical semicolon insertion [won't be]
-// * type declaration [won't be]
 
 
 
@@ -56,6 +34,8 @@
 #define ECJS_UNKNOWN_OPERATOR			7
 #define ECJS_INVALID_NON_LOCAL_EXIT		8
 #define ECJS_INVALID_NUMBER_OF_ARGUMENTS	9
+#define ECJS_INVALID_TOKEN			10
+#define ECJS_CANNOT_REDECLARE			11
 
 
 
@@ -78,10 +58,10 @@
         value_type getType() const { \
           return VT_FUNCTION; \
           } \
-        ref<javascript::value> call(context const &ctx,parameter_list const &parameters) const; \
+        ixion::ref<ixion::javascript::value> call(context const &ctx,parameter_list const &parameters) const; \
       }; \
     } \
-  ref<javascript::value> NAME::call(context const &ctx,parameter_list const &parameters) const
+  ixion::ref<ixion::javascript::value> NAME::call(context const &ctx,parameter_list const &parameters) const
 
 #define IXLIB_JS_CONVERT_PARAMETERS_0 \
   
@@ -96,7 +76,7 @@
 #define EXJS_THROWINFOTOKEN(CODE,INFO,TOKEN)\
   EXJS_THROWINFOLINE(CODE,INFO,(TOKEN).Line)
 #define EXJS_THROWINFOLINE(CODE,INFO,LINE)\
-  throw javascript_exception(CODE,LINE,INFO,__FILE__,__LINE__);
+  throw ixion::javascript_exception(CODE,LINE,INFO,__FILE__,__LINE__);
 
 
 
@@ -117,6 +97,29 @@ namespace ixion {
 
 
   // javascript ---------------------------------------------------------------
+  /**
+  This code tries to be an implementation of ECMAScript 4, as available at 
+  http://www.mozilla.org/js/
+  Note that ES4 is still in the process of standardization. 
+
+  It is meant to behave like an ES4 interpreter in strict mode, none
+  of the backward-compatible braindead-isms like newline semicolon
+  insertion and other stuff will ever be implemented.
+
+  This is the list of its shortcomings:
+  <ul>
+    <li> exceptions
+    <li> proper error reporting with line numbers
+    <li> classes,namespaces,packages
+    <li> constness
+    <li> Number/String constructor and class methods
+    <li> real regexp's
+    <li> the methods listed in FIXME's (js_library.cc js_value.cc)
+    <li> cannot cross-assign predefined methods [won't be]
+    <li> Grammatical semicolon insertion [won't be]
+    <li> type declaration [won't be]
+    </ul>
+  */
   namespace javascript {
     class context;
     class expression;
@@ -170,8 +173,8 @@ namespace ixion {
         // this operation is defined to eliminate any wrappers
         virtual ref<value> duplicate() const;
 
-        virtual ref<value> lookup(string const &identifier,bool want_lvalue);
-        virtual ref<value> subscript(value const &index,bool want_lvalue);
+        virtual ref<value> lookup(string const &identifier);
+        virtual ref<value> subscript(value const &index);
         virtual ref<value> call(context const &ctx,parameter_list const &parameters) const;
         virtual ref<value> construct(context const &ctx,parameter_list const &parameters) const;
         virtual ref<value> assign(ref<value> op2);
@@ -206,7 +209,7 @@ namespace ixion {
           };
             
       public:
-        ref<value> lookup(string const &identifier,bool want_lvalue);
+        ref<value> lookup(string const &identifier);
         virtual ref<value> callMethod(string const &identifier,context const &ctx,parameter_list const &parameters) = 0;
       };
 
@@ -226,13 +229,18 @@ namespace ixion {
 	  return VT_SCOPE;
 	  }
 
-        ref<value> lookup(string const &identifier,bool want_lvalue);
+        ref<value> lookup(string const &identifier);
 
         void unite(ref<value> scope);
         void separate(ref<value> scope);
+	void clearScopes();
         
-        void addMember(string const &name,ref<value> member);
+        bool hasMember(string const &name) const;
+	void addMember(string const &name,ref<value> member);
         void removeMember(string const &name);
+	void clearMembers();
+	
+	void clear();
       };
     
     class js_array : public value_with_methods {
@@ -262,8 +270,8 @@ namespace ixion {
         
         ref<value> duplicate() const;
   
-        ref<value> lookup(string const &identifier,bool want_lvalue);
-        ref<value> subscript(value const &index,bool want_lvalue);
+        ref<value> lookup(string const &identifier);
+        ref<value> subscript(value const &index);
         ref<value> callMethod(string const &identifier,javascript::context const &ctx,parameter_list const &parameters);
   
         TSize size() const {
@@ -277,30 +285,37 @@ namespace ixion {
       public:
         virtual ~expression() {
           }
-        virtual ref<value> evaluate(context const &ctx,bool want_lvalue = false) const = 0;
+        virtual ref<value> evaluate(context const &ctx) const = 0;
       };
     
     ref<value> makeUndefined();
     ref<value> makeNull();
-    ref<value> makeBoolean(bool val);
-    ref<value> makeConstantBoolean(bool val);
-    ref<value> makeInt(double val);
-    ref<value> makeConstantInt(double val);
-    ref<value> makeFloat(double val);
-    ref<value> makeConstantFloat(double val);
-    ref<value> makeString(string const &val);
+    ref<value> makeValue(bool val);
+    ref<value> makeConstant(bool val);
+    ref<value> makeValue(signed long val);
+    ref<value> makeConstant(signed long val);
+    ref<value> makeValue(signed int val);
+    ref<value> makeConstant(signed int val);
+    ref<value> makeValue(unsigned long val);
+    ref<value> makeConstant(unsigned long val);
+    ref<value> makeValue(unsigned int val);
+    ref<value> makeConstant(unsigned int val);
+    ref<value> makeValue(double val);
+    ref<value> makeConstant(double val);
+    ref<value> makeValue(string const &val);
+    ref<value> makeConstant(string const &val);
     ref<value> makeArray(TSize size = 0);
-    ref<value> makeConstantString(string const &val);
-    ref<value> makeLValue(ref<value> &target);
+    ref<value> makeLValue(ref<value> target);
     ref<value> wrapConstant(ref<value> val);
-    ref<expression> makeConstant(ref<value> val);
+    ref<expression> makeConstantExpression(ref<value> val);
 
     class interpreter {
       public:
-        list_scope		RootScope;
-        no_free_ref<value>	RootScopeRef;
-        
+        ref<list_scope,value>			RootScope;
+      
+      public:
         interpreter();
+	~interpreter();
         
         ref<expression> parse(string const &str);
         ref<expression> parse(istream &istr);
@@ -316,6 +331,8 @@ namespace ixion {
         ref<expression> parseSwitch(
           scanner::token_iterator &first,scanner::token_iterator const &last,string const &label);
         ref<expression> parseVariableDeclaration(
+          scanner::token_iterator &first,scanner::token_iterator const &last);
+        ref<expression> parseConstantDeclaration(
           scanner::token_iterator &first,scanner::token_iterator const &last);
         ref<expression> parseInstruction(
           scanner::token_iterator &first,scanner::token_iterator const &last);

@@ -8,6 +8,7 @@
 
 
 #include <strstream>
+#include "ixlib_i18n.hh"
 #include <ixlib_base.hh>
 #include <ixlib_scanjs.hh>
 #include <ixlib_numconv.hh>
@@ -23,8 +24,12 @@
 #define EXPECT(WHAT,STRINGIFIED) \
   if (first == last) EXJS_THROW(ECJS_UNEXPECTED_EOF) \
   if (first->Type != WHAT) \
-    EXJS_THROWINFOTOKEN(ECJS_UNEXPECTED,("'"+first->Text+"' instead of " STRINGIFIED).c_str(),*first)
-  
+    EXJS_THROWINFOTOKEN(ECJS_UNEXPECTED,("'"+first->Text+"' "+_("instead of ")+STRINGIFIED).c_str(),*first)
+
+
+
+
+static char *dummy_i18n_referencer = N_("instead of ");
 
 
 
@@ -52,14 +57,16 @@ static char *(PlainText[]) ={
   N_("Unknown identifier"),
   N_("Unknown operator"),
   N_("Invalid non-local exit"),
-  N_("Invalid number of arguments")
+  N_("Invalid number of arguments"),
+  N_("Invalid token encountered"),
+  N_("Cannot redeclare identifier"),
   };
 
 
 
 
 // javascript_exception -------------------------------------------------------
-javascript_exception::javascript_exception(TErrorCode error, TIndex js_line, char const *info,char *module = NULL,
+javascript_exception::javascript_exception(TErrorCode error,TIndex js_line,char const *info,char *module = NULL,
   TIndex line = 0)
 : base_exception(error, NULL, module, line, "JS") {
   HasInfo = true;
@@ -84,26 +91,27 @@ char *javascript_exception::getText() const {
 
 
 // context --------------------------------------------------------------------
-context::context(list_scope *rootscope)
-  : CurrentScope(rootscope),RootScope(rootscope) {
-  }
-
-
-
-
-context::context(context const &ctx,list_scope *current_scope) 
-  : CurrentScope(current_scope),RootScope(ctx.RootScope) {
+context::context(ref<list_scope,value> scope)
+  : CurrentScope(scope) {
   }
 
 
 
 
 // interpreter -----------------------------------------------------------------
-interpreter::interpreter() 
-  : RootScopeRef(&RootScope) {
+interpreter::interpreter() {
+  RootScope = new list_scope;
+  EX_MEMCHECK(RootScope.get())
+  
   ref<value> ac = new js_array_constructor();
   EX_MEMCHECK(ac.get())
-  RootScope.addMember("Array",ac);
+  RootScope->addMember("Array",ac);
+  }
+
+
+
+
+interpreter::~interpreter() {
   }
 
 
@@ -158,7 +166,7 @@ ref<value> interpreter::execute(ref<expression> expr) {
 ref<value> interpreter::evaluateCatchExits(ref<expression> expr) {
   ref<value> result;
   try {
-    context ctx(&RootScope);
+    context ctx(RootScope);
     result = expr->evaluate(ctx);
     }
   catch (return_exception &re) {
@@ -204,14 +212,14 @@ interpreter::parseInstructionList(scanner::token_iterator &first,scanner::token_
 ref<expression> 
 interpreter::parseSwitch(scanner::token_iterator &first,scanner::token_iterator const &last,string const &label) {
   ADVANCE
-  EXPECT('(',"'(' in switch statement")
+  EXPECT('(',_("'(' in switch statement"))
   ADVANCE
   
   ref<expression> discr = parseExpression(first,last);
-  EXPECT(')',"')' in switch statement")
+  EXPECT(')',_("')' in switch statement"))
   ADVANCE
   
-  EXPECT('{',"'{' in switch statement")
+  EXPECT('{',_("'{' in switch statement"))
   ADVANCE
   
   auto_ptr<js_switch> sw;
@@ -240,7 +248,7 @@ interpreter::parseSwitch(scanner::token_iterator &first,scanner::token_iterator 
       ADVANCE
 
       dvalue = parseExpression(first,last);
-      EXPECT(':',"':' in case label")
+      EXPECT(':',_("':' in case label"))
       ADVANCE
       }
     else if (first->Type == TT_JS_DEFAULT) {
@@ -253,7 +261,7 @@ interpreter::parseSwitch(scanner::token_iterator &first,scanner::token_iterator 
       
       ADVANCE
       dvalue = NULL;
-      EXPECT(':',"':' in default label")
+      EXPECT(':',_("':' in default label"))
       ADVANCE
       }
     else {
@@ -266,7 +274,7 @@ interpreter::parseSwitch(scanner::token_iterator &first,scanner::token_iterator 
   if (ilist.get())
     sw->addCase(dvalue,ilist.release());
     
-  EXPECT('}',"'}' in switch statement")
+  EXPECT('}',_("'}' in switch statement"))
   ADVANCE
   
   return sw.release();
@@ -277,10 +285,10 @@ interpreter::parseSwitch(scanner::token_iterator &first,scanner::token_iterator 
 
 ref<expression> 
 interpreter::parseVariableDeclaration(scanner::token_iterator &first,scanner::token_iterator const &last) {
-  EXPECT(TT_JS_VAR,"var keyword")
+  EXPECT(TT_JS_VAR,_("var keyword"))
   ADVANCE
   
-  EXPECT(TT_JS_IDENTIFIER,"variable identifier")
+  EXPECT(TT_JS_IDENTIFIER,_("variable identifier"))
   string id = first->Text;
   ADVANCE
   
@@ -300,7 +308,7 @@ interpreter::parseVariableDeclaration(scanner::token_iterator &first,scanner::to
     while (first->Type == ',') {
       ADVANCE
       
-      EXPECT(TT_JS_IDENTIFIER,"variable identifier")
+      EXPECT(TT_JS_IDENTIFIER,_("variable identifier"))
       id = first->Text;
       ADVANCE
       
@@ -311,7 +319,52 @@ interpreter::parseVariableDeclaration(scanner::token_iterator &first,scanner::to
       ref<expression> decl = new variable_declaration(id,def);
       EX_MEMCHECK(decl.get())
       ilist->add(decl);
+      }
+    result = ilist.release();
+    }
 
+  return result;
+  }
+
+
+
+
+ref<expression> 
+interpreter::parseConstantDeclaration(scanner::token_iterator &first,scanner::token_iterator const &last) {
+  EXPECT(TT_JS_CONST,_("const keyword"))
+  ADVANCE
+  
+  EXPECT(TT_JS_IDENTIFIER,_("variable identifier"))
+  string id = first->Text;
+  ADVANCE
+  
+  ref<expression> def;
+  EXPECT('=',_("initializer for constant"))
+  ADVANCE
+  def = parseExpression(first,last);
+
+  ref<expression> result = new constant_declaration(id,def);
+  EX_MEMCHECK(result.get())
+
+  if (first->Type == ',') {
+    auto_ptr<instruction_list> ilist(new instruction_list());
+    EX_MEMCHECK(ilist.get())
+    ilist->add(result);
+    
+    while (first->Type == ',') {
+      ADVANCE
+      
+      EXPECT(TT_JS_IDENTIFIER,_("variable identifier"))
+      id = first->Text;
+      ADVANCE
+      
+      EXPECT('=',_("initializer for constant"))
+      ADVANCE
+      def = parseExpression(first,last);
+
+      ref<expression> decl = new constant_declaration(id,def);
+      EX_MEMCHECK(decl.get())
+      ilist->add(decl);
       }
     result = ilist.release();
     }
@@ -347,20 +400,26 @@ interpreter::parseInstruction(scanner::token_iterator &first,scanner::token_iter
     EXPECT(';',"';'")
     first++;
     }
+  else if (first->Type == TT_JS_CONST) {
+    result = parseConstantDeclaration(first,last);
+
+    EXPECT(';',"';'")
+    first++;
+    }
   else if (first->Type == TT_JS_FUNCTION) {
     ADVANCE
     
-    EXPECT(TT_JS_IDENTIFIER,"variable identifier")
+    EXPECT(TT_JS_IDENTIFIER,_("function identifier"))
     string id = first->Text;
     ADVANCE
     
-    EXPECT('(',"'(' in function declaration")
+    EXPECT('(',_("'(' in function declaration"))
     ADVANCE
     
     function::parameter_name_list pnames;
     
     while (first->Type != ')') {
-      EXPECT(TT_JS_IDENTIFIER,"parameter identifier")
+      EXPECT(TT_JS_IDENTIFIER,_("parameter identifier"))
       pnames.push_back(first->Text);
       ADVANCE
       
@@ -368,10 +427,10 @@ interpreter::parseInstruction(scanner::token_iterator &first,scanner::token_iter
         ADVANCE 
 	}
       }
-    EXPECT(')',"')' in function declaration")
+    EXPECT(')',_("')' in function declaration"))
     ADVANCE
 
-    EXPECT('{',"'{' in function definition")
+    EXPECT('{',_("'{' in function definition"))
     ADVANCE
     
     ref<expression> body = parseInstructionList(first,last,false);
@@ -385,11 +444,11 @@ interpreter::parseInstruction(scanner::token_iterator &first,scanner::token_iter
   else if (first->Type == TT_JS_IF) {
     ADVANCE
     
-    EXPECT('(',"'(' in if clause")
+    EXPECT('(',_("'(' in if statement"))
     ADVANCE
     
     ref<expression> cond = parseExpression(first,last);
-    EXPECT(')',"')' in if clause")
+    EXPECT(')',_("')' in if statement"))
     first++;
     ref<expression> if_expr = parseInstruction(first,last);
     ref<expression> else_expr;
@@ -406,11 +465,11 @@ interpreter::parseInstruction(scanner::token_iterator &first,scanner::token_iter
     }
   else if (first->Type == TT_JS_WHILE) {
     ADVANCE
-    EXPECT('(',"'(' in while clause")
+    EXPECT('(',_("'(' in while statement"))
     ADVANCE
     
     ref<expression> cond = parseExpression(first,last);
-    EXPECT(')',"')' in while clause")
+    EXPECT(')',_("')' in while statement"))
     first++;
 
     ref<expression> loop_expr = parseInstruction(first,last);
@@ -427,14 +486,14 @@ interpreter::parseInstruction(scanner::token_iterator &first,scanner::token_iter
     ADVANCE
     ref<expression> loop_expr = parseInstruction(first,last);
 
-    EXPECT(TT_JS_WHILE,"'while' in do-while")
+    EXPECT(TT_JS_WHILE,_("'while' in do-while"))
     ADVANCE
     
-    EXPECT('(',"'(' in do-while clause")
+    EXPECT('(',_("'(' in do-while statement"))
     ADVANCE
     
     ref<expression> cond = parseExpression(first,last);
-    EXPECT(')',"')' in do-while clause")
+    EXPECT(')',_("')' in do-while statement"))
     first++;
     
     if (label.size()) {
@@ -448,7 +507,7 @@ interpreter::parseInstruction(scanner::token_iterator &first,scanner::token_iter
   else if (first->Type == TT_JS_FOR) {
     ADVANCE
     
-    EXPECT('(',"'(' in for clause")
+    EXPECT('(',_("'(' in for statement"))
     ADVANCE
     
     ref<expression> init_expr;
@@ -462,7 +521,7 @@ interpreter::parseInstruction(scanner::token_iterator &first,scanner::token_iter
       ADVANCE
       ref<expression> array_expr = parseExpression(first,last);
 
-      EXPECT(')',"')' in for clause")
+      EXPECT(')',_("')' in for statement"))
       first++;
       
       ref<expression> loop_expr = parseInstruction(first,last);
@@ -476,17 +535,17 @@ interpreter::parseInstruction(scanner::token_iterator &first,scanner::token_iter
       }
     else {
       // for (;;) ...
-      EXPECT(';',"';' in for clause")
+      EXPECT(';',_("';' in for statement"))
       ADVANCE
       
       ref<expression> cond_expr = parseExpression(first,last);
   
-      EXPECT(';',"';' in for clause")
+      EXPECT(';',_("';' in for statement"))
       ADVANCE
       
       ref<expression> update_expr = parseExpression(first,last);
       
-      EXPECT(')',"')' in for clause")
+      EXPECT(')',_("')' in for statement"))
       first++;
   
       ref<expression> loop_expr = parseInstruction(first,last);
@@ -507,7 +566,7 @@ interpreter::parseInstruction(scanner::token_iterator &first,scanner::token_iter
     if (first->Type != ';')
       result = new js_return(line,parseExpression(first,last));
     else
-      result = new js_return(line,makeConstant(makeNull()));
+      result = new js_return(line,makeConstantExpression(makeNull()));
     
     EX_MEMCHECK(result.get())
     EXPECT(';',"';'")
@@ -518,7 +577,7 @@ interpreter::parseInstruction(scanner::token_iterator &first,scanner::token_iter
     ADVANCE
     
     if (first->Type != ';') {
-      EXPECT(TT_JS_IDENTIFIER,"break label")
+      EXPECT(TT_JS_IDENTIFIER,_("break label"))
       result = new js_break(line,first->Text);
       ADVANCE
       }
@@ -534,7 +593,7 @@ interpreter::parseInstruction(scanner::token_iterator &first,scanner::token_iter
     ADVANCE
     
     if (first->Type != ';') {
-      EXPECT(TT_JS_IDENTIFIER,"continue label")
+      EXPECT(TT_JS_IDENTIFIER,_("continue label"))
       result = new js_continue(line,first->Text);
       ADVANCE
       }
@@ -547,7 +606,7 @@ interpreter::parseInstruction(scanner::token_iterator &first,scanner::token_iter
     }
   else if (first->Type == ';') {
     first++;
-    result = makeConstant(ref<value>(NULL));
+    result = makeConstantExpression(ref<value>(NULL));
     }
   else {
     // was nothing else, must be expression
@@ -596,8 +655,6 @@ interpreter::parseExpression(scanner::token_iterator &first,scanner::token_itera
   precedence:
   the called routine will continue parsing as long as the encountered 
   operators all have precedence greater or equal than the given parameter.
-  
-  those are the possible precedence values:
   */
   
   // an EOF condition cannot legally occur inside 
@@ -614,7 +671,7 @@ interpreter::parseExpression(scanner::token_iterator &first,scanner::token_itera
       
       ref<expression> cls = parseExpression(first,last,PREC_SUBSCRIPT);
       
-      EXPECT('(',"'(' in 'new' expression")
+      EXPECT('(',_("'(' in 'new' expression"))
       ADVANCE
 
       function_call::parameter_expression_list pexps;
@@ -626,7 +683,7 @@ interpreter::parseExpression(scanner::token_iterator &first,scanner::token_itera
           }
         }
 	
-      EXPECT(')',"')' in 'new' expression")
+      EXPECT(')',_("')' in 'new' expression"))
       ADVANCE
       
       expr = new construction(cls,pexps);
@@ -658,29 +715,29 @@ interpreter::parseExpression(scanner::token_iterator &first,scanner::token_itera
   // parse term ---------------------------------------------------------------
   if (expr.get() == NULL && precedence <= PREC_TERM) {
     if (first->Type == TT_JS_LIT_INT) {
-      expr = makeConstant(makeConstantInt(evalUnsigned(first->Text)));
+      expr = makeConstantExpression(makeConstant(evalUnsigned(first->Text)));
       ADVANCE
       }
     else if (first->Type == TT_JS_LIT_FLOAT) {
-      expr = makeConstant(makeConstantFloat(evalFloat(first->Text)));
+      expr = makeConstantExpression(makeConstant(evalFloat(first->Text)));
       ADVANCE
       }
     else if (first->Type == TT_JS_LIT_STRING) {
-      expr = makeConstant(makeConstantString(parseCEscapes(
+      expr = makeConstantExpression(makeConstant(parseCEscapes(
         first->Text.substr(1,first->Text.size()-2)
 	)));
       ADVANCE
       }
     else if (first->Type == TT_JS_LIT_TRUE) {
-      expr = makeConstant(makeConstantBoolean(true));
+      expr = makeConstantExpression(makeConstant(true));
       ADVANCE
       }
     else if (first->Type == TT_JS_LIT_FALSE) {
-      expr = makeConstant(makeConstantBoolean(false));
+      expr = makeConstantExpression(makeConstant(false));
       ADVANCE
       }
     else if (first->Type == TT_JS_LIT_UNDEFINED) {
-      expr = makeConstant(makeUndefined());
+      expr = makeConstantExpression(makeUndefined());
       ADVANCE
       }
     else if (first->Type == TT_JS_IDENTIFIER) {
@@ -689,7 +746,7 @@ interpreter::parseExpression(scanner::token_iterator &first,scanner::token_itera
       ADVANCE
       }
     else if (first->Type == TT_JS_NULL) {
-      expr = makeConstant(makeNull());
+      expr = makeConstantExpression(makeNull());
       ADVANCE
       }
     }
@@ -714,7 +771,7 @@ interpreter::parseExpression(scanner::token_iterator &first,scanner::token_itera
           }
         }
 	
-      EXPECT(')',"')' in function call")
+      EXPECT(')',_("')' in function call"))
       ADVANCE
       
       expr = new function_call(expr,pexps);
@@ -742,7 +799,7 @@ interpreter::parseExpression(scanner::token_iterator &first,scanner::token_itera
       
       ref<expression> index = parseExpression(first,last);
       
-      EXPECT(']',"']' in subscript")
+      EXPECT(']',_("']' in subscript"))
       ADVANCE
       
       expr = new subscript_operation(expr,index);

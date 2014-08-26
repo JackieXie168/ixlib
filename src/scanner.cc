@@ -8,6 +8,7 @@
 
 
 #include <FlexLexer.h>
+#include "ixlib_i18n.hh"
 #include <ixlib_numconv.hh>
 #include <ixlib_token_lex.hh>
 #include <ixlib_scanner.hh>

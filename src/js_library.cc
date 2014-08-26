@@ -59,7 +59,7 @@ namespace {
       
       ref<value> duplicate() const;
 
-      ref<value> lookup(string const &identifier,bool want_lvalue);
+      ref<value> lookup(string const &identifier);
       ref<value> callMethod(string const &identifier,context const &ctx,parameter_list const &parameters);
     };
   }
@@ -89,7 +89,7 @@ IXLIB_JS_DECLARE_FUNCTION(parseInt) {
   unsigned radix = 10;
   if (parameters.size() == 2)
     radix = parameters[1]->toInt();
-  return makeConstantInt(evalSigned(parameters[0]->toString(),radix));
+  return makeConstant(evalSigned(parameters[0]->toString(),radix));
   }
 
 
@@ -100,32 +100,36 @@ IXLIB_JS_DECLARE_FUNCTION(parseFloat) {
   if (parameters.size() != 1) {
     EXJS_THROWINFO(ECJS_INVALID_NUMBER_OF_ARGUMENTS,"parseFloat")
     }
-  return makeConstantFloat(evalFloat(parameters[0]->toString()));
+  return makeConstant(evalFloat(parameters[0]->toString()));
   }
 
 
 
 
 // isNaN ----------------------------------------------------------------------
+#ifndef WIN32
 IXLIB_JS_DECLARE_FUNCTION(isNaN) {
   if (parameters.size() != 1) {
     EXJS_THROWINFO(ECJS_INVALID_NUMBER_OF_ARGUMENTS,"isNaN")
     }
   int classification = fpclassify(parameters[0]->toFloat());
-  return makeConstantBoolean(classification == FP_NAN);
+  return makeConstant(classification == FP_NAN);
   }
+#endif
 
 
 
 
 // isFinite -------------------------------------------------------------------
+#ifndef WIN32
 IXLIB_JS_DECLARE_FUNCTION(isFinite) {
   if (parameters.size() != 1) {
     EXJS_THROWINFO(ECJS_INVALID_NUMBER_OF_ARGUMENTS,"isFinite")
     }
   int classification = fpclassify(parameters[0]->toFloat());
-  return makeConstantBoolean(classification != FP_NAN && classification != FP_INFINITE);
+  return makeConstant(classification != FP_NAN && classification != FP_INFINITE);
   }
+#endif
 
 
 
@@ -139,20 +143,20 @@ ref<value> Math::duplicate() const {
 
 
 
-ref<value> Math::lookup(string const &identifier,bool want_lvalue) {
+ref<value> Math::lookup(string const &identifier) {
   #define MATH_CONSTANT(NAME,VALUE) \
-    if (identifier == NAME) return makeConstantFloat(VALUE);
+    if (identifier == NAME) return makeConstant(VALUE);
   
-  MATH_CONSTANT("E",M_E)
-  MATH_CONSTANT("LN10",M_LN10)
-  MATH_CONSTANT("LN2",M_LN2)
-  MATH_CONSTANT("LOG2E",M_LOG2E)  
-  MATH_CONSTANT("LOG10E,",M_LOG10E)
-  MATH_CONSTANT("PI",M_PI)
-  MATH_CONSTANT("SQRT1_2",M_SQRT1_2)
-  MATH_CONSTANT("SQRT2",M_SQRT2)
+  MATH_CONSTANT("E",2.7182818284590452354)
+  MATH_CONSTANT("LN10",2.30258509299404568402)
+  MATH_CONSTANT("LN2",0.69314718055994530942)
+  MATH_CONSTANT("LOG2E",1.4426950408889634074)  
+  MATH_CONSTANT("LOG10E,",0.43429448190325182765)
+  MATH_CONSTANT("PI",3.14159265358979323846)
+  MATH_CONSTANT("SQRT1_2",0.70710678118654752440)
+  MATH_CONSTANT("SQRT2",1.41421356237309504880)
 
-  return super::lookup(identifier,want_lvalue);
+  return super::lookup(identifier);
   }
 
 
@@ -164,7 +168,7 @@ ref<value> Math::callMethod(string const &identifier,context const &ctx,paramete
       if (parameters.size() != 1) { \
         EXJS_THROWINFO(ECJS_INVALID_NUMBER_OF_ARGUMENTS,"Math." NAME) \
         } \
-      return makeConstantFloat(C_NAME(parameters[0]->toFloat())); \
+      return makeConstant(C_NAME(parameters[0]->toFloat())); \
       }
   
   MATH_FUNCTION("abs",fabs)
@@ -176,7 +180,9 @@ ref<value> Math::callMethod(string const &identifier,context const &ctx,paramete
   MATH_FUNCTION("exp",exp)
   MATH_FUNCTION("floor",floor)
   MATH_FUNCTION("log",log)
+  #ifndef WIN32
   MATH_FUNCTION("round",round)
+  #endif
   MATH_FUNCTION("sin",sin)
   MATH_FUNCTION("sqrt",sqrt)
   MATH_FUNCTION("tan",tan)
@@ -184,19 +190,30 @@ ref<value> Math::callMethod(string const &identifier,context const &ctx,paramete
     if (parameters.size() != 2) {
       EXJS_THROWINFO(ECJS_INVALID_NUMBER_OF_ARGUMENTS,"Math.atan2")
       }
-    return makeConstantFloat(atan2(parameters[0]->toFloat(),parameters[1]->toFloat()));
+    return makeConstant(atan2(parameters[0]->toFloat(),parameters[1]->toFloat()));
     }
   if (identifier == "pow") {
     if (parameters.size() != 2) {
       EXJS_THROWINFO(ECJS_INVALID_NUMBER_OF_ARGUMENTS,"Math.pow")
       }
-    return makeConstantFloat(pow(parameters[0]->toFloat(),parameters[1]->toFloat()));
+    return makeConstant(pow(parameters[0]->toFloat(),parameters[1]->toFloat()));
     }
   if (identifier == "random") {
     if (parameters.size() != 0) {
       EXJS_THROWINFO(ECJS_INVALID_NUMBER_OF_ARGUMENTS,"Math.random")
       }
-    return makeConstantFloat(RNG());
+    return makeConstant(RNG());
+    }
+  // *** FIXME this is non-compliant, but there is no equivalent standard function
+  if (identifier == "initRandom") {
+    if (parameters.size() >= 2) {
+      EXJS_THROWINFO(ECJS_INVALID_NUMBER_OF_ARGUMENTS,"Math.initRandom")
+      }
+    if (parameters.size() == 0)
+      RNG.init();
+    else if (parameters.size() == 1)
+      RNG.init(parameters[0]->toFloat());
+    return makeNull();
     }
   
   // *** FIXME: implement max, min
@@ -210,7 +227,7 @@ ref<value> Math::callMethod(string const &identifier,context const &ctx,paramete
 #define ADD_GLOBAL_OBJECT(NAME,TYPE) \
   { ref<value> x = new TYPE(); \
     EX_MEMCHECK(x.get()) \
-    ip.RootScope.addMember(NAME,x); \
+    ip.RootScope->addMember(NAME,x); \
     }
   
 
@@ -219,16 +236,20 @@ ref<value> Math::callMethod(string const &identifier,context const &ctx,paramete
 void javascript::addGlobal(interpreter &ip) {
   ref<value> ev = new eval(ip);
   EX_MEMCHECK(ev.get())
-  ip.RootScope.addMember("eval",ev);
+  ip.RootScope->addMember("eval",ev);
 
   ADD_GLOBAL_OBJECT("parseInt",parseInt)
   ADD_GLOBAL_OBJECT("parseFloat",parseFloat)
+  #ifndef WIN32
   ADD_GLOBAL_OBJECT("isNaN",isNaN)
   ADD_GLOBAL_OBJECT("isFinite",isFinite)
+  #endif
   
-  ip.RootScope.addMember("NaN",makeConstantFloat(NAN));
-  ip.RootScope.addMember("Infinity",makeConstantFloat(INFINITY));
-  ip.RootScope.addMember("undefined",makeUndefined());
+  // *** FIXME hope this is portable
+  float zero = 0;
+  ip.RootScope->addMember("NaN",makeConstant(0.0/zero));
+  ip.RootScope->addMember("Infinity",makeConstant(1.0/zero));
+  ip.RootScope->addMember("undefined",makeUndefined());
   }
 
 

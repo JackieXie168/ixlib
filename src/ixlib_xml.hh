@@ -1,14 +1,6 @@
 // ----------------------------------------------------------------------------
 //  Description      : iXiONmedia XML parser
 // ----------------------------------------------------------------------------
-//  Remarks          :
-//    tag::Children and tag::Text use the same indices. Thus, in the following
-//    piece of XML 
-//      <XML>  paff <EXPLOSION/> puff </XML>
-//    Text[0] would be "paff", Children[0] would be "EXPLOSION", Text[1] would
-//    be "puff".
-//
-// ----------------------------------------------------------------------------
 //  (c) Copyright 1999 by iXiONmedia, all rights reserved.
 // ----------------------------------------------------------------------------
 
@@ -64,6 +56,19 @@ namespace ixion {
 
 
 // xml_file -------------------------------------------------------------------
+  /**
+  An Object implementing an XML file parser and writer.
+  
+  tag::Children and tag::Text use the same indices. Thus, in the following
+  piece of XML 
+  
+  <code>
+    <XML>  paff <EXPLOSION/> puff </XML>
+    </code>
+    
+  Text[0] would be "paff", Children[0] would be "EXPLOSION", Text[1] would
+  be "puff".
+  */
   class xml_file {
     protected:
       typedef scanner::token_list::const_iterator token_iterator;

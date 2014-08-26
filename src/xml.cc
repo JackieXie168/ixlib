@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include "ixlib_i18n.hh"
 #include <ixlib_xml.hh>
 #include <ixlib_numconv.hh>
 #include <ixlib_token_xml.hh>

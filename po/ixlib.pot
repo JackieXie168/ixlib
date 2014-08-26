@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2000-09-14 16:23+0200\n"
+"POT-Creation-Date: 2001-03-23 21:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,174 +14,513 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: ENCODING\n"
 
-#: src/exgen.cc:22
+#: src/exgen.cc:23
 msgid "Unable to evaluate expression"
 msgstr ""
 
-#: src/exgen.cc:23
+#: src/exgen.cc:24
 msgid "Function not yet implemented"
 msgstr ""
 
-#: src/exgen.cc:24
+#: src/exgen.cc:25
 msgid "General error"
 msgstr ""
 
-#: src/exgen.cc:25
+#: src/exgen.cc:26
 msgid "NULL pointer encountered"
 msgstr ""
 
-#: src/exgen.cc:26
+#: src/exgen.cc:27
 msgid "Invalid parameter"
 msgstr ""
 
-#: src/exgen.cc:27
+#: src/exgen.cc:28
 msgid "Index out of range"
 msgstr ""
 
-#: src/exgen.cc:28
+#: src/exgen.cc:29
 msgid "Buffer overrun"
 msgstr ""
 
-#: src/exgen.cc:29
+#: src/exgen.cc:30
 msgid "Buffer underrun"
 msgstr ""
 
-#: src/exgen.cc:30
+#: src/exgen.cc:31
 msgid "Item not found"
 msgstr ""
 
-#: src/exgen.cc:31
+#: src/exgen.cc:32 src/js_interpreter.cc:53
 msgid "Invalid operation"
 msgstr ""
 
-#: src/exgen.cc:32
+#: src/exgen.cc:33
 msgid "Dimension mismatch"
 msgstr ""
 
-#: src/exgen.cc:33
+#: src/exgen.cc:34
 msgid "Operation cancelled"
 msgstr ""
 
-#: src/exgen.cc:34
+#: src/exgen.cc:35
 msgid "Unable to operate on empty set"
 msgstr ""
 
-#: src/exgen.cc:65
+#: src/exgen.cc:36
+msgid "Unable to remove GC entry"
+msgstr ""
+
+#: src/exgen.cc:37
+msgid "Unable to protect non-freeable entry"
+msgstr ""
+
+#: src/exgen.cc:44
 msgid "Unable to allocate memory"
 msgstr ""
 
-#: src/exio.cc:22
+#: src/exio.cc:23
 msgid "Unmatched wildcard"
 msgstr ""
 
-#: src/exio.cc:23
+#: src/exio.cc:24
 msgid "Parameter error: wildcard"
 msgstr ""
 
-#: src/exio.cc:24
+#: src/exio.cc:25
 msgid "Path syntax error"
 msgstr ""
 
-#: src/exio.cc:25
+#: src/exio.cc:26
 msgid "Path relative or invalid"
 msgstr ""
 
-#: src/exio.cc:26
+#: src/exio.cc:27
 msgid "Seek error"
 msgstr ""
 
-#: src/exio.cc:27
+#: src/exio.cc:28
 msgid "Read request across EOF"
 msgstr ""
 
-#: src/exio.cc:28
+#: src/exio.cc:29
 msgid "Write request across EOF"
 msgstr ""
 
-#: src/exio.cc:29
+#: src/exio.cc:30
 msgid "Write protection violation"
 msgstr ""
 
-#: src/exio.cc:30
+#: src/exio.cc:31
 msgid "File clipping violation"
 msgstr ""
 
-#: src/exio.cc:31
+#: src/exio.cc:32
 msgid "Internal error"
 msgstr ""
 
-#: src/exio.cc:32
+#: src/exio.cc:33
 msgid "No such file or directory"
 msgstr ""
 
-#: src/exio.cc:33
+#: src/exio.cc:34
 msgid "Access denied"
 msgstr ""
 
-#: src/exio.cc:34
+#: src/exio.cc:35
 msgid "File exists"
 msgstr ""
 
-#: src/exio.cc:35
+#: src/exio.cc:36
 msgid "Too many open files"
 msgstr ""
 
-#: src/exio.cc:36
+#: src/exio.cc:37
 msgid "Out of media space"
 msgstr ""
 
-#: src/exio.cc:37
+#: src/exio.cc:38
 msgid "File too big"
 msgstr ""
 
-#: src/exio.cc:38
+#: src/exio.cc:39
 msgid "Hardware failure"
 msgstr ""
 
-#: src/exio.cc:39
+#: src/exio.cc:40
 msgid "Path inaccessible"
 msgstr ""
 
-#: src/exio.cc:40
+#: src/exio.cc:41
 msgid "Continuity violation"
 msgstr ""
 
-#: src/exio.cc:41
+#: src/exio.cc:42
 msgid "Not supported"
 msgstr ""
 
-#: src/exio.cc:42
+#: src/exio.cc:43
 msgid "Invalid file format"
 msgstr ""
 
-#: src/exio.cc:43
+#: src/exio.cc:44
 msgid "Invalid replacement sequence"
 msgstr ""
 
-#: src/exio.cc:44
+#: src/exio.cc:45
 msgid "Invalid chunk"
 msgstr ""
 
-#: src/exio.cc:45
+#: src/exio.cc:46
 msgid "CRC error"
 msgstr ""
 
-#: src/re.cc:27
-msgid "Invalid quantifier"
+#: src/js_interpreter.cc:32
+msgid "instead of "
+msgstr ""
+
+#: src/js_interpreter.cc:51 src/xml.cc:48
+msgid "Unterminated comment"
+msgstr ""
+
+#: src/js_interpreter.cc:52
+msgid "Cannot convert"
+msgstr ""
+
+#: src/js_interpreter.cc:54
+msgid "Unexpected token encountered"
+msgstr ""
+
+#: src/js_interpreter.cc:55
+msgid "Unexpected end of file"
+msgstr ""
+
+#: src/js_interpreter.cc:56
+msgid "Cannot modify rvalue"
+msgstr ""
+
+#: src/js_interpreter.cc:57
+msgid "Unknown identifier"
+msgstr ""
+
+#: src/js_interpreter.cc:58
+msgid "Unknown operator"
+msgstr ""
+
+#: src/js_interpreter.cc:59
+msgid "Invalid non-local exit"
+msgstr ""
+
+#: src/js_interpreter.cc:60
+msgid "Invalid number of arguments"
+msgstr ""
+
+#: src/js_interpreter.cc:61
+msgid "Invalid token encountered"
+msgstr ""
+
+#: src/js_interpreter.cc:62
+msgid "Cannot redeclare identifier"
+msgstr ""
+
+#: src/js_interpreter.cc:215
+msgid "'(' in switch statement"
+msgstr ""
+
+#: src/js_interpreter.cc:219
+msgid "')' in switch statement"
+msgstr ""
+
+#: src/js_interpreter.cc:222
+msgid "'{' in switch statement"
+msgstr ""
+
+#: src/js_interpreter.cc:251
+msgid "':' in case label"
+msgstr ""
+
+#: src/js_interpreter.cc:264
+msgid "':' in default label"
+msgstr ""
+
+#: src/js_interpreter.cc:277
+msgid "'}' in switch statement"
+msgstr ""
+
+#: src/js_interpreter.cc:288
+msgid "var keyword"
+msgstr ""
+
+#: src/js_interpreter.cc:291 src/js_interpreter.cc:311
+#: src/js_interpreter.cc:337 src/js_interpreter.cc:357
+msgid "variable identifier"
+msgstr ""
+
+#: src/js_interpreter.cc:334
+msgid "const keyword"
+msgstr ""
+
+#: src/js_interpreter.cc:342 src/js_interpreter.cc:361
+msgid "initializer for constant"
+msgstr ""
+
+#: src/js_interpreter.cc:412
+msgid "function identifier"
+msgstr ""
+
+#: src/js_interpreter.cc:416
+msgid "'(' in function declaration"
+msgstr ""
+
+#: src/js_interpreter.cc:422
+msgid "parameter identifier"
+msgstr ""
+
+#: src/js_interpreter.cc:430
+msgid "')' in function declaration"
+msgstr ""
+
+#: src/js_interpreter.cc:433
+msgid "'{' in function definition"
+msgstr ""
+
+#: src/js_interpreter.cc:447
+msgid "'(' in if statement"
+msgstr ""
+
+#: src/js_interpreter.cc:451
+msgid "')' in if statement"
+msgstr ""
+
+#: src/js_interpreter.cc:468
+msgid "'(' in while statement"
+msgstr ""
+
+#: src/js_interpreter.cc:472
+msgid "')' in while statement"
+msgstr ""
+
+#: src/js_interpreter.cc:489
+msgid "'while' in do-while"
+msgstr ""
+
+#: src/js_interpreter.cc:492
+msgid "'(' in do-while statement"
+msgstr ""
+
+#: src/js_interpreter.cc:496
+msgid "')' in do-while statement"
+msgstr ""
+
+#: src/js_interpreter.cc:510
+msgid "'(' in for statement"
+msgstr ""
+
+#: src/js_interpreter.cc:524 src/js_interpreter.cc:548
+msgid "')' in for statement"
+msgstr ""
+
+#. for (;;) ...
+#: src/js_interpreter.cc:538 src/js_interpreter.cc:543
+msgid "';' in for statement"
+msgstr ""
+
+#: src/js_interpreter.cc:580
+msgid "break label"
+msgstr ""
+
+#: src/js_interpreter.cc:596
+msgid "continue label"
+msgstr ""
+
+#: src/js_interpreter.cc:674
+msgid "'(' in 'new' expression"
+msgstr ""
+
+#: src/js_interpreter.cc:686
+msgid "')' in 'new' expression"
+msgstr ""
+
+#: src/js_interpreter.cc:774
+msgid "')' in function call"
+msgstr ""
+
+#: src/js_interpreter.cc:802
+msgid "']' in subscript"
+msgstr ""
+
+#: src/js_value.cc:29
+msgid "to string from "
+msgstr ""
+
+#: src/js_value.cc:36
+msgid "to int from "
+msgstr ""
+
+#: src/js_value.cc:43
+msgid "to float from "
+msgstr ""
+
+#: src/js_value.cc:50
+msgid "to boolean from "
+msgstr ""
+
+#: src/js_value.cc:69
+msgid "duplication of "
+msgstr ""
+
+#: src/js_value.cc:77
+msgid "lookup of "
+msgstr ""
+
+#: src/js_value.cc:77 src/js_value.cc:116 src/js_value.cc:125
+#: src/js_value.cc:133 src/js_value.cc:141
+msgid " on "
+msgstr ""
+
+#: src/js_value.cc:85
+msgid "subscript on "
+msgstr ""
+
+#: src/js_value.cc:93
+msgid "call on "
+msgstr ""
+
+#: src/js_value.cc:101
+msgid "construction on "
+msgstr ""
+
+#: src/js_value.cc:108
+msgid "assignment to "
+msgstr ""
+
+#: src/js_value.cc:194
+msgid "prefix ++"
+msgstr ""
+
+#: src/js_value.cc:195 src/js_value.cc:197
+msgid "postfix ++"
+msgstr ""
+
+#: src/js_value.cc:196
+msgid "prefix --"
+msgstr ""
+
+#: src/js_value.cc:199
+msgid "unary +"
+msgstr ""
+
+#: src/js_value.cc:200
+msgid "unary -"
+msgstr ""
+
+#: src/js_value.cc:249
+msgid "undefined"
+msgstr ""
+
+#: src/js_value.cc:250
+msgid "null"
+msgstr ""
+
+#: src/js_value.cc:251
+msgid "integer"
+msgstr ""
+
+#: src/js_value.cc:252
+msgid "floating point"
+msgstr ""
+
+#: src/js_value.cc:253
+msgid "string"
+msgstr ""
+
+#: src/js_value.cc:254
+msgid "function"
+msgstr ""
+
+#: src/js_value.cc:255
+msgid "object"
+msgstr ""
+
+#: src/js_value.cc:256
+msgid "built-in object"
+msgstr ""
+
+#: src/js_value.cc:257
+msgid "host object"
+msgstr ""
+
+#: src/js_value.cc:258
+msgid "scope"
+msgstr ""
+
+#: src/js_value.cc:259
+msgid "bound method"
+msgstr ""
+
+#: src/js_value.cc:260
+msgid "type"
+msgstr ""
+
+#: src/js_value.cc:261
+msgid "unknown value type"
+msgstr ""
+
+#: src/js_value.cc:1148
+msgid "by assignment"
 msgstr ""
 
 #: src/re.cc:28
-msgid "Unbalanced backreference"
+msgid "Invalid quantifier"
 msgstr ""
 
 #: src/re.cc:29
-msgid "Invalid escape sequence"
+msgid "Unbalanced backreference"
 msgstr ""
 
 #: src/re.cc:30
-msgid "Invalid backreference"
+msgid "Invalid escape sequence"
 msgstr ""
 
 #: src/re.cc:31
+msgid "Invalid backreference"
+msgstr ""
+
+#: src/re.cc:32
 msgid "Unterminated character class"
+msgstr ""
+
+#: src/scanner.cc:26
+msgid "Unknown token"
+msgstr ""
+
+#: src/scanner.cc:27
+msgid "End of input"
+msgstr ""
+
+#: src/xml.cc:41
+msgid "Syntax error"
+msgstr ""
+
+#: src/xml.cc:42
+msgid "No text expected in this context"
+msgstr ""
+
+#: src/xml.cc:43
+msgid "No literal expected in this context"
+msgstr ""
+
+#: src/xml.cc:44
+msgid "Literal expected"
+msgstr ""
+
+#: src/xml.cc:45
+msgid "Unexpected end of input"
+msgstr ""
+
+#: src/xml.cc:46
+msgid "Close tag expected"
+msgstr ""
+
+#: src/xml.cc:47
+msgid "Close tag has different name"
 msgstr ""

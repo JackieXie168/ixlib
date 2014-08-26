@@ -1,16 +1,6 @@
 // ----------------------------------------------------------------------------
 //  Description      : Automatic arrays
 // ----------------------------------------------------------------------------
-//  Remarks          :
-//    The array does nothing in terms of deallocation or destruction.
-//    The tracking_array does nothing in terms of deallocation or destruction,
-//    but keeps track of which (linear consecutive) area of items has been
-//    constructed.
-//    The auto_array does automatically deallocate the storage it allocates,
-//    but does not destroy it before.
-//    The auto_destroy_array does deallocate and destroy automatically.
-//
-// ----------------------------------------------------------------------------
 //  (c) Copyright 1999 by iXiONmedia, all rights reserved.
 // ----------------------------------------------------------------------------
 
@@ -29,6 +19,11 @@
 
 
 namespace ixion {
+  /**
+  An object that provides methods for reallocatable array management.
+  
+  Nothing in terms of allocation or deallocation is done automatically.
+  */
   template<class T,class Allocator = allocator<T> >
   struct array {
     typedef T                                         value_type;
@@ -112,6 +107,13 @@ namespace ixion {
   
   
   
+  /**
+  An object that provides methods for reallocatable array management
+  and keeps track of which (linearly consecutive) area of items has been
+  constructed.
+  
+  Nothing in terms of allocation or deallocation is done automatically.
+  */
   template<class T,class Allocator = allocator<T> >
   class tracking_array: public array<T,Allocator> {
     pointer FirstValid,LastValid;
@@ -204,40 +206,48 @@ namespace ixion {
   
   
   
-  
+
+  /** 
+  An array object that automatically deallocates the storage it allocates,
+  but does nothing in terms of construction or destruction.
+  */
   template<class T,class Allocator = allocator<T> >
   class auto_array : public array<T,Allocator> {
-    typedef array<T,Allocator> super;
-  
+      typedef array<T,Allocator> super;
+    
     public:
-    auto_array(Allocator const &alloc = Allocator())
-      : super(alloc)
-      { }
-    auto_array(size_type cap,Allocator const &alloc = Allocator())
-      : super(cap,alloc)
-      { }
-    auto_array(auto_array &source)
-      : super(source)
-      { source.invalidate(); }
-    virtual ~auto_array()
-      { internal_deallocate(); }
-  
-    auto_array &operator=(auto_array &source) {
-      internal_deallocate();
-      super::operator=(source);
-      source.invalidate();
-      return *this;
-      }
-  
-    virtual void allocate(size_type cap) {
-      internal_deallocate();
-      super::allocate(cap);
-      }
+      auto_array(Allocator const &alloc = Allocator())
+        : super(alloc)
+        { }
+      auto_array(size_type cap,Allocator const &alloc = Allocator())
+        : super(cap,alloc)
+        { }
+      auto_array(auto_array &source)
+        : super(source)
+        { source.invalidate(); }
+      virtual ~auto_array()
+        { internal_deallocate(); }
+    
+      auto_array &operator=(auto_array &source) {
+        internal_deallocate();
+        super::operator=(source);
+        source.invalidate();
+        return *this;
+        }
+    
+      virtual void allocate(size_type cap) {
+        internal_deallocate();
+        super::allocate(cap);
+        }
   };
   
   
   
   
+  /** 
+  An array object that automatically deallocates the storage it allocates,
+  as well as calls the appropriate constructors at the right times.
+  */
   template<class T,class Allocator = allocator<T> >
   class auto_destroy_array: public tracking_array<T,Allocator> {
     typedef tracking_array<T,Allocator> super;

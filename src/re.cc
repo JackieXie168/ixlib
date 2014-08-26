@@ -9,6 +9,7 @@
 
 #include <stack>
 #include <cctype>
+#include "ixlib_i18n.hh"
 #include <ixlib_exgen.hh>
 #include <ixlib_numeric.hh>
 #include <ixlib_numconv.hh>

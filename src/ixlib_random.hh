@@ -1,10 +1,6 @@
 // ----------------------------------------------------------------------------
 //  Description      : Random numbers
 // ----------------------------------------------------------------------------
-//  Remarks          :
-//    max is never reached.
-//
-// ----------------------------------------------------------------------------
 //  (c) Copyright 1996 by iXiONmedia, all rights reserved.
 // ----------------------------------------------------------------------------
 
@@ -34,13 +30,17 @@ namespace ixion {
       : Seed(1)
       { }
   
-    void init()
-      { Seed = time(NULL); }
+    void init() { 
+      time_t current_time = time(NULL);
+      Seed = double(current_time)*sin(current_time); 
+      }
     void init(double seed)
       { Seed = fabs(seed); }
+
+    /// Generate one random number in the interval [0,max).
     double operator()(double max = 1) {
       // normalize
-      while (Seed > 2) Seed = log(Seed)/log(2);
+      while (Seed > 3) Seed = log(Seed);
       Seed -= floor(Seed);
       Seed = pow(Seed+Pi,8);
       Seed -= floor(Seed);
@@ -62,6 +62,8 @@ namespace ixion {
         { Generator.init(); }
       void init(unsigned seed)
         { Generator.init(seed); }
+      
+      /// Generate one random number in the interval [0,max).
       unsigned operator()(unsigned max = 32768) {
         unsigned num = rng8() + (rng8() << 7) + (rng8() << 14) + (rng8() << 21) + (rng8() << 28);
         return num % max;

@@ -110,7 +110,7 @@ bin_SCRIPTS = ixlib-config
 m4datadir = $(datadir)/aclocal
 m4data_DATA = ixlib.m4
 
-EXTRA_DIST = ixlib.m4
+EXTRA_DIST = ixlib.m4 ABOUT-NLS doxygen.cfg ixlib.doc
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ixlib_config.hh
@@ -379,6 +379,7 @@ distdir: $(DISTFILES)
 	      || exit 1; \
 	  fi; \
 	done
+	$(MAKE) $(AM_MAKEFLAGS) top_distdir="$(top_distdir)" distdir="$(distdir)" dist-hook
 info-am:
 info: info-recursive
 dvi-am:
@@ -461,6 +462,22 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 mrproper:
 	find -name '*.bck' -exec rm '{}' \;
+
+documentation:
+	rm -R doc
+	mkdir doc
+	doxygen doxygen.cfg
+
+dist-hook: documentation
+	tar cvfz ixlib-doc-@VERSION@.tar.gz -C doc/html .
+
+update-web-doc: documentation
+	rsync -e ssh --verbose --progress -r doc/html/ inducer@shell.sourceforge.net:/home/groups/ixlib/htdocs/doc
+
+update-web-site: 
+	rsync -e ssh --verbose --progress web/* inducer@shell.sourceforge.net:/home/groups/ixlib/htdocs
+
+update-web: update-web-doc update-web-site
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

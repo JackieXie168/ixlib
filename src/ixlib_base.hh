@@ -1,25 +1,16 @@
-// ----------------------------------------------------------------------------
-//  Description      : iXiONmedia library base declarations
-// ----------------------------------------------------------------------------
-//  Remarks          :
-//    This sole header must be C-safe for autoconf purposes.
-//
-// ----------------------------------------------------------------------------
-//  (c) Copyright 1996 by iXiONmedia, all rights reserved.
-// ----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+    Description      : iXiONmedia library base declarations
+   ----------------------------------------------------------------------------
+    (c) Copyright 1996 by iXiONmedia, all rights reserved.
+   ----------------------------------------------------------------------------
+   This header must be C-safe for autoconf purposes.
+   */
 
 
 
 
 #ifndef IXLIB_BASE
 #define IXLIB_BASE
-
-
-
-
-#include <libintl.h>
-#define _(String) gettext(String)
-#define N_(String) (String)
 
 
 
@@ -35,8 +26,10 @@
 
 #ifdef __cplusplus
 namespace ixion {
+  extern "C" {
 #endif
-// Aliases --------------------------------------------------------------------
+/* Aliases --------------------------------------------------------------------
+*/
   const double Pi = 3.141592653589793285;
   const double Euler = 2.718281828;
   const double Gravity = 9.8065; // m/s^2
@@ -49,7 +42,8 @@ namespace ixion {
 
 
 
-// STL Helper macro -----------------------------------------------------------
+/* STL Helper macro -----------------------------------------------------------
+*/
 #define FOREACH(VAR,LIST,LISTTYPE) \
   for (LISTTYPE::iterator VAR = (LIST).begin(),last = (LIST).end();VAR != last;VAR++) 
 #define FOREACH_CONST(VAR,LIST,LISTTYPE) \
@@ -58,7 +52,8 @@ namespace ixion {
 
 
 
-// Nomenclature typedefs ------------------------------------------------------
+/* Nomenclature typedefs ------------------------------------------------------
+*/
   typedef unsigned char   	TUnsigned8;
   typedef unsigned short  	TUnsigned16;
   typedef unsigned long   	TUnsigned32;
@@ -92,16 +87,17 @@ namespace ixion {
   
   
   
+  int ixlibGetMajorVersion();
+  int ixlibGetMinorVersion();
+  int ixlibGetMicroVersion();
+
+  void ixlibInitI18n();
+  
+  
+  
+  
   #ifdef __cplusplus
-  extern "C" {
-  #endif
-    int ixlibGetMajorVersion();
-    int ixlibGetMinorVersion();
-    int ixlibGetMicroVersion();
-    #ifdef __cplusplus
     }
-    #endif
-  #ifdef __cplusplus
   }
   #endif
 

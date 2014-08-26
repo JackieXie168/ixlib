@@ -148,6 +148,7 @@ true			return TT_JS_LIT_TRUE;
 false			return TT_JS_LIT_FALSE;
 undefined		return TT_JS_LIT_UNDEFINED;
 in			return TT_JS_IN;
+const			return TT_JS_CONST;
 
 {LIT_INT}		return TT_JS_LIT_INT;
 {LIT_FLOAT}		return TT_JS_LIT_FLOAT;
@@ -156,3 +157,4 @@ in			return TT_JS_IN;
 {IDENTIFIER}		return TT_JS_IDENTIFIER;
 
 {WHITESPACE}+		/* nothing */
+.			EXJS_THROWINFOLINE(ECJS_INVALID_TOKEN,YYText(),lineno())

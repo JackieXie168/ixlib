@@ -25,7 +25,7 @@ js_array(TSize size) {
 
   ref<value> null = javascript::makeNull();
   for (TIndex i = 0;i < size;i++)
-    Array[i] = null;
+    Array[i] = makeLValue(null);
   }
 
 
@@ -61,9 +61,9 @@ duplicate() const {
 
 ref<javascript::value> 
 js_array::
-lookup(string const &identifier,bool want_lvalue) {
-  if (identifier == "length") return javascript::makeInt(Array.size());
-  return super::lookup(identifier,want_lvalue);
+lookup(string const &identifier) {
+  if (identifier == "length") return javascript::makeConstant(Array.size());
+  return super::lookup(identifier);
   }
 
 
@@ -71,12 +71,9 @@ lookup(string const &identifier,bool want_lvalue) {
 
 ref<javascript::value> 
 js_array::
-subscript(value const &index,bool want_lvalue) {
+subscript(value const &index) {
   TIndex idx = index.toInt();
-  if (want_lvalue)
-    return javascript::makeLValue(operator[](idx));
-  else
-    return operator[](idx);
+  return operator[](idx);
   }
 
 
@@ -97,7 +94,7 @@ callMethod(string const &id,javascript::context const &ctx,parameter_list const 
     FOREACH_CONST(first,parameters,parameter_list) {
       Array.push_back((*first)->duplicate());
       }
-    return javascript::makeInt(Array.size());
+    return javascript::makeConstant(Array.size());
     }
   else if (id == "reverse" && parameters.size() == 0) {
     reverse(Array.begin(),Array.end());
@@ -124,7 +121,7 @@ callMethod(string const &id,javascript::context const &ctx,parameter_list const 
     FOREACH_CONST(first,parameters,parameter_list) {
       Array.insert(Array.begin() + i++,(*first)->duplicate());
       }
-    return javascript::makeInt(Array.size());
+    return javascript::makeConstant(Array.size());
     }
   // *** FIXME: implement join, splice and sort
   
@@ -142,7 +139,7 @@ void js_array::resize(TSize size) {
     
     ref<value> null = javascript::makeNull();
     for (TIndex i = prevsize;i < size;i++)
-      Array[i] = null;
+      Array[i] = makeLValue(null);
     }
   }
 

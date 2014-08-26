@@ -5,10 +5,10 @@
 AC_INIT(src/ixlib_base.hh)
 
 ix_ixlib_major_version=0
-ix_ixlib_minor_version=94
+ix_ixlib_minor_version=95
 ix_ixlib_micro_version=0
 
-IXLIB_BINARY_IFACE_VERSION=0
+IXLIB_BINARY_IFACE_VERSION=1
 IXLIB_BINARY_REVISION=$ix_ixlib_minor_version
 IXLIB_BINARY_AGE=0
 AC_SUBST(IXLIB_BINARY_IFACE_VERSION)
@@ -29,6 +29,9 @@ AC_DEFINE_UNQUOTED(IXLIB_MICRO_VERSION,$ix_ixlib_micro_version,
 # -----------------------------------------------------------------------------
 
 ALL_LINGUAS="de"
+
+# Not for c++, yet (2001-03-11)
+# AC_LIBTOOL_WIN32_DLL
 
 AC_PROG_CC
 AC_PROG_CXX

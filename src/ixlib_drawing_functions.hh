@@ -1,19 +1,8 @@
 // ----------------------------------------------------------------------------
 //  Description      : Generic drawing functions
 // ----------------------------------------------------------------------------
-//  Remarks          : none.
-//
-// ----------------------------------------------------------------------------
 //  (c) Copyright 2000 by iXiONmedia, all rights reserved.
 // ----------------------------------------------------------------------------
-// the line routine only draws [(x1,y1),(x2,y2)), i.e. leaves out the last pixel
-// set it manually if needed
-// the target object must implement 
-// * setPixel(x,y)
-// * drawHLine(x1,y,x2) draws [x1,x2)
-// * drawVLine(x,y1,y2) draws [y1,y2)
-// further, the target interface must be stateful with respect to drawing modes
-// and colors (i.e. these cannot be passed by these functions)
 
 
 
@@ -30,7 +19,26 @@
 
 
 namespace ixion {
+  /**
+  A namespace containing functions that implement drawing primitives on
+  a "Target" object that must have the following methods:
+  <ul>
+    <li> setPixel(x,y)
+    <li> drawHLine(x1,y,x2) draws [x1,x2)
+    <li> drawVLine(x,y1,y2) draws [y1,y2)
+    </ul>
+    
+  Further, the Target interface must be stateful with respect to drawing modes
+  and colors (i.e. these cannot be passed through these functions).
+  */
   namespace drawing_functions {
+    /**
+    Draws a line from [(x1,y1),(x2,y2)), i.e. leaves out the last pixel.
+    Set manually if needed.
+    
+    This is done to allow faciliating the drawing of multiple lines
+    in-a-row.
+    */
     template<class Target>
     void drawLine(Target &target,int x1,int y1,int x2,int y2);
     

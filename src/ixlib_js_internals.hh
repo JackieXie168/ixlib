@@ -1,9 +1,6 @@
 // ----------------------------------------------------------------------------
 //  Description      : Javascript interpreter
 // ----------------------------------------------------------------------------
-//  Remarks          : none.
-//
-// ----------------------------------------------------------------------------
 //  (c) Copyright 2000 by iXiONmedia, all rights reserved.
 // ----------------------------------------------------------------------------
 
@@ -24,11 +21,9 @@
 namespace ixion {
   namespace javascript {
     struct context {
-      list_scope	*CurrentScope;
-      list_scope	*RootScope;
+      ref<list_scope,value>	CurrentScope;
       
-      context(list_scope *rootscope);
-      context(context const &ctx,list_scope *current_scope);
+      context(ref<list_scope,value> scope);
       };
     
     struct return_exception {
@@ -74,15 +69,15 @@ namespace ixion {
         const_floating_point(double value);
     
         value_type getType() const;
-        string toString() const;
         int toInt() const;
         double toFloat() const;
         bool toBoolean() const;
-
-        ref<value> duplicate() const;
+        string toString() const;
         
+        ref<value> duplicate() const;
+	
         ref<value> callMethod(string const &identifier,context const &ctx,parameter_list const &parameters);
-
+	
         ref<value> operatorUnary(operator_id op) const;
         ref<value> operatorBinary(operator_id op,expression const &op2,context const &ctx) const;
       };
@@ -93,6 +88,41 @@ namespace ixion {
         
       public:
         floating_point(double value);
+
+        ref<value> operatorUnaryModifying(operator_id op);
+        ref<value> operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx);
+      };
+      
+    class const_integer : public value_with_methods {
+      private:
+        typedef value_with_methods 	super;
+
+      protected:
+        long 				Value;
+      
+      public:
+        const_integer(long value);
+    
+        value_type getType() const;
+        int toInt() const;
+        double toFloat() const;
+        bool toBoolean() const;
+        string toString() const;
+        
+        ref<value> duplicate() const;
+	
+        ref<value> callMethod(string const &identifier,context const &ctx,parameter_list const &parameters);
+	
+        ref<value> operatorUnary(operator_id op) const;
+        ref<value> operatorBinary(operator_id op,expression const &op2,context const &ctx) const;
+      };
+
+    class integer : public const_integer {
+      private:
+        typedef const_integer	super;
+        
+      public:
+        integer(long value);
 
         ref<value> operatorUnaryModifying(operator_id op);
         ref<value> operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx);
@@ -111,10 +141,11 @@ namespace ixion {
         value_type getType() const;
         string toString() const;
         bool toBoolean() const;
+	string stringify() const;
 
         ref<value> duplicate() const;
         
-        ref<value> lookup(string const &identifier,bool want_lvalue);
+        ref<value> lookup(string const &identifier);
         ref<value> callMethod(string const &identifier,context const &ctx,parameter_list const &parameters);
 
         ref<value> operatorBinary(operator_id op,expression const &op2,context const &ctx) const;
@@ -123,10 +154,10 @@ namespace ixion {
       
     class lvalue : public value {
       protected:
-        ref<value>	&Reference;
+        ref<value>	Reference;
       
       public:
-        lvalue(ref<value> &ref);
+        lvalue(ref<value> ref);
         
         value_type getType() const;
         string toString() const;
@@ -137,8 +168,8 @@ namespace ixion {
 
         ref<value> duplicate() const;
         
-        ref<value> lookup(string const &identifier,bool want_lvalue);
-        ref<value> subscript(value const &index,bool want_lvalue);
+        ref<value> lookup(string const &identifier);
+        ref<value> subscript(value const &index);
         ref<value> call(context const &ctx,parameter_list const &parameters) const;
         ref<value> assign(ref<value> op2);
 
@@ -164,8 +195,8 @@ namespace ixion {
 
         ref<value> duplicate() const;
         
-        ref<value> lookup(string const &identifier,bool want_lvalue);
-        ref<value> subscript(value const &index,bool want_lvalue);
+        ref<value> lookup(string const &identifier);
+        ref<value> subscript(value const &index);
         ref<value> call(context const &ctx,parameter_list const &parameters) const;
         ref<value> assign(ref<value> value);
 
@@ -180,11 +211,12 @@ namespace ixion {
         typedef vector<string>		parameter_name_list;
         
       protected:
-        parameter_name_list			ParameterNameList;
+        parameter_name_list		ParameterNameList;
         ref<expression>			Body;
+	ref<value>			LexicalScope;
       
       public:
-        function(parameter_name_list const &pnames,ref<expression> body);
+        function(parameter_name_list const &pnames,ref<expression> body,ref<value> lex_scope);
 
         value_type getType() const{
           return VT_FUNCTION;
@@ -213,7 +245,7 @@ namespace ixion {
         ref<value>		Value;
       public:
         constant(ref<value> val);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
     
     class unary_operator : public expression {
@@ -223,7 +255,7 @@ namespace ixion {
       
       public:
         unary_operator(value::operator_id opt,ref<expression> opn);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
 
     class modifying_unary_operator : public expression {
@@ -233,7 +265,7 @@ namespace ixion {
       
       public:
         modifying_unary_operator(value::operator_id opt,ref<expression> opn);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
       
     class binary_operator : public expression {
@@ -244,7 +276,7 @@ namespace ixion {
       
       public:
         binary_operator(value::operator_id opt,ref<expression> opn1,ref<expression> opn2);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
 
     class modifying_binary_operator : public expression {
@@ -255,7 +287,7 @@ namespace ixion {
       
       public:
         modifying_binary_operator(value::operator_id opt,ref<expression> opn1,ref<expression> opn2);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
     
     class ternary_operator : public expression {
@@ -266,7 +298,7 @@ namespace ixion {
       
       public:
         ternary_operator(ref<expression> opn1,ref<expression> opn2,ref<expression> opn3);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
     
     class subscript_operation : public expression {
@@ -276,7 +308,7 @@ namespace ixion {
       
       public:
         subscript_operation(ref<expression> opn1,ref<expression> opn2);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
 
     class lookup_operation : public expression {
@@ -287,7 +319,7 @@ namespace ixion {
       public:
         lookup_operation(string const &id);
         lookup_operation(ref<expression> opn,string const &id);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
     
     class assignment : public expression {
@@ -297,7 +329,7 @@ namespace ixion {
       
       public:
         assignment(ref<expression> opn1,ref<expression> opn2);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
     
     class function_call : public expression {
@@ -310,7 +342,7 @@ namespace ixion {
       
       public:
         function_call(ref<expression> fun,parameter_expression_list const &pexps);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
 
     class construction : public expression {
@@ -323,7 +355,7 @@ namespace ixion {
       
       public:
         construction(ref<expression> cls,parameter_expression_list const &pexps);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
 
     // instructions ---------------------------------------------------------
@@ -334,7 +366,17 @@ namespace ixion {
       
       public:
         variable_declaration(string const &id,ref<expression> def_value);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
+      };
+
+    class constant_declaration : public expression {
+      protected:
+        string		Identifier;
+        ref<expression>	DefaultValue;
+      
+      public:
+        constant_declaration(string const &id,ref<expression> def_value);
+        ref<value> evaluate(context const &ctx) const;
       };
 
     class function_declaration : public expression {
@@ -343,28 +385,28 @@ namespace ixion {
 
       protected:
         string			Identifier;
-        parameter_name_list		ParameterNameList;
+        parameter_name_list	ParameterNameList;
         ref<expression>		Body;
       
       public:
         function_declaration(string const &id,parameter_name_list const &pnames,
           ref<expression> body);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
     
     class instruction_list : public expression {
       protected:
         typedef vector<ref<expression> >	expression_list;
-        expression_list			ExpressionList;
+        expression_list				ExpressionList;
       
       public:
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
         void add(ref<expression> expr);
       };
     
     class scoped_instruction_list : public instruction_list {
       public:
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
     
     class js_if : public expression {
@@ -375,7 +417,7 @@ namespace ixion {
       
       public:
         js_if(ref<expression> cond,ref<expression> ifex,ref<expression> ifnotex);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
 
     class js_while : public expression {
@@ -388,7 +430,7 @@ namespace ixion {
       public:
         js_while(ref<expression> cond,ref<expression> loopex);
         js_while(ref<expression> cond,ref<expression> loopex,string const &Label);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
 
     class js_do_while : public expression {
@@ -401,7 +443,7 @@ namespace ixion {
       public:
         js_do_while(ref<expression> cond,ref<expression> loopex);
         js_do_while(ref<expression> cond,ref<expression> loopex,string const &Label);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
 
     class js_for : public expression {
@@ -416,7 +458,7 @@ namespace ixion {
       public:
         js_for(ref<expression> init,ref<expression> cond,ref<expression> update,ref<expression> loop);
         js_for(ref<expression> init,ref<expression> cond,ref<expression> update,ref<expression> loop,string const &label);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
     
     class js_for_in : public expression {
@@ -430,7 +472,7 @@ namespace ixion {
       public:
         js_for_in(ref<expression> iter,ref<expression> array,ref<expression> loop);
         js_for_in(ref<expression> iter,ref<expression> array,ref<expression> loop,string const &label);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
     
     class js_return : public expression {
@@ -440,7 +482,7 @@ namespace ixion {
       
       public:
         js_return(unsigned line,ref<expression> retval);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
 
     class js_break : public expression {
@@ -452,7 +494,7 @@ namespace ixion {
       public:
         js_break(unsigned line);
         js_break(unsigned line,string const &label);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
 
     class js_continue : public expression {
@@ -464,7 +506,7 @@ namespace ixion {
       public:
         js_continue(unsigned line);
         js_continue(unsigned line,string const &label);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
     
     class break_label : public expression {
@@ -474,7 +516,7 @@ namespace ixion {
       
       public:
         break_label(string const &label,ref<expression> expr);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
       };
 
     class js_switch : public expression {
@@ -493,7 +535,7 @@ namespace ixion {
       public:
         js_switch(ref<expression> discriminant);
         js_switch(ref<expression> discriminant,string const &label);
-        ref<value> evaluate(context const &ctx,bool want_lvalue) const;
+        ref<value> evaluate(context const &ctx) const;
         void addCase(ref<expression> dvalue,ref<expression> expr);
       };
     }

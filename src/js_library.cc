@@ -42,7 +42,7 @@ namespace {
       eval(interpreter &interpreter)
         : Interpreter(interpreter) {
 	}
-      ref<value> call(context const &ctx,parameter_list const &parameters) const;
+      ref<value> call(parameter_list const &parameters);
     };
     
   class Math : public value_with_methods {
@@ -60,7 +60,7 @@ namespace {
       ref<value> duplicate() const;
 
       ref<value> lookup(string const &identifier);
-      ref<value> callMethod(string const &identifier,context const &ctx,parameter_list const &parameters);
+      ref<value> callMethod(string const &identifier,parameter_list const &parameters);
     };
   }
   
@@ -70,7 +70,7 @@ namespace {
 // eval -----------------------------------------------------------------------
 ref<value> 
 eval::
-call(context const &ctx,parameter_list const &parameters) const {
+call(parameter_list const &parameters) {
   if (parameters.size() != 1) {
     EXJS_THROWINFO(ECJS_INVALID_NUMBER_OF_ARGUMENTS,"eval")
     }
@@ -162,7 +162,7 @@ ref<value> Math::lookup(string const &identifier) {
 
 
 
-ref<value> Math::callMethod(string const &identifier,context const &ctx,parameter_list const &parameters) {
+ref<value> Math::callMethod(string const &identifier,parameter_list const &parameters) {
   #define MATH_FUNCTION(NAME,C_NAME) \
     if (identifier == NAME) { \
       if (parameters.size() != 1) { \
@@ -171,7 +171,7 @@ ref<value> Math::callMethod(string const &identifier,context const &ctx,paramete
       return makeConstant(C_NAME(parameters[0]->toFloat())); \
       }
   
-  MATH_FUNCTION("abs",fabs)
+  MATH_FUNCTION("abs",NUM_ABS)
   MATH_FUNCTION("acos",acos)
   MATH_FUNCTION("asin",asin)
   MATH_FUNCTION("atan",atan)
@@ -226,7 +226,6 @@ ref<value> Math::callMethod(string const &identifier,context const &ctx,paramete
 // external interface functions -----------------------------------------------
 #define ADD_GLOBAL_OBJECT(NAME,TYPE) \
   { ref<value> x = new TYPE(); \
-    EX_MEMCHECK(x.get()) \
     ip.RootScope->addMember(NAME,x); \
     }
   
@@ -235,7 +234,6 @@ ref<value> Math::callMethod(string const &identifier,context const &ctx,paramete
 
 void javascript::addGlobal(interpreter &ip) {
   ref<value> ev = new eval(ip);
-  EX_MEMCHECK(ev.get())
   ip.RootScope->addMember("eval",ev);
 
   ADD_GLOBAL_OBJECT("parseInt",parseInt)

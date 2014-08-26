@@ -21,29 +21,29 @@
 
 namespace ixion {
   class command_line {
-    vector<string>       Parameters;
-    string               Command;
+    std::vector<std::string>	Parameters;
+    std::string			Command;
   
     public:
     command_line(int argc = 0,char *argv[] = NULL);
   
-    void extend(string const &par);
+    void extend(std::string const &par);
   
     TSize operator~() const
       { return Parameters.size(); }
-    string operator[](TIndex no) const
+    std::string operator[](TIndex no) const
       { return Parameters[no]; }
   
-    string getCommand() const
+    std::string getCommand() const
       { return Command; }
   
-    TSize count(string const &mask);
-    string get(string const &mask,TIndex matchno = 0);
+    TSize count(std::string const &mask);
+    std::string get(std::string const &mask,TIndex matchno = 0);
   
     private:
-    static bool isHook(string const &text)
+    static bool isHook(std::string const &text)
       { return text[0] == '@'; }
-    static bool matchMask(string const &mask,string const &par);
+    static bool matchMask(std::string const &mask,std::string const &par);
     };
   }
 

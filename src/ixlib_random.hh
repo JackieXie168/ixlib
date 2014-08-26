@@ -17,6 +17,7 @@
 #include <cmath>
 #include <ctime>
 #include <ixlib_base.hh>
+#include <ixlib_numeric.hh>
 
 
 
@@ -31,11 +32,11 @@ namespace ixion {
       { }
   
     void init() { 
-      time_t current_time = time(NULL);
-      Seed = double(current_time)*sin(current_time); 
+      double current_time = time(NULL);
+      Seed = current_time*sin(current_time); 
       }
     void init(double seed)
-      { Seed = fabs(seed); }
+      { Seed = NUM_ABS(seed); }
 
     /// Generate one random number in the interval [0,max).
     double operator()(double max = 1) {

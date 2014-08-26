@@ -31,6 +31,7 @@
 
 
 
+using namespace std;
 using namespace ixion;
 
 
@@ -81,7 +82,6 @@ xml_file::tag::tag(xml_file::tag const &source)
 : Name(source.Name),Attributes(source.Attributes),Text(source.Text) {
   FOREACH_CONST(first,source,tag) {
     tag *tg = new tag(**first);
-    EX_MEMCHECK(tg)
     Children.push_back(tg);
     }
   
@@ -205,7 +205,6 @@ void xml_file::tag::parse(token_iterator &first,token_iterator const &last) {
 	break;
       case TT_XML_BEGIN_TAG:
         tg = new tag;
-	EX_MEMCHECK(tg)
 	try {
 	  tg->parse(first,last);
 	  Children.push_back(tg);
@@ -313,7 +312,6 @@ void xml_file::parse(scanner::token_list const &tokenlist) {
       case TT_XML_STRINGLITERAL:
       case TT_XML_BEGIN_TAG:
         RootTag = new tag;
-	EX_MEMCHECK(RootTag)
 	try {
 	  RootTag->parse(first,last);
 	  }

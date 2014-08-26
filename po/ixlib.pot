@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-04-17 18:05+0200\n"
+"POT-Creation-Date: 2001-06-29 18:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,7 +50,7 @@ msgstr ""
 msgid "Item not found"
 msgstr ""
 
-#: src/exgen.cc:32 src/js_interpreter.cc:53
+#: src/exgen.cc:32 src/js_interpreter.cc:65
 msgid "Invalid operation"
 msgstr ""
 
@@ -72,10 +72,6 @@ msgstr ""
 
 #: src/exgen.cc:37
 msgid "Unable to protect non-freeable entry"
-msgstr ""
-
-#: src/exgen.cc:44
-msgid "Unable to allocate memory"
 msgstr ""
 
 #: src/exio.cc:23
@@ -174,357 +170,412 @@ msgstr ""
 msgid "CRC error"
 msgstr ""
 
-#: src/js_interpreter.cc:32
+#: src/js_interpreter.cc:33 src/js_interpreter.cc:463
 msgid "instead of "
 msgstr ""
 
-#: src/js_interpreter.cc:51 src/xml.cc:48
+#: src/js_interpreter.cc:63 src/xml.cc:49
 msgid "Unterminated comment"
 msgstr ""
 
-#: src/js_interpreter.cc:52
+#: src/js_interpreter.cc:64
 msgid "Cannot convert"
 msgstr ""
 
-#: src/js_interpreter.cc:54
+#: src/js_interpreter.cc:66
 msgid "Unexpected token encountered"
 msgstr ""
 
-#: src/js_interpreter.cc:55
+#: src/js_interpreter.cc:67
 msgid "Unexpected end of file"
 msgstr ""
 
-#: src/js_interpreter.cc:56
+#: src/js_interpreter.cc:68
 msgid "Cannot modify rvalue"
 msgstr ""
 
-#: src/js_interpreter.cc:57
+#: src/js_interpreter.cc:69
 msgid "Unknown identifier"
 msgstr ""
 
-#: src/js_interpreter.cc:58
+#: src/js_interpreter.cc:70
 msgid "Unknown operator"
 msgstr ""
 
-#: src/js_interpreter.cc:59
+#: src/js_interpreter.cc:71
 msgid "Invalid non-local exit"
 msgstr ""
 
-#: src/js_interpreter.cc:60
+#: src/js_interpreter.cc:72
 msgid "Invalid number of arguments"
 msgstr ""
 
-#: src/js_interpreter.cc:61
+#: src/js_interpreter.cc:73
 msgid "Invalid token encountered"
 msgstr ""
 
-#: src/js_interpreter.cc:62
+#: src/js_interpreter.cc:74
 msgid "Cannot redeclare identifier"
 msgstr ""
 
-#: src/js_interpreter.cc:215
+#: src/js_interpreter.cc:75
+msgid "Constructor called on constructed object"
+msgstr ""
+
+#: src/js_interpreter.cc:76
+msgid "No superclass available"
+msgstr ""
+
+#: src/js_interpreter.cc:221
 msgid "'(' in switch statement"
 msgstr ""
 
-#: src/js_interpreter.cc:219
+#: src/js_interpreter.cc:225
 msgid "')' in switch statement"
 msgstr ""
 
-#: src/js_interpreter.cc:222
+#: src/js_interpreter.cc:228
 msgid "'{' in switch statement"
 msgstr ""
 
-#: src/js_interpreter.cc:251
+#: src/js_interpreter.cc:255
 msgid "':' in case label"
 msgstr ""
 
-#: src/js_interpreter.cc:264
+#: src/js_interpreter.cc:267
 msgid "':' in default label"
 msgstr ""
 
-#: src/js_interpreter.cc:277
+#: src/js_interpreter.cc:280
 msgid "'}' in switch statement"
 msgstr ""
 
-#: src/js_interpreter.cc:288
-msgid "var keyword"
-msgstr ""
-
-#: src/js_interpreter.cc:291 src/js_interpreter.cc:311
-#: src/js_interpreter.cc:337 src/js_interpreter.cc:357
+#: src/js_interpreter.cc:293 src/js_interpreter.cc:313
 msgid "variable identifier"
 msgstr ""
 
-#: src/js_interpreter.cc:334
-msgid "const keyword"
+#: src/js_interpreter.cc:337 src/js_interpreter.cc:357
+msgid "constant identifier"
 msgstr ""
 
 #: src/js_interpreter.cc:342 src/js_interpreter.cc:361
 msgid "initializer for constant"
 msgstr ""
 
-#: src/js_interpreter.cc:412
+#: src/js_interpreter.cc:381
 msgid "function identifier"
 msgstr ""
 
-#: src/js_interpreter.cc:416
+#: src/js_interpreter.cc:385
 msgid "'(' in function declaration"
 msgstr ""
 
-#: src/js_interpreter.cc:422
+#: src/js_interpreter.cc:391 src/js_interpreter.cc:431
+#: src/js_interpreter.cc:473
 msgid "parameter identifier"
 msgstr ""
 
-#: src/js_interpreter.cc:430
+#: src/js_interpreter.cc:399
 msgid "')' in function declaration"
 msgstr ""
 
-#: src/js_interpreter.cc:433
+#: src/js_interpreter.cc:402
 msgid "'{' in function definition"
 msgstr ""
 
-#: src/js_interpreter.cc:447
+#: src/js_interpreter.cc:421
+msgid "method identifier"
+msgstr ""
+
+#: src/js_interpreter.cc:425
+msgid "'(' in method declaration"
+msgstr ""
+
+#: src/js_interpreter.cc:439
+msgid "')' in method declaration"
+msgstr ""
+
+#: src/js_interpreter.cc:442
+msgid "'{' in method definition"
+msgstr ""
+
+#: src/js_interpreter.cc:461
+msgid "constructor identifier"
+msgstr ""
+
+#: src/js_interpreter.cc:463 src/js_interpreter.cc:503
+msgid "class identifier"
+msgstr ""
+
+#: src/js_interpreter.cc:467
+msgid "'(' in constructor declaration"
+msgstr ""
+
+#: src/js_interpreter.cc:481
+msgid "')' in constructor declaration"
+msgstr ""
+
+#: src/js_interpreter.cc:484
+msgid "'{' in constructor definition"
+msgstr ""
+
+#: src/js_interpreter.cc:513
+msgid "'{' in class declaration"
+msgstr ""
+
+#: src/js_interpreter.cc:547
+msgid "'function' keyword"
+msgstr ""
+
+#: src/js_interpreter.cc:623
 msgid "'(' in if statement"
 msgstr ""
 
-#: src/js_interpreter.cc:451
+#: src/js_interpreter.cc:627
 msgid "')' in if statement"
 msgstr ""
 
-#: src/js_interpreter.cc:468
+#: src/js_interpreter.cc:645
 msgid "'(' in while statement"
 msgstr ""
 
-#: src/js_interpreter.cc:472
+#: src/js_interpreter.cc:649
 msgid "')' in while statement"
 msgstr ""
 
-#: src/js_interpreter.cc:489
+#: src/js_interpreter.cc:667
 msgid "'while' in do-while"
 msgstr ""
 
-#: src/js_interpreter.cc:492
+#: src/js_interpreter.cc:670
 msgid "'(' in do-while statement"
 msgstr ""
 
-#: src/js_interpreter.cc:496
+#: src/js_interpreter.cc:674
 msgid "')' in do-while statement"
 msgstr ""
 
-#: src/js_interpreter.cc:510
+#: src/js_interpreter.cc:689
 msgid "'(' in for statement"
 msgstr ""
 
-#: src/js_interpreter.cc:524 src/js_interpreter.cc:548
+#: src/js_interpreter.cc:706 src/js_interpreter.cc:730
 msgid "')' in for statement"
 msgstr ""
 
 #. for (;;) ...
-#: src/js_interpreter.cc:538 src/js_interpreter.cc:543
+#: src/js_interpreter.cc:720 src/js_interpreter.cc:725
 msgid "';' in for statement"
 msgstr ""
 
-#: src/js_interpreter.cc:580
+#: src/js_interpreter.cc:760
 msgid "break label"
 msgstr ""
 
-#: src/js_interpreter.cc:596
+#: src/js_interpreter.cc:775
 msgid "continue label"
 msgstr ""
 
-#: src/js_interpreter.cc:674
+#: src/js_interpreter.cc:854
 msgid "'(' in 'new' expression"
 msgstr ""
 
-#: src/js_interpreter.cc:686
+#: src/js_interpreter.cc:866
 msgid "')' in 'new' expression"
 msgstr ""
 
-#: src/js_interpreter.cc:774
+#: src/js_interpreter.cc:953
 msgid "')' in function call"
 msgstr ""
 
-#: src/js_interpreter.cc:802
+#: src/js_interpreter.cc:979
 msgid "']' in subscript"
 msgstr ""
 
-#: src/js_value.cc:29
-msgid "to string from "
+#: src/js_value.cc:31
+msgid "-> string"
 msgstr ""
 
-#: src/js_value.cc:36
-msgid "to int from "
+#: src/js_value.cc:39
+msgid " -> int"
 msgstr ""
 
-#: src/js_value.cc:43
-msgid "to float from "
+#: src/js_value.cc:47
+msgid " -> float"
 msgstr ""
 
-#: src/js_value.cc:50
-msgid "to boolean from "
+#: src/js_value.cc:55
+msgid " -> bool"
 msgstr ""
 
-#: src/js_value.cc:69
-msgid "duplication of "
+#: src/js_value.cc:75
+msgid ": duplication"
 msgstr ""
 
-#: src/js_value.cc:77
-msgid "lookup of "
-msgstr ""
-
-#: src/js_value.cc:77 src/js_value.cc:116 src/js_value.cc:125
-#: src/js_value.cc:133 src/js_value.cc:141
-msgid " on "
-msgstr ""
-
-#: src/js_value.cc:85
-msgid "subscript on "
+#: src/js_value.cc:84
+msgid ": lookup of "
 msgstr ""
 
 #: src/js_value.cc:93
-msgid "call on "
+msgid ": subscript"
 msgstr ""
 
-#: src/js_value.cc:101
-msgid "construction on "
+#: src/js_value.cc:102
+msgid ": call"
 msgstr ""
 
-#: src/js_value.cc:108
-msgid "assignment to "
+#: src/js_value.cc:111
+msgid ": call as method"
 msgstr ""
 
-#: src/js_value.cc:194
+#: src/js_value.cc:120
+msgid ": construction"
+msgstr ""
+
+#: src/js_value.cc:128
+msgid ": assignment"
+msgstr ""
+
+#: src/js_value.cc:137
+msgid ": operator "
+msgstr ""
+
+#: src/js_value.cc:171 src/js_value.cc:180
+msgid " on "
+msgstr ""
+
+#: src/js_value.cc:242
 msgid "prefix ++"
 msgstr ""
 
-#: src/js_value.cc:195 src/js_value.cc:197
+#: src/js_value.cc:243 src/js_value.cc:245
 msgid "postfix ++"
 msgstr ""
 
-#: src/js_value.cc:196
+#: src/js_value.cc:244
 msgid "prefix --"
 msgstr ""
 
-#: src/js_value.cc:199
+#: src/js_value.cc:247
 msgid "unary +"
 msgstr ""
 
-#: src/js_value.cc:200
+#: src/js_value.cc:248
 msgid "unary -"
 msgstr ""
 
-#: src/js_value.cc:249
+#: src/js_value.cc:297
 msgid "undefined"
 msgstr ""
 
-#: src/js_value.cc:250
+#: src/js_value.cc:298
 msgid "null"
 msgstr ""
 
-#: src/js_value.cc:251
+#: src/js_value.cc:299
 msgid "integer"
 msgstr ""
 
-#: src/js_value.cc:252
+#: src/js_value.cc:300
 msgid "floating point"
 msgstr ""
 
-#: src/js_value.cc:253
+#: src/js_value.cc:301
 msgid "string"
 msgstr ""
 
-#: src/js_value.cc:254
+#: src/js_value.cc:302
 msgid "function"
 msgstr ""
 
-#: src/js_value.cc:255
+#: src/js_value.cc:303
 msgid "object"
 msgstr ""
 
-#: src/js_value.cc:256
+#: src/js_value.cc:304
 msgid "built-in object"
 msgstr ""
 
-#: src/js_value.cc:257
+#: src/js_value.cc:305
 msgid "host object"
 msgstr ""
 
-#: src/js_value.cc:258
+#: src/js_value.cc:306
 msgid "scope"
 msgstr ""
 
-#: src/js_value.cc:259
+#: src/js_value.cc:307
 msgid "bound method"
 msgstr ""
 
-#: src/js_value.cc:260
+#: src/js_value.cc:308
 msgid "type"
 msgstr ""
 
-#: src/js_value.cc:261
+#: src/js_value.cc:309
 msgid "unknown value type"
 msgstr ""
 
-#: src/js_value.cc:1152
+#: src/js_value.cc:1268
 msgid "by assignment"
 msgstr ""
 
-#: src/re.cc:35
+#: src/re.cc:36
 msgid "Invalid quantifier"
 msgstr ""
 
-#: src/re.cc:36
+#: src/re.cc:37
 msgid "Unbalanced backreference"
 msgstr ""
 
-#: src/re.cc:37
+#: src/re.cc:38
 msgid "Invalid escape sequence"
 msgstr ""
 
-#: src/re.cc:38
+#: src/re.cc:39
 msgid "Invalid backreference"
 msgstr ""
 
-#: src/re.cc:39
+#: src/re.cc:40
 msgid "Unterminated character class"
 msgstr ""
 
-#: src/re.cc:40
+#: src/re.cc:41
 msgid "Unable to match without expression"
 msgstr ""
 
-#: src/scanner.cc:26
+#: src/scanner.cc:27
 msgid "Unknown token"
 msgstr ""
 
-#: src/scanner.cc:27
+#: src/scanner.cc:28
 msgid "End of input"
 msgstr ""
 
-#: src/xml.cc:41
+#: src/xml.cc:42
 msgid "Syntax error"
 msgstr ""
 
-#: src/xml.cc:42
+#: src/xml.cc:43
 msgid "No text expected in this context"
 msgstr ""
 
-#: src/xml.cc:43
+#: src/xml.cc:44
 msgid "No literal expected in this context"
 msgstr ""
 
-#: src/xml.cc:44
+#: src/xml.cc:45
 msgid "Literal expected"
 msgstr ""
 
-#: src/xml.cc:45
+#: src/xml.cc:46
 msgid "Unexpected end of input"
 msgstr ""
 
-#: src/xml.cc:46
+#: src/xml.cc:47
 msgid "Close tag expected"
 msgstr ""
 
-#: src/xml.cc:47
+#: src/xml.cc:48
 msgid "Close tag has different name"
 msgstr ""

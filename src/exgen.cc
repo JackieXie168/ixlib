@@ -40,38 +40,7 @@ static char *(PlainText[]) = {
 
 
 
-static char *(MemPlainText[]) = { 
-  N_("Unable to allocate memory"),
-  };
-
-
-
-
 // generic_exception ----------------------------------------------------------
 char const *generic_exception::getText() const {
   return _(PlainText[Error]);
   }
-
-
-
-
-// memory_exception -----------------------------------------------------------
-memory_exception::memory_exception(TErrorCode error,TSize bytesmissing,
-  char *module,TIndex line)
-: base_exception(error,NULL,module,line,"MEM") {
-  if (bytesmissing) {
-    HasInfo = true;
-    try {
-      strcpy(Info,bytes2dec(bytesmissing).c_str());
-    }
-    catch (...) { }
-    }
-  }
-
-
-
-
-char const *memory_exception::getText() const {
-  return _(MemPlainText[Error]);
-  }
-

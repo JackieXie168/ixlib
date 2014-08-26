@@ -19,6 +19,11 @@
 
 
 
+using namespace std;
+
+
+
+
 #define BEGIN_TEST \
 int main() {\
   try { \

@@ -14,6 +14,7 @@
 
 
 
+using namespace std;
 using namespace ixion;
 
 
@@ -26,10 +27,20 @@ static string numChars = IXLIB_NUMCHARS;
 
 
 // exported subroutines -------------------------------------------------------
+string ixion::float2dec(double value) {
+  char buf[255];
+  sprintf((char *)&buf,"%f",value);
+  return string(buf);
+  }
+
+
+
+
 string ixion::float2dec(double value, unsigned int precision) {
-  char buf[precision+10];
+  char buf[255];
   string cmd("%.");
-  cmd += unsigned2dec(precision) + "g";
+  
+  cmd += unsigned2dec(precision) + "f";
   sprintf((char *)&buf,cmd.c_str(),value);
   return string(buf);
   }

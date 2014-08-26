@@ -21,7 +21,7 @@
 
 namespace ixion {
   template<class T>
-  class polygon_segment : public vector<coord_vector<T,2> > {
+  class polygon_segment : public std::vector<coord_vector<T,2> > {
       // vertices are enumerated in counter-clockwise 
       // (mathematically positive) order
       // boolean operations depend on this
@@ -29,18 +29,18 @@ namespace ixion {
       typedef coord_vector<T,2>      vertex_2d;
 
     private:
-      typedef vector<vertex_2d>      Super;
+      typedef std::vector<vertex_2d>      super;
 
     public:
       polygon_segment() {
         }
       polygon_segment(rectangle<T> const &src);
       polygon_segment(polygon_segment const &src) 
-        : Super(src) {
+        : super(src) {
         }
   
       void push_back_c(T x,T y);
-      void insert_c(iterator it,T x,T y);
+      void insert_c(super::iterator it,T x,T y);
 
       bool isPointInside(T x,T y);
       
@@ -60,8 +60,8 @@ namespace ixion {
 
 
   template<class T>
-  class polygon : public vector<polygon_segment<T> *> {
-      typedef vector<polygon_segment<T> *>      Super;
+  class polygon : public std::vector<polygon_segment<T> *> {
+      typedef std::vector<polygon_segment<T> *>      super;
       
     public:
       typedef polygon_segment<T>::vertex_2d	vertex_2d;

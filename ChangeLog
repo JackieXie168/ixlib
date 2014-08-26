@@ -1,3 +1,94 @@
+2001-06-29  Andreas Kloeckner  <ak@ixion.net>
+
+	* released version 0.96.0
+	* src/ixlib_random.hh: replaced fabs by NUM_ABS because of gcc3 bug
+
+2001-06-27  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_geometry.hh: added coord_vector::op!=
+
+2001-06-25  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_polygon.hh: fixed gcc3 name lookup weirdness
+
+2001-06-20  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/Makefile.am: added an ed script patch to fix the broken
+	  flex-generated code. (kludge, but works)
+
+	* made the whole library compile with gcc3.
+
+2001-06-16  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_geometry.hh: added region::size() call
+	  added rectangle::getWidth/Height/Area calls,
+          marked getSizeX/Y obsolete
+
+2001-06-10  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_numconv.hh: made float2dec behave more predictably
+
+	* src/js_value.cc: fixed string conversion of integers
+
+2001-06-09  Andreas Kloeckner  <ak@ixion.net>
+
+	* js: constructors and scoping are *much* faster and more
+	  compliant
+	
+	* src/ixlib_javascript.hh: removed context parameter for
+	  call, callAsMethod and construct. They aren't needed.
+          Further, removed the compatibility wrappers for
+          call, construct and duplicate in value.
+		  
+	  !! BE CAREFUL !!
+          If you have overloaded call(), construct() or duplicate() in any of
+	  your javascript::value implementations, *PLEASE* double-check that 
+	  their prototypes match the new ones in ixlib_javascript.hh!
+          Otherwise, you're in for some really hard-to-track errors.
+
+2001-06-06  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_exgen.hh: removed memory related exceptions, they
+	  are superceded by ANSI C++ bad_alloc.
+
+2001-06-01  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/js_value.cc: added string.toString()
+
+2001-05-26  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/lex.*.yy: made both scanners batch scanners for a *HUGE*
+	  performance benefit
+
+	* src/ixlib_string.hh: added encoding and decoding to/from base64
+	  (as of rfc2045)
+
+2001-05-20  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_matrix_impl.hh: normalize() variable thinko corrected,
+	  thanks to Vaughn Cato <vaughn@giantstudios.com>
+
+2001-05-09  Andreas Kloeckner  <ak@ixion.net>
+
+	* javascript: improved error reporting
+
+2001-05-04  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/js_value.cc: finally fixed a == null, a != null
+
+	* src/ixlib_javascript.hh: jumbled constness of value methods a bit
+          Backward-compatibility wrappers are in place to avoid major 
+	  source incompatibility. Users are encouraged to switch to the new
+	  non-const interfaces.
+
+2001-05-03  Andreas Kloeckner  <ak@ixion.net>
+
+	* configure.in: bumped version number to 0.96.0
+
+2001-05-01  Andreas Kloeckner  <ak@ixion.net>
+
+	* javascript: added support for classes
+
 2001-04-17  Andreas Kloeckner  <ak@ixion.net>
 
 	* Released version 0.95.1

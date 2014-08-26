@@ -1,10 +1,13 @@
 /* -------- definitions ------- */
 
-%option c++ debug yylineno noyywrap prefix="js" outfile="lex.javascript.cc"
+%option c++ yylineno noyywrap prefix="js" outfile="lex.javascript.cc" batch
 
 %{
-#include <ixlib_javascript.hh>
+#include <ixlib_js_internals.hh>
 #include <ixlib_token_javascript.hh>
+
+using namespace ixion;
+using namespace javascript;
 %}
 
 WHITESPACE	[ \t\n\r]
@@ -149,6 +152,11 @@ false			return TT_JS_LIT_FALSE;
 undefined		return TT_JS_LIT_UNDEFINED;
 in			return TT_JS_IN;
 const			return TT_JS_CONST;
+class			return TT_JS_CLASS;
+extends			return TT_JS_EXTENDS;
+namespace		return TT_JS_NAMESPACE;
+static			return TT_JS_STATIC;
+constructor		return TT_JS_CONSTRUCTOR;
 
 {LIT_INT}		return TT_JS_LIT_INT;
 {LIT_FLOAT}		return TT_JS_LIT_FLOAT;
@@ -157,4 +165,4 @@ const			return TT_JS_CONST;
 {IDENTIFIER}		return TT_JS_IDENTIFIER;
 
 {WHITESPACE}+		/* nothing */
-.			EXJS_THROWINFOLINE(ECJS_INVALID_TOKEN,YYText(),lineno())
+.			EXJS_THROWINFOLOCATION(ECJS_INVALID_TOKEN,YYText(),code_location(lineno()))

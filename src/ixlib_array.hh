@@ -24,7 +24,7 @@ namespace ixion {
   
   Nothing in terms of allocation or deallocation is done automatically.
   */
-  template<class T,class Allocator = allocator<T> >
+  template<class T,class Allocator = std::allocator<T> >
   struct array {
     typedef T                                         value_type;
     typedef Allocator                                 allocator_type;
@@ -76,7 +76,7 @@ namespace ixion {
   
     virtual void allocate(size_type cap) {
       pointer tmp = Alloc.allocate(cap);
-      if (!tmp && cap) throw bad_alloc();
+      if (!tmp && cap) throw std::bad_alloc();
       Data = tmp;
       Capacity = cap;
       }
@@ -114,7 +114,7 @@ namespace ixion {
   
   Nothing in terms of allocation or deallocation is done automatically.
   */
-  template<class T,class Allocator = allocator<T> >
+  template<class T,class Allocator = std::allocator<T> >
   class tracking_array: public array<T,Allocator> {
     pointer FirstValid,LastValid;
     
@@ -211,7 +211,7 @@ namespace ixion {
   An array object that automatically deallocates the storage it allocates,
   but does nothing in terms of construction or destruction.
   */
-  template<class T,class Allocator = allocator<T> >
+  template<class T,class Allocator = std::allocator<T> >
   class auto_array : public array<T,Allocator> {
       typedef array<T,Allocator> super;
     
@@ -248,7 +248,7 @@ namespace ixion {
   An array object that automatically deallocates the storage it allocates,
   as well as calls the appropriate constructors at the right times.
   */
-  template<class T,class Allocator = allocator<T> >
+  template<class T,class Allocator = std::allocator<T> >
   class auto_destroy_array: public tracking_array<T,Allocator> {
     typedef tracking_array<T,Allocator> super;
   

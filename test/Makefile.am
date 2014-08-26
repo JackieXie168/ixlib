@@ -11,7 +11,8 @@ check_PROGRAMS=teststring testnumconv testre testcmdline testtextfile \
 
 noinst_PROGRAMS=javascript
 
-EXTRA_DIST=test.xml src.txt frobnitz.par runem test.js
+EXTRA_DIST=src.txt frobnitz.par runem test.js invertmap.js \
+  test-big.xml test-structure.xml
 
 noinst_SCRIPTS=runem
 

@@ -46,10 +46,6 @@
   EX_THROWINFO(generic,CODE,INFO)
 #define EXGEN_NYI\
   EXGEN_THROW(EC_NOTYETIMPLEMENTED)
-#define EXMEM_THROW(BYTES)\
-  throw memory_exception(ECMEM_GENERAL,BYTES,__FILE__,__LINE__);
-#define EX_MEMCHECK(PTR)\
-  if (!PTR) EXMEM_THROW(sizeof(*PTR));
 
 
 
@@ -61,13 +57,6 @@ namespace ixion {
       TIndex line = 0)
       : base_exception(error,info,module,line,"GEN") { 
       }
-    virtual char const *getText() const;
-    };
-
-// memory_exception -----------------------------------------------------------
-  struct memory_exception : public base_exception {
-    memory_exception(TErrorCode error,TSize bytesmissing = 0,char *module = NULL,
-      TIndex line = 0);
     virtual char const *getText() const;
     };
   }

@@ -23,11 +23,21 @@ using namespace ixion;
 
 
 BEGIN_TEST
-  ifstream istr("test.xml");
+  { ifstream istr("test-big.xml");
   
-  xml_file xml;
-  xml.read(istr);
+    xml_file xml;
+    xml.read(istr);
+  
+    ofstream ostr("test.xml.new");
+    xml.write(ostr);
+    }
 
-  ofstream ostr("test.xml.new");
-  xml.write(ostr);
+  { ifstream istr("test-structure.xml");
+  
+    xml_file xml;
+    xml.read(istr);
+  
+    ofstream ostr("test.xml.out");
+    xml.write(ostr);
+    }
 END_TEST

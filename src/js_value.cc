@@ -18,6 +18,7 @@
 
 
 
+using namespace std;
 using namespace ixion;
 using namespace javascript;
 
@@ -26,28 +27,32 @@ using namespace javascript;
 
 // value ----------------------------------------------------------------------
 string value::toString() const {
-  EXJS_THROWINFO(ECJS_CANNOT_CONVERT,(string(_("to string from "))+valueType2string(getType())).c_str())
+  EXJS_THROWINFO_NO_LOCATION(ECJS_CANNOT_CONVERT,
+    (valueType2string(getType())+string(_("-> string"))).c_str())
   }
 
 
 
 
 int value::toInt() const {
-  EXJS_THROWINFO(ECJS_CANNOT_CONVERT,(string(_("to int from "))+valueType2string(getType())).c_str())
+  EXJS_THROWINFO_NO_LOCATION(ECJS_CANNOT_CONVERT,
+    (valueType2string(getType())+_(" -> int")).c_str())
   }
 
 
 
 
 double value::toFloat() const {
-  EXJS_THROWINFO(ECJS_CANNOT_CONVERT,(string(_("to float from "))+valueType2string(getType())).c_str())
+  EXJS_THROWINFO_NO_LOCATION(ECJS_CANNOT_CONVERT,
+    (valueType2string(getType())+_(" -> float")).c_str())
   }
 
 
 
 
 bool value::toBoolean() const {
-  EXJS_THROWINFO(ECJS_CANNOT_CONVERT,(string(_("to boolean from "))+valueType2string(getType())).c_str())
+  EXJS_THROWINFO_NO_LOCATION(ECJS_CANNOT_CONVERT,
+    (valueType2string(getType())+_(" -> bool")).c_str())
   }
 
 
@@ -65,8 +70,9 @@ string value::stringify() const {
 
 
 
-ref<value> value::duplicate() const {
-  EXJS_THROWINFO(ECJS_INVALID_OPERATION,(string(_("duplication of "))+valueType2string(getType())).c_str())
+ref<value> value::duplicate() {
+  EXJS_THROWINFO_NO_LOCATION(ECJS_INVALID_OPERATION,
+    (valueType2string(getType())+_(": duplication")).c_str())
   }
 
 
@@ -74,7 +80,8 @@ ref<value> value::duplicate() const {
 
 ref<value> 
 value::lookup(string const &identifier) {
-  EXJS_THROWINFO(ECJS_INVALID_OPERATION,(_("lookup of ")+identifier+_(" on ")+valueType2string(getType())).c_str())
+  EXJS_THROWINFO_NO_LOCATION(ECJS_INVALID_OPERATION,
+    (valueType2string(getType())+_(": lookup of ")+identifier).c_str())
   }
 
 
@@ -82,30 +89,43 @@ value::lookup(string const &identifier) {
 
 ref<value> 
 value::subscript(value const &index) {
-  EXJS_THROWINFO(ECJS_INVALID_OPERATION,(string(_("subscript on "))+valueType2string(getType())).c_str())
+  EXJS_THROWINFO_NO_LOCATION(ECJS_INVALID_OPERATION,
+    (valueType2string(getType())+_(": subscript")).c_str())
   }
 
 
 
 
 ref<value> 
-value::call(context const &ctx,parameter_list const &parameters) const {
-  EXJS_THROWINFO(ECJS_INVALID_OPERATION,(string(_("call on "))+valueType2string(getType())).c_str())
+value::call(parameter_list const &parameters) {
+  EXJS_THROWINFO_NO_LOCATION(ECJS_INVALID_OPERATION,
+    (valueType2string(getType())+_(": call")).c_str())
   }
 
 
 
 
 ref<value> 
-value::construct(context const &ctx,parameter_list const &parameters) const {
-  EXJS_THROWINFO(ECJS_INVALID_OPERATION,(string(_("construction on "))+valueType2string(getType())).c_str())
+value::callAsMethod(ref<value> instance,parameter_list const &parameters) {
+  EXJS_THROWINFO_NO_LOCATION(ECJS_INVALID_OPERATION,
+    (valueType2string(getType())+_(": call as method")).c_str())
+  }
+
+
+
+
+ref<value> 
+value::construct(parameter_list const &parameters) {
+  EXJS_THROWINFO_NO_LOCATION(ECJS_INVALID_OPERATION,
+    (valueType2string(getType())+_(": construction")).c_str())
   }
 
 
 
 
 ref<value> value::assign(ref<value> op2) {
-  EXJS_THROWINFO(ECJS_INVALID_OPERATION,(string(_("assignment to "))+valueType2string(getType())).c_str())
+  EXJS_THROWINFO_NO_LOCATION(ECJS_INVALID_OPERATION,
+    (valueType2string(getType())+_(": assignment")).c_str())
   }
 
 
@@ -113,16 +133,42 @@ ref<value> value::assign(ref<value> op2) {
 
 ref<value> 
 value::operatorUnary(operator_id op) const {
-  EXJS_THROWINFO(ECJS_INVALID_OPERATION,(string(operator2string(op))+_(" on ")+valueType2string(getType())).c_str())
+  EXJS_THROWINFO_NO_LOCATION(ECJS_INVALID_OPERATION,
+    (valueType2string(getType())+_(": operator ")+operator2string(op)).c_str())
   }
 
 
 
 
 ref<value> 
-value::operatorBinary(operator_id op,expression const &op2,context const &ctx) const {
-  if (op2.evaluate(ctx)->getType() == VT_NULL) return makeConstant(false);
-  EXJS_THROWINFO(ECJS_INVALID_OPERATION,(string(operator2string(op))+_(" on ")+valueType2string(getType())).c_str())
+value::operatorBinary(operator_id op,ref<value> op2) const {
+  if (op == OP_EQUAL) {
+    if (getType() == VT_NULL) 
+      return makeConstant(op2->getType() == VT_NULL);
+    if (op2->getType() == VT_NULL)
+      return makeConstant(getType() == VT_NULL);
+    }
+  if (op == OP_NOT_EQUAL) {
+    if (getType() == VT_NULL) 
+      return makeConstant(op2->getType() != VT_NULL);
+    if (op2->getType() == VT_NULL)
+      return makeConstant(getType() != VT_NULL);
+    }
+  EXJS_THROWINFO_NO_LOCATION(ECJS_INVALID_OPERATION,
+    (valueType2string(getType())+" "+string(operator2string(op))+" "+valueType2string(op2->getType())).c_str())
+  }
+
+
+
+
+ref<value> 
+value::operatorBinaryShortcut(operator_id op,expression const &op2,context const &ctx) const {
+  if (op == OP_LOGICAL_OR) 
+    return makeConstant(toBoolean() || op2.evaluate(ctx)->toBoolean());
+  if (op == OP_LOGICAL_AND)
+    return makeConstant(toBoolean() && op2.evaluate(ctx)->toBoolean());
+  EXJS_THROWINFO_NO_LOCATION(ECJS_INVALID_OPERATION,
+    (string(operator2string(op))+_(" on ")+valueType2string(getType())).c_str())
   }
 
 
@@ -130,15 +176,17 @@ value::operatorBinary(operator_id op,expression const &op2,context const &ctx) c
 
 ref<value> 
 value::operatorUnaryModifying(operator_id op) {
-  EXJS_THROWINFO(ECJS_INVALID_OPERATION,(string(operator2string(op))+_(" on ")+valueType2string(getType())).c_str())
+  EXJS_THROWINFO_NO_LOCATION(ECJS_INVALID_OPERATION,
+    (string(operator2string(op))+_(" on ")+valueType2string(getType())).c_str())
   }
 
 
 
 
 ref<value> 
-value::operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx) {
-  EXJS_THROWINFO(ECJS_INVALID_OPERATION,(string(operator2string(op))+_(" on ")+valueType2string(getType())).c_str())
+value::operatorBinaryModifying(operator_id op,ref<value> op2) {
+  EXJS_THROWINFO_NO_LOCATION(ECJS_INVALID_OPERATION,
+    (valueType2string(getType())+" "+string(operator2string(op))+" "+valueType2string(op2->getType())).c_str())
   }
 
 
@@ -188,7 +236,7 @@ value::token2operator(scanner::token const &token,bool unary,bool prefix) {
 
 
 
-char *
+string
 value::operator2string(operator_id op) {
   switch (op) {
     case OP_PRE_INCREMENT: return _("prefix ++");
@@ -244,7 +292,7 @@ value::operator2string(operator_id op) {
 
 
 
-char *value::valueType2string(value_type vt) {
+string value::valueType2string(value_type vt) {
   switch (vt) {
     case VT_UNDEFINED: return _("undefined");
     case VT_NULL: return _("null");
@@ -266,18 +314,27 @@ char *value::valueType2string(value_type vt) {
 
 
 // value_with_methods ---------------------------------------------------------
-value_with_methods::method::
-method(string const &identifier,value_with_methods *parent)
-  : Identifier(identifier),Parent(parent),ParentRef(parent) {
+value_with_methods::bound_method::
+bound_method(string const &identifier,ref<value_with_methods,value> parent)
+  : Identifier(identifier),Parent(parent) {
   }
 
 
 
 
 ref<value> 
-value_with_methods::method::
-call(context const &ctx,parameter_list const &parameters) const {
-  return Parent->callMethod(Identifier,ctx,parameters);
+value_with_methods::bound_method::duplicate() {
+  // bound_methods are immutable
+  return this;
+  }
+
+
+
+
+ref<value> 
+value_with_methods::bound_method::
+call(parameter_list const &parameters) {
+  return Parent->callMethod(Identifier,parameters);
   }
 
 
@@ -286,8 +343,7 @@ call(context const &ctx,parameter_list const &parameters) const {
 ref<value> 
 value_with_methods::
 lookup(string const &identifier) {
-  ref<value> result = new method(identifier,this);
-  EX_MEMCHECK(result.get())
+  ref<value> result = new bound_method(identifier,this);
   return result;
   }
 
@@ -302,13 +358,6 @@ value::value_type null::getType() const {
 
 
 
-string null::toString() const {
-  return "null";
-  }
-
-
-
-
 bool null::toBoolean() const {
   return false;
   }
@@ -316,20 +365,8 @@ bool null::toBoolean() const {
 
 
 
-ref<value> null::duplicate() const {
+ref<value> null::duplicate() {
   return makeNull();
-  }
-
-
-
-
-ref<value> null::operatorBinary(operator_id op,expression const &op2,context const &ctx) const {
-  if (op == OP_EQUAL) {
-    ref<value> op2_val = op2.evaluate(ctx);
-    return makeConstant(op2_val->getType() == VT_NULL);
-    }
-  else 
-    return value::operatorBinary(op,op2,ctx);
   }
 
 
@@ -378,7 +415,7 @@ string const_floating_point::toString() const {
 
 
 
-ref<value> const_floating_point::duplicate() const {
+ref<value> const_floating_point::duplicate() {
   return makeValue(Value);
   }
 
@@ -387,7 +424,7 @@ ref<value> const_floating_point::duplicate() const {
 
 ref<value> 
 const_floating_point::
-callMethod(string const &identifier,context const &ctx,parameter_list const &parameters) {
+callMethod(string const &identifier,parameter_list const &parameters) {
   IXLIB_JS_IF_METHOD("toInt",0,0)
     return makeConstant((signed long) Value);
   IXLIB_JS_IF_METHOD("toFloat",0,0)
@@ -422,7 +459,7 @@ callMethod(string const &identifier,context const &ctx,parameter_list const &par
     else
       return makeConstant(float2dec(Value));
     }
-  EXJS_THROWINFO(ECJS_UNKNOWN_IDENTIFIER,("float." + identifier).c_str())
+  EXJS_THROWINFO_NO_LOCATION(ECJS_UNKNOWN_IDENTIFIER,("float." + identifier).c_str())
   }
 
 
@@ -444,36 +481,49 @@ const_floating_point::operatorUnary(operator_id op) const {
 
 
 ref<value> 
-const_floating_point::operatorBinary(operator_id op,expression const &op2,context const &ctx) const {
-  #define PROMOTING_OPERATOR(OP) { \
-    ref<value> op2val = op2.evaluate(ctx); \
-    if (op2val->getType() == VT_NULL) return makeConstant(false); \
-    if (op2val->getType() == VT_STRING) \
-      return makeConstant(toString() OP op2val->toString()); \
-    else \
-      return makeConstant(Value OP op2val->toFloat()); \
-    }
-
-  if (op == OP_LOGICAL_OR) 
-    return makeConstant(toBoolean() || op2.evaluate(ctx)->toBoolean());
-  if (op == OP_LOGICAL_AND)
-    return makeConstant(toBoolean() && op2.evaluate(ctx)->toBoolean());
+const_floating_point::operatorBinary(operator_id op,ref<value> op2) const {
+  #define FLOAT_OPERATOR(OP) \
+    if (op2->getType() == VT_FLOATING_POINT || op2->getType() == VT_INTEGER) \
+      return makeConstant(Value OP op2->toFloat());
+  #define PASS_UP \
+    return super::operatorBinary(op,op2);
 
   switch (op) {
-    case OP_PLUS: PROMOTING_OPERATOR(+)
-    case OP_MINUS: return makeConstant(Value - op2.evaluate(ctx)->toFloat());
-    case OP_MULTIPLY: return makeConstant(Value * op2.evaluate(ctx)->toFloat());
-    case OP_DIVIDE: return makeConstant(Value / op2.evaluate(ctx)->toFloat());
-    case OP_EQUAL: PROMOTING_OPERATOR(==)
-    case OP_NOT_EQUAL: PROMOTING_OPERATOR(!=)
-    case OP_LESS_EQUAL: PROMOTING_OPERATOR(<=)
-    case OP_GREATER_EQUAL: PROMOTING_OPERATOR(>=)
-    case OP_LESS: PROMOTING_OPERATOR(<)
-    case OP_GREATER: PROMOTING_OPERATOR(>)
+    case OP_PLUS: 
+      FLOAT_OPERATOR(+)
+      PASS_UP
+    case OP_MINUS:
+      FLOAT_OPERATOR(-)
+      PASS_UP
+    case OP_MULTIPLY: 
+      FLOAT_OPERATOR(*)
+      PASS_UP
+    case OP_DIVIDE: 
+      FLOAT_OPERATOR(/)
+      PASS_UP
+    case OP_EQUAL: 
+      FLOAT_OPERATOR(==)
+      PASS_UP
+    case OP_NOT_EQUAL: 
+      FLOAT_OPERATOR(!=)
+      PASS_UP
+    case OP_LESS_EQUAL: 
+      FLOAT_OPERATOR(<=)
+      PASS_UP
+    case OP_GREATER_EQUAL: 
+      FLOAT_OPERATOR(>=)
+      PASS_UP
+    case OP_LESS: 
+      FLOAT_OPERATOR(<)
+      PASS_UP
+    case OP_GREATER: 
+      FLOAT_OPERATOR(>)
+      PASS_UP
     default:
-      return super::operatorBinary(op,op2,ctx);
+      return super::operatorBinary(op,op2);
     }
-  #undef PROMOTING_OPERATOR
+  #undef FLOAT_OPERATOR
+  #undef PASS_UP
   }
 
 
@@ -511,53 +561,53 @@ floating_point::operatorUnaryModifying(operator_id op) {
 
 
 ref<value> 
-floating_point::operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx) {
+floating_point::operatorBinaryModifying(operator_id op,ref<value> op2) {
   int val;
   switch (op) {
     case OP_PLUS_ASSIGN:
-      Value += op2.evaluate(ctx)->toFloat();
+      Value += op2->toFloat();
       return ref<value>(this);
     case OP_MINUS_ASSIGN:
-      Value -= op2.evaluate(ctx)->toFloat();
+      Value -= op2->toFloat();
       return ref<value>(this);
     case OP_MUTLIPLY_ASSIGN:
-      Value *= op2.evaluate(ctx)->toFloat();
+      Value *= op2->toFloat();
       return ref<value>(this);
     case OP_DIVIDE_ASSIGN:
-      Value /= op2.evaluate(ctx)->toFloat();
+      Value /= op2->toFloat();
       return ref<value>(this);
     case OP_MODULO_ASSIGN:
       val = (int) Value;
-      val %= (int) op2.evaluate(ctx)->toFloat();
+      val %= (int) op2->toFloat();
       Value = val;
       return ref<value>(this);
     case OP_BIT_AND_ASSIGN:
       val = (int) Value;
-      val &= (int) op2.evaluate(ctx)->toFloat();
+      val &= (int) op2->toFloat();
       Value = val;
       return ref<value>(this);
     case OP_BIT_OR_ASSIGN:
       val = (int) Value;
-      val |= (int) op2.evaluate(ctx)->toFloat();
+      val |= (int) op2->toFloat();
       Value = val;
       return ref<value>(this);
     case OP_BIT_XOR_ASSIGN:
       val = (int) Value;
-      val ^= (int) op2.evaluate(ctx)->toFloat();
+      val ^= (int) op2->toFloat();
       Value = val;
       return ref<value>(this);
     case OP_LEFT_SHIFT_ASSIGN:
       val = (int) Value;
-      val <<= (int) op2.evaluate(ctx)->toFloat();
+      val <<= (int) op2->toFloat();
       Value = val;
       return ref<value>(this);
     case OP_RIGHT_SHIFT_ASSIGN:
       val = (int) Value;
-      val >>= (int) op2.evaluate(ctx)->toFloat();
+      val >>= (int) op2->toFloat();
       Value = val;
       return ref<value>(this);
     default:
-      return super::operatorBinaryModifying(op,op2,ctx);
+      return super::operatorBinaryModifying(op,op2);
     }
   }
 
@@ -601,13 +651,13 @@ bool const_integer::toBoolean() const {
 
 
 string const_integer::toString() const {
-  return float2dec(Value);
+  return signed2dec(Value);
   }
 
 
 
 
-ref<value> const_integer::duplicate() const {
+ref<value> const_integer::duplicate() {
   return makeValue(Value);
   }
 
@@ -616,7 +666,7 @@ ref<value> const_integer::duplicate() const {
 
 ref<value> 
 const_integer::
-callMethod(string const &identifier,context const &ctx,parameter_list const &parameters) {
+callMethod(string const &identifier,parameter_list const &parameters) {
   IXLIB_JS_IF_METHOD("toInt",0,0)
     return makeConstant(Value);
   IXLIB_JS_IF_METHOD("toFloat",0,0) 
@@ -626,7 +676,7 @@ callMethod(string const &identifier,context const &ctx,parameter_list const &par
     if (parameters.size() == 1) radix = parameters[0]->toInt();
     return makeConstant(signed2base(Value,0,radix));
     }
-  EXJS_THROWINFO(ECJS_UNKNOWN_IDENTIFIER,("integer." + identifier).c_str())
+  EXJS_THROWINFO_NO_LOCATION(ECJS_UNKNOWN_IDENTIFIER,("integer." + identifier).c_str())
   }
 
 
@@ -648,64 +698,81 @@ const_integer::operatorUnary(operator_id op) const {
 
 
 ref<value> 
-const_integer::operatorBinary(operator_id op,expression const &op2,context const &ctx) const {
-  #define STRING_OPERATOR(OP) \
-    if (op2val->getType() == VT_STRING) \
-      return makeConstant(toString() OP op2val->toString());
+const_integer::operatorBinary(operator_id op,ref<value> op2) const {
   #define FLOAT_OPERATOR(OP) \
-    if (op2val->getType() == VT_FLOATING_POINT) \
-      return makeConstant(toFloat() OP op2val->toFloat());
-  #define OPERATOR(OP) \
-    return makeConstant(Value OP op2val->toInt());
+    if (op2->getType() == VT_FLOATING_POINT) \
+      return makeConstant(toFloat() OP op2->toFloat());
+  #define INT_OPERATOR(OP) \
+    if (op2->getType() == VT_INTEGER) \
+      return makeConstant(Value OP op2->toInt());
+  #define PASS_UP \
+    return super::operatorBinary(op,op2);
 
-  if (op == OP_LOGICAL_OR) 
-    return makeConstant(toBoolean() || op2.evaluate(ctx)->toBoolean());
-  if (op == OP_LOGICAL_AND)
-    return makeConstant(toBoolean() && op2.evaluate(ctx)->toBoolean());
-
-  ref<value> op2val = op2.evaluate(ctx); \
   switch (op) {
     case OP_PLUS: 
-      STRING_OPERATOR(+)
       FLOAT_OPERATOR(+)
-      OPERATOR(+)
+      INT_OPERATOR(+)
+      PASS_UP
     case OP_MINUS: 
       FLOAT_OPERATOR(-)
-      OPERATOR(-)
+      INT_OPERATOR(-)
+      PASS_UP
     case OP_MULTIPLY: 
       FLOAT_OPERATOR(*)
-      OPERATOR(*)
+      INT_OPERATOR(*)
+      PASS_UP
     case OP_DIVIDE: 
       FLOAT_OPERATOR(/)
-      OPERATOR(/)
-    case OP_MODULO: return makeConstant((long) Value % op2.evaluate(ctx)->toInt());
-    case OP_BIT_AND: return makeConstant((long) Value & op2.evaluate(ctx)->toInt());
-    case OP_BIT_OR: return makeConstant((long) Value | op2.evaluate(ctx)->toInt());
-    case OP_BIT_XOR: return makeConstant((long) Value ^ op2.evaluate(ctx)->toInt());
-    case OP_LEFT_SHIFT: return makeConstant((long) Value << op2.evaluate(ctx)->toInt());
-    case OP_RIGHT_SHIFT: return makeConstant((long) Value >> op2.evaluate(ctx)->toInt());
+      INT_OPERATOR(/)
+      PASS_UP
+    case OP_MODULO: 
+      INT_OPERATOR(%)
+      PASS_UP
+    case OP_BIT_AND: 
+      INT_OPERATOR(&)
+      PASS_UP
+    case OP_BIT_OR: 
+      INT_OPERATOR(|)
+      PASS_UP
+    case OP_BIT_XOR: 
+      INT_OPERATOR(^)
+      PASS_UP
+    case OP_LEFT_SHIFT: 
+      INT_OPERATOR(<<)
+      PASS_UP
+    case OP_RIGHT_SHIFT: 
+      INT_OPERATOR(>>)
+      PASS_UP
     case OP_EQUAL: 
-      STRING_OPERATOR(==)
-      OPERATOR(==)
+      FLOAT_OPERATOR(==)
+      INT_OPERATOR(==)
+      PASS_UP
     case OP_NOT_EQUAL: 
-      STRING_OPERATOR(!=)
-      OPERATOR(!=)
+      FLOAT_OPERATOR(!=)
+      INT_OPERATOR(!=)
+      PASS_UP
     case OP_LESS_EQUAL: 
-      STRING_OPERATOR(<=)
-      OPERATOR(<=)
+      FLOAT_OPERATOR(<=)
+      INT_OPERATOR(<=)
+      PASS_UP
     case OP_GREATER_EQUAL: 
-      STRING_OPERATOR(>=)
-      OPERATOR(>=)
+      FLOAT_OPERATOR(>=)
+      INT_OPERATOR(>=)
+      PASS_UP
     case OP_LESS: 
-      STRING_OPERATOR(<)
-      OPERATOR(<)
+      FLOAT_OPERATOR(<)
+      INT_OPERATOR(<)
+      PASS_UP
     case OP_GREATER: 
-      STRING_OPERATOR(>)
-      OPERATOR(>)
+      FLOAT_OPERATOR(>)
+      INT_OPERATOR(>)
+      PASS_UP
     default:
-      return super::operatorBinary(op,op2,ctx);
+      PASS_UP
     }
-  #undef PROMOTING_OPERATOR
+  #undef FLOAT_OPERATOR
+  #undef INT_OPERATOR
+  #undef PASS_UP
   }
 
 
@@ -743,53 +810,53 @@ integer::operatorUnaryModifying(operator_id op) {
 
 
 ref<value> 
-integer::operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx) {
+integer::operatorBinaryModifying(operator_id op,ref<value> op2) {
   int val;
   switch (op) {
     case OP_PLUS_ASSIGN:
-      Value += op2.evaluate(ctx)->toInt();
+      Value += op2->toInt();
       return ref<value>(this);
     case OP_MINUS_ASSIGN:
-      Value -= op2.evaluate(ctx)->toInt();
+      Value -= op2->toInt();
       return ref<value>(this);
     case OP_MUTLIPLY_ASSIGN:
-      Value *= op2.evaluate(ctx)->toInt();
+      Value *= op2->toInt();
       return ref<value>(this);
     case OP_DIVIDE_ASSIGN:
-      Value /= op2.evaluate(ctx)->toInt();
+      Value /= op2->toInt();
       return ref<value>(this);
     case OP_MODULO_ASSIGN:
       val = (int) Value;
-      val %= (int) op2.evaluate(ctx)->toInt();
+      val %= (int) op2->toInt();
       Value = val;
       return ref<value>(this);
     case OP_BIT_AND_ASSIGN:
       val = (int) Value;
-      val &= (int) op2.evaluate(ctx)->toInt();
+      val &= (int) op2->toInt();
       Value = val;
       return ref<value>(this);
     case OP_BIT_OR_ASSIGN:
       val = (int) Value;
-      val |= (int) op2.evaluate(ctx)->toInt();
+      val |= (int) op2->toInt();
       Value = val;
       return ref<value>(this);
     case OP_BIT_XOR_ASSIGN:
       val = (int) Value;
-      val ^= (int) op2.evaluate(ctx)->toInt();
+      val ^= (int) op2->toInt();
       Value = val;
       return ref<value>(this);
     case OP_LEFT_SHIFT_ASSIGN:
       val = (int) Value;
-      val <<= (int) op2.evaluate(ctx)->toInt();
+      val <<= (int) op2->toInt();
       Value = val;
       return ref<value>(this);
     case OP_RIGHT_SHIFT_ASSIGN:
       val = (int) Value;
-      val >>= (int) op2.evaluate(ctx)->toInt();
+      val >>= (int) op2->toInt();
       Value = val;
       return ref<value>(this);
     default:
-      return super::operatorBinaryModifying(op,op2,ctx);
+      return super::operatorBinaryModifying(op,op2);
     }
   }
 
@@ -832,7 +899,7 @@ string js_string::stringify() const {
 
 
 
-ref<value> js_string::duplicate() const {
+ref<value> js_string::duplicate() {
   return makeValue(Value);
   }
 
@@ -847,7 +914,9 @@ ref<value> js_string::lookup(string const &identifier) {
 
 
 
-ref<value> js_string::callMethod(string const &identifier,context const &ctx,parameter_list const &parameters) {
+ref<value> js_string::callMethod(string const &identifier,parameter_list const &parameters) {
+  IXLIB_JS_IF_METHOD("toString",0,0) 
+    return makeConstant(Value);
   IXLIB_JS_IF_METHOD("charAt",1,1) 
     return makeConstant(string(1,Value.at(parameters[0]->toInt())));
   IXLIB_JS_IF_METHOD("charCodeAt",1,1) 
@@ -901,40 +970,48 @@ ref<value> js_string::callMethod(string const &identifier,context const &ctx,par
   IXLIB_JS_IF_METHOD("toUpperCase",0,0) {
     return makeConstant(upper(Value));
     }
-  EXJS_THROWINFO(ECJS_UNKNOWN_IDENTIFIER,("String." + identifier).c_str())
+  EXJS_THROWINFO_NO_LOCATION(ECJS_UNKNOWN_IDENTIFIER,("String." + identifier).c_str())
   }
 
 
 
 
-ref<value> js_string::operatorBinary(operator_id op,expression const &op2,context const &ctx) const {
+ref<value> js_string::operatorBinary(operator_id op,ref<value> op2) const {
   switch (op) {
-    case OP_PLUS: return makeConstant(Value+op2.evaluate(ctx)->toString());
-    case OP_EQUAL: {
-      ref<value> op2val = op2.evaluate(ctx);
-      if (op2val->getType() == VT_NULL) return makeConstant(false);
-      return makeConstant(Value == op2val->toString());
-      }
-    case OP_NOT_EQUAL: return makeConstant(Value != op2.evaluate(ctx)->toString());
-    case OP_LESS_EQUAL: return makeConstant(Value <= op2.evaluate(ctx)->toString());
-    case OP_GREATER_EQUAL: return makeConstant(Value >= op2.evaluate(ctx)->toString());
-    case OP_LESS: return makeConstant(Value < op2.evaluate(ctx)->toString());
-    case OP_GREATER: return makeConstant(Value > op2.evaluate(ctx)->toString());
+    case OP_PLUS: return makeConstant(Value+op2->toString());
+    case OP_EQUAL:
+      if (op2->getType() == VT_STRING) return makeConstant(Value == op2->toString());
+      else return super::operatorBinary(op,op2);
+    case OP_NOT_EQUAL:
+      if (op2->getType() == VT_STRING) return makeConstant(Value != op2->toString());
+      else return super::operatorBinary(op,op2);
+    case OP_LESS_EQUAL: 
+      if (op2->getType() == VT_STRING) return makeConstant(Value <= op2->toString());
+      else return super::operatorBinary(op,op2);
+    case OP_GREATER_EQUAL: 
+      if (op2->getType() == VT_STRING) return makeConstant(Value >= op2->toString());
+      else return super::operatorBinary(op,op2);
+    case OP_LESS:
+      if (op2->getType() == VT_STRING) return makeConstant(Value < op2->toString());
+      else return super::operatorBinary(op,op2);
+    case OP_GREATER:
+      if (op2->getType() == VT_STRING) return makeConstant(Value > op2->toString());
+      else return super::operatorBinary(op,op2);
     default:
-      return super::operatorBinary(op,op2,ctx);
+      return super::operatorBinary(op,op2);
     }
   }
 
 
 
 
-ref<value> js_string::operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx) {
+ref<value> js_string::operatorBinaryModifying(operator_id op,ref<value> op2) {
   switch (op) {
     case OP_PLUS_ASSIGN:
-      Value += op2.evaluate(ctx)->toString();
+      Value += op2->toString();
       return ref<value>(this);
     default:
-      return super::operatorBinaryModifying(op,op2,ctx);
+      return super::operatorBinaryModifying(op,op2);
     }
   }
 
@@ -991,7 +1068,7 @@ string lvalue::stringify() const {
 
 
 
-ref<value> lvalue::duplicate() const {
+ref<value> lvalue::duplicate() {
   return Reference->duplicate();
   }
 
@@ -1012,8 +1089,24 @@ ref<value> lvalue::subscript(value const &index) {
 
 
 
-ref<value> lvalue::call(context const &ctx,parameter_list const &parameters) const {
-  return Reference->call(ctx,parameters);
+ref<value> lvalue::call(parameter_list const &parameters) {
+  return Reference->call(parameters);
+  }
+
+
+
+
+ref<value> 
+lvalue::callAsMethod(ref<value> instance,parameter_list const &parameters) {
+  return Reference->callAsMethod(instance,parameters);
+  }
+
+
+
+
+ref<value> 
+lvalue::construct(parameter_list const &parameters) {
+  return Reference->construct(parameters);
   }
 
 
@@ -1034,8 +1127,15 @@ ref<value> lvalue::operatorUnary(operator_id op) const {
 
 
 
-ref<value> lvalue::operatorBinary(operator_id op,expression const &op2,context const &ctx) const {
-  return Reference->operatorBinary(op,op2,ctx);
+ref<value> lvalue::operatorBinary(operator_id op,ref<value> op2) const {
+  return Reference->operatorBinary(op,op2);
+  }
+
+
+
+
+ref<value> lvalue::operatorBinaryShortcut(operator_id op,expression const &op2,context const &ctx) const {
+  return Reference->operatorBinaryShortcut(op,op2,ctx);
   }
 
 
@@ -1058,8 +1158,8 @@ ref<value> lvalue::operatorUnaryModifying(operator_id op)  {
 
 
 
-ref<value> lvalue::operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx) {
-  LVALUE_RETURN(Reference->operatorBinaryModifying(op,op2,ctx))
+ref<value> lvalue::operatorBinaryModifying(operator_id op,ref<value> op2) {
+  LVALUE_RETURN(Reference->operatorBinaryModifying(op,op2))
   }
 
 
@@ -1116,7 +1216,7 @@ string constant_wrapper::stringify() const {
 
 
 ref<value> 
-constant_wrapper::duplicate() const {
+constant_wrapper::duplicate() {
   return Constant->duplicate();
   }
 
@@ -1140,8 +1240,24 @@ constant_wrapper::subscript(value const &index) {
 
 
 ref<value> 
-constant_wrapper::call(context const &ctx,parameter_list const &parameters) const {
-  return Constant->call(ctx,parameters);
+constant_wrapper::call(parameter_list const &parameters) const {
+  return Constant->call(parameters);
+  }
+
+
+
+
+ref<value> 
+constant_wrapper::callAsMethod(ref<value> instance,parameter_list const &parameters) {
+  return Constant->callAsMethod(instance,parameters);
+  }
+
+
+
+
+ref<value> 
+constant_wrapper::construct(parameter_list const &parameters) {
+  return Constant->construct(parameters);
   }
 
 
@@ -1149,7 +1265,7 @@ constant_wrapper::call(context const &ctx,parameter_list const &parameters) cons
 
 ref<value> 
 constant_wrapper::assign(ref<value> value) {
-  EXJS_THROWINFO(ECJS_CANNOT_MODIFY_RVALUE,_("by assignment"))
+  EXJS_THROWINFO_NO_LOCATION(ECJS_CANNOT_MODIFY_RVALUE,_("by assignment"))
   }
 
 
@@ -1164,24 +1280,30 @@ constant_wrapper::operatorUnary(operator_id op) const {
 
 
 ref<value> 
-constant_wrapper::operatorBinary(operator_id op,expression const &op2,context const &ctx) const {
-  return Constant->operatorBinary(op,op2,ctx);
+constant_wrapper::operatorBinary(operator_id op,ref<value> op2) const {
+  return Constant->operatorBinary(op,op2);
   }
 
+
+
+
+ref<value> 
+constant_wrapper::operatorBinaryShortcut(operator_id op,expression const &op2,context const &ctx) const {
+  return Constant->operatorBinaryShortcut(op,op2,ctx);
+  }
 
 
 
 ref<value> 
 constant_wrapper::operatorUnaryModifying(operator_id op) {
-  EXJS_THROWINFO(ECJS_CANNOT_MODIFY_RVALUE,operator2string(op))
+  EXJS_THROWINFO_NO_LOCATION(ECJS_CANNOT_MODIFY_RVALUE,operator2string(op).c_str())
   }
 
 
 
-
 ref<value> 
-constant_wrapper::operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx) {
-  EXJS_THROWINFO(ECJS_CANNOT_MODIFY_RVALUE,operator2string(op))
+constant_wrapper::operatorBinaryModifying(operator_id op,ref<value> op2) {
+  EXJS_THROWINFO_NO_LOCATION(ECJS_CANNOT_MODIFY_RVALUE,operator2string(op).c_str())
   }
 
 
@@ -1200,7 +1322,7 @@ list_scope::lookup(string const &identifier) {
       }
     catch (...) { }
     }
-  EXJS_THROWINFO(ECJS_UNKNOWN_IDENTIFIER,identifier.c_str())
+  EXJS_THROWINFO_NO_LOCATION(ECJS_UNKNOWN_IDENTIFIER,identifier.c_str())
   }
 
 
@@ -1242,6 +1364,9 @@ bool list_scope::hasMember(string const &name) const {
 
 
 void list_scope::addMember(string const &name,ref<value> member) {
+  if (hasMember(name)) 
+    EXJS_THROWINFO_NO_LOCATION(ECJS_CANNOT_REDECLARE,name.c_str())
+
   MemberMap[name] = member;
   }
 
@@ -1270,17 +1395,71 @@ void list_scope::clear() {
 
 
 
-// function -------------------------------------------------------------------
-function::function(parameter_name_list const &pnames,ref<expression> body,ref<value> lex_scope)
-  : ParameterNameList(pnames),Body(body),LexicalScope(lex_scope) {
+// callable_with_parameters ---------------------------------------------------
+callable_with_parameters::callable_with_parameters(parameter_name_list const &pnames)
+  : ParameterNameList(pnames) {
   }
 
 
 
 
-ref<value> function::duplicate() const {
+void callable_with_parameters::addParametersTo(list_scope &scope,parameter_list const &parameters) const {
+  parameter_list::const_iterator 
+    firstp = parameters.begin(),
+    lastp = parameters.end();
+  
+  FOREACH_CONST(first,ParameterNameList,parameter_name_list) {
+    if (firstp == lastp)
+      scope.addMember(*first,makeLValue(makeNull()));
+    else
+      scope.addMember(*first,makeLValue((*firstp)->duplicate()));
+    
+    firstp++;
+    }
+  }
+
+
+
+
+ref<value> callable_with_parameters::evaluateBody(expression &body,context const &ctx) {
+  ref<value> result;
+  
+  try {
+    result = body.evaluate(ctx);
+    }
+  catch (return_exception &fr) {
+    result = fr.ReturnValue;
+    }
+  catch (break_exception &be) {
+    if (be.HasLabel)
+      EXJS_THROWINFOLOCATION(ECJS_INVALID_NON_LOCAL_EXIT,("break "+be.Label).c_str(),be.Location)
+    else
+      EXJS_THROWINFOLOCATION(ECJS_INVALID_NON_LOCAL_EXIT,"break",be.Location)
+    }
+  catch (continue_exception &ce) {
+    if (ce.HasLabel)
+      EXJS_THROWINFOLOCATION(ECJS_INVALID_NON_LOCAL_EXIT,("continue "+ce.Label).c_str(),ce.Location)
+    else
+      EXJS_THROWINFOLOCATION(ECJS_INVALID_NON_LOCAL_EXIT,"continue",ce.Location)
+    }
+  if (result.get()) return result->duplicate();
+  return ref<value>(NULL);
+  }
+
+
+
+
+// function -------------------------------------------------------------------
+function::function(parameter_name_list const &pnames,ref<expression> body,ref<value> lex_scope)
+  : super(pnames),Body(body),LexicalScope(lex_scope) {
+  }
+
+
+
+
+ref<value> function::duplicate() {
   // functions are not mutable
-  return const_cast<function *>(this);
+  return this;
   }
 
 
@@ -1288,49 +1467,263 @@ ref<value> function::duplicate() const {
 
 ref<value> 
 function::
-call(context const &ctx,parameter_list const &parameters) const {
+call(parameter_list const &parameters) {
   ref<list_scope,value> scope = new list_scope;
-  EX_MEMCHECK(scope.get())
   scope->unite(LexicalScope);
-  context inner_context(scope);
   
-  parameter_list::const_iterator 
-    firstp = parameters.begin(),
-    lastp = parameters.end();
-  
-  FOREACH_CONST(first,ParameterNameList,parameter_name_list) {
-    if (firstp == lastp)
-      scope->addMember(*first,makeLValue(makeNull()));
-    else
-      scope->addMember(*first,makeLValue((*firstp)->duplicate()));
-    
-    firstp++;
-    }
-  
-  ref<value> result;
-  
-  try {
-    result = Body->evaluate(inner_context);
-    }
-  catch (return_exception &fr) {
-    result = fr.ReturnValue;
-    }
-  catch (break_exception &be) {
-    if (be.HasLabel)
-      EXJS_THROWINFOLINE(ECJS_INVALID_NON_LOCAL_EXIT,("break "+be.Label).c_str(),be.Line)
-    else
-      EXJS_THROWINFOLINE(ECJS_INVALID_NON_LOCAL_EXIT,"break",be.Line)
-    }
-  catch (continue_exception &ce) {
-    if (ce.HasLabel)
-      EXJS_THROWINFOLINE(ECJS_INVALID_NON_LOCAL_EXIT,("continue "+ce.Label).c_str(),ce.Line)
-    else
-      EXJS_THROWINFOLINE(ECJS_INVALID_NON_LOCAL_EXIT,"continue",ce.Line)
-    }
-  if (result.get()) return result->duplicate();
-  return ref<value>(NULL);
+  addParametersTo(*scope,parameters);
+  return evaluateBody(*Body,context(scope));
   
   // ATTENTION: this is a scope cancellation point.
+  }
+
+
+
+
+// method ---------------------------------------------------------------------
+method::method(parameter_name_list const &pnames,ref<expression> body,ref<value> lex_scope)
+  : super(pnames),Body(body),LexicalScope(lex_scope) {
+  }
+
+
+
+
+ref<value> method::duplicate() {
+  // methods are not mutable
+  return this;
+  }
+
+
+
+
+ref<value> 
+method::
+callAsMethod(ref<value> instance,parameter_list const &parameters) {
+  ref<list_scope,value> scope = new list_scope;
+  scope->unite(LexicalScope);
+  scope->unite(instance);
+  scope->addMember("this",instance);
+  
+  addParametersTo(*scope,parameters);
+  return evaluateBody(*Body,context(scope));
+  
+  // ATTENTION: this is a scope cancellation point.
+  }
+
+
+
+
+// constructor ----------------------------------------------------------------
+constructor::constructor(parameter_name_list const &pnames,ref<expression> body,ref<value> lex_scope)
+  : super(pnames),Body(body),LexicalScope(lex_scope) {
+  }
+
+
+
+
+ref<value> constructor::duplicate() {
+  // constructors are not mutable
+  return this;
+  }
+
+
+
+
+ref<value> 
+constructor::
+callAsMethod(ref<value> instance,parameter_list const &parameters) {
+  ref<list_scope,value> scope = new list_scope;
+  scope->unite(LexicalScope);
+  scope->unite(instance);
+  scope->addMember("this",instance);
+  
+  addParametersTo(*scope,parameters);
+  return evaluateBody(*Body,context(scope));
+  
+  // ATTENTION: this is a scope cancellation point.
+  }
+
+
+
+
+// js_class -------------------------------------------------------------------
+js_class::super_instance_during_construction::super_instance_during_construction(
+ref<value> super_class)
+  : SuperClass(super_class) {
+  }
+
+
+
+
+ref<value> js_class::super_instance_during_construction::call(parameter_list const &parameters) {
+  if (SuperClassInstance.get())
+    EXJS_THROW_NO_LOCATION(ECJS_DOUBLE_CONSTRUCTION)
+
+  SuperClassInstance = SuperClass->construct(parameters);
+  return SuperClassInstance;
+  }
+
+
+
+
+ref<value> js_class::super_instance_during_construction::lookup(string const &identifier) {
+  return getSuperClassInstance()->lookup(identifier);
+  }
+
+
+
+
+ref<value> js_class::super_instance_during_construction::getSuperClassInstance() {
+  if (SuperClassInstance.get())
+    return SuperClassInstance;
+  
+  SuperClassInstance = SuperClass->construct(parameter_list());
+  return SuperClassInstance;
+  }
+
+
+
+
+js_class::js_class(ref<value> lex_scope,ref<value> super_class,ref<value> constructor,
+ref<value> static_method_scope,ref<value> method_scope,
+ref<value> static_variable_scope,declaration_list const &variable_list) 
+  : LexicalScope(lex_scope),SuperClass(super_class),Constructor(constructor),
+  StaticMethodScope(static_method_scope),
+  MethodScope(method_scope),StaticVariableScope(static_variable_scope),
+  VariableList(variable_list) {
+  }
+
+
+
+
+ref<value> js_class::duplicate() {
+  // classes are not mutable
+  return this;
+  }
+
+
+
+
+ref<value> js_class::lookup(string const &identifier) {
+  try {
+    return lookupLocal(identifier);
+    }
+  catch (...) { }
+  
+  if (SuperClass.get())
+    return SuperClass->lookup(identifier);
+  
+  EXJS_THROWINFO_NO_LOCATION(ECJS_UNKNOWN_IDENTIFIER,identifier.c_str())
+  }
+
+
+
+
+ref<value> js_class::lookupLocal(string const &identifier) {
+  try {
+    return StaticMethodScope->lookup(identifier);
+    }
+  catch (...) { }
+  
+  return StaticVariableScope->lookup(identifier);
+  }
+
+
+
+
+ref<value> js_class::construct(parameter_list const &parameters) {
+  ref<list_scope,value> vl(new list_scope);
+  
+  ref<js_class_instance,value> instance(
+    new js_class_instance(this,MethodScope,vl));
+
+  ref<list_scope,value> construction_scope(new list_scope);
+  construction_scope->unite(LexicalScope);
+  construction_scope->unite(instance);
+
+  FOREACH_CONST(first,VariableList,declaration_list)
+    (*first)->evaluate(context(vl,construction_scope));
+  
+  ref<super_instance_during_construction,value> temp_super;
+  if (SuperClass.get()) {
+    temp_super = new super_instance_during_construction(SuperClass);
+    vl->addMember("super",temp_super);
+    }
+  
+  if (Constructor.get())
+    Constructor->callAsMethod(instance,parameters);
+  
+  if (temp_super.get()) {
+    ref<value> super = temp_super->getSuperClassInstance();
+    vl->removeMember("super");
+    instance->setSuperClassInstance(super);
+    vl->addMember("super",super);
+    }
+  return instance;
+  }
+
+
+
+
+// js_class_instance ----------------------------------------------------------
+js_class_instance::bound_method::bound_method(ref<value> instance,ref<value> method) 
+  : Instance(instance),Method(method) {
+  }
+
+
+
+
+ref<value> js_class_instance::bound_method::call(parameter_list const &parameters) {
+  return Method->callAsMethod(Instance,parameters);
+  }
+
+
+
+
+js_class_instance::js_class_instance(ref<js_class,value> cls,
+ref<value> method_scope,ref<value> variable_scope)
+  : Class(cls),MethodScope(method_scope),VariableScope(variable_scope) {
+  }
+
+
+
+
+void js_class_instance::setSuperClassInstance(ref<value> super_class_instance) {
+  SuperClassInstance = super_class_instance;
+  }
+
+
+
+
+ref<value> js_class_instance::duplicate() {
+  return this;
+  }
+
+
+
+
+ref<value> js_class_instance::lookup(string const &identifier) {
+  try {
+    ref<value> method = MethodScope->lookup(identifier);
+    ref<value> bound = new bound_method(this,method);
+    return bound;
+    }
+  catch (...) { }
+  
+  try {
+    return VariableScope->lookup(identifier);
+    }
+  catch (...) { }
+  
+  try {
+    return Class->lookupLocal(identifier);
+    }
+  catch (...) { }
+
+  if (SuperClassInstance.get())
+    return SuperClassInstance->lookup(identifier);
+  
+  EXJS_THROWINFO_NO_LOCATION(ECJS_UNKNOWN_IDENTIFIER,identifier.c_str())
   }
 
 
@@ -1341,7 +1734,6 @@ ref<value>
 javascript::makeUndefined() {
   // *** FIXME: this is non-compliant
   ref<value> result(new null());
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1351,7 +1743,6 @@ javascript::makeUndefined() {
 ref<value> 
 javascript::makeNull() {
   ref<value> result(new null());
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1377,7 +1768,6 @@ javascript::makeConstant(bool val) {
 ref<value> 
 javascript::makeValue(signed int val) {
   ref<value> result(new integer(val));
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1387,7 +1777,6 @@ javascript::makeValue(signed int val) {
 ref<value> 
 javascript::makeConstant(signed int val) {
   ref<value> result(new const_integer(val));
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1397,7 +1786,6 @@ javascript::makeConstant(signed int val) {
 ref<value> 
 javascript::makeValue(unsigned int val) {
   ref<value> result(new integer(val));
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1407,7 +1795,6 @@ javascript::makeValue(unsigned int val) {
 ref<value> 
 javascript::makeConstant(unsigned int val) {
   ref<value> result(new const_integer(val));
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1417,7 +1804,6 @@ javascript::makeConstant(unsigned int val) {
 ref<value> 
 javascript::makeValue(signed long val) {
   ref<value> result(new integer(val));
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1427,7 +1813,6 @@ javascript::makeValue(signed long val) {
 ref<value> 
 javascript::makeConstant(signed long val) {
   ref<value> result(new const_integer(val));
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1437,7 +1822,6 @@ javascript::makeConstant(signed long val) {
 ref<value> 
 javascript::makeValue(unsigned long val) {
   ref<value> result(new integer(val));
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1447,7 +1831,6 @@ javascript::makeValue(unsigned long val) {
 ref<value> 
 javascript::makeConstant(unsigned long val) {
   ref<value> result(new const_integer(val));
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1457,7 +1840,6 @@ javascript::makeConstant(unsigned long val) {
 ref<value> 
 javascript::makeValue(double val) {
   ref<value> result(new floating_point(val));
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1467,7 +1849,6 @@ javascript::makeValue(double val) {
 ref<value> 
 javascript::makeConstant(double val) {
   ref<value> result(new const_floating_point(val));
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1477,7 +1858,6 @@ javascript::makeConstant(double val) {
 ref<value> 
 javascript::makeValue(string const &val) {
   ref<value> result(new js_string(val));
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1494,7 +1874,6 @@ javascript::makeConstant(string const &val) {
 
 ref<value> javascript::makeArray(TSize size) {
   auto_ptr<js_array> result(new js_array(size));
-  EX_MEMCHECK(result.get())
   return result.release();
   }
 
@@ -1504,7 +1883,6 @@ ref<value> javascript::makeArray(TSize size) {
 ref<value> 
 javascript::makeLValue(ref<value> target) {
   ref<value> result = new lvalue(target);
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -1514,16 +1892,5 @@ javascript::makeLValue(ref<value> target) {
 ref<value> 
 javascript::wrapConstant(ref<value> val) {
   ref<value> result(new constant_wrapper(val));
-  EX_MEMCHECK(result.get())
-  return result;
-  }
-
-
-
-
-ref<expression> 
-javascript::makeConstantExpression(ref<value> val) {
-  ref<expression> result(new constant(val));
-  EX_MEMCHECK(result.get())
   return result;
   }

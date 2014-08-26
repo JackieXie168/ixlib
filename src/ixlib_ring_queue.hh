@@ -29,7 +29,7 @@ namespace ixion {
   in other threads and other critical environments where standard
   library functionality is only available in a restricted way.
   */
-  template<class T,class Allocator = allocator<T> >
+  template<class T,class Allocator = std::allocator<T> >
   class ring_queue {
     private:
       auto_array<T,Allocator>		Data;

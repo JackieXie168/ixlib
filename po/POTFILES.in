@@ -5,6 +5,7 @@ src/exgen.cc
 src/exio.cc
 src/js_array.cc
 src/js_expression.cc
+src/js_declaration.cc
 src/js_instruction.cc
 src/js_interpreter.cc
 src/js_library.cc

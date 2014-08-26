@@ -52,7 +52,7 @@ base_exception::base_exception(TErrorCode error,char const *info,char *module,
 
 
 
-char const *base_exception::what() const {
+char const *base_exception::what() const throw () {
   if (HasInfo) {
     if (Module) {
       if (Line)

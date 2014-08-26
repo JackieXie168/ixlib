@@ -4,7 +4,7 @@
 # (c) iXiONmedia 1999
 # -----------------------------------------------------------------------------
 
-SUBDIRS=po intl src test 
+SUBDIRS=intl src test po 
 
 mrproper:
 	find -name '*.bck' -exec rm '{}' \;
@@ -15,13 +15,15 @@ documentation:
 	doxygen doxygen.cfg
 
 dist-hook: documentation
-	tar cvfz ixlib-doc-@VERSION@.tar.gz -C doc/html .
+	cp -R doc/html ixlib-doc-@VERSION@
+	tar chozf ixlib-doc-@VERSION@.tar.gz ixlib-doc-@VERSION@ 
+	rm -R ixlib-doc-@VERSION@
 
 update-web-doc: documentation
-	rsync -e ssh --verbose --progress -r doc/html/ inducer@shell.sourceforge.net:/home/groups/ixlib/htdocs/doc
+	rsync -e ssh --verbose --progress -r doc/html/ inducer@shell.sourceforge.net:/home/groups/i/ix/ixlib/htdocs/doc
 
 update-web-site: 
-	rsync -e ssh --verbose --progress web/* inducer@shell.sourceforge.net:/home/groups/ixlib/htdocs
+	rsync -e ssh --verbose --progress web/* inducer@shell.sourceforge.net:/home/groups/i/ix/ixlib/htdocs
 
 update-web: update-web-doc update-web-site
 

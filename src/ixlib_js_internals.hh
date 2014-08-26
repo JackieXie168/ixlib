@@ -18,29 +18,48 @@
 
 
 
+using namespace std;
+
+
+
+
 namespace ixion {
   namespace javascript {
-    struct context {
-      ref<list_scope,value>	CurrentScope;
+    struct code_location {
+      TIndex	Line;
       
-      context(ref<list_scope,value> scope);
+      code_location(scanner::token &tok);
+      explicit code_location(TIndex line);
+      string stringify() const;
       };
-    
+
     struct return_exception {
-      ref<value>	ReturnValue;
-      unsigned	Line;
+      ref<value>        ReturnValue;
+      code_location	Location;
+      
+      return_exception(ref<value> retval,code_location const &loc)
+        : ReturnValue(retval),Location(loc) {
+	}
       };
 
     struct break_exception {
-      bool		HasLabel;
-      string 		Label;
-      unsigned	Line;
+      bool              HasLabel;
+      string            Label;
+      code_location	Location;
+      
+      break_exception(bool has_label,string const &label,code_location const &loc)
+        : HasLabel(has_label),Label(label),Location(loc) {
+	}
       };
     
     struct continue_exception {
-      bool		HasLabel;
-      string		Label;
-      unsigned	Line;
+      bool              HasLabel;
+      string            Label;
+      code_location	Location;
+
+      continue_exception(bool has_label,string const &label,code_location const &loc)
+        : HasLabel(has_label),Label(label),Location(loc) {
+	}
       };
 
     // values -----------------------------------------------------------------
@@ -50,20 +69,17 @@ namespace ixion {
         
       public:
         value_type getType() const;
-        string toString() const;
         bool toBoolean() const;
         
-        ref<value> duplicate() const;
-        
-        ref<value> operatorBinary(operator_id op,expression const &op2,context const &ctx) const;
+        ref<value> duplicate();
       };
     
     class const_floating_point : public value_with_methods {
       private:
-        typedef value_with_methods 	super;
+        typedef value_with_methods      super;
 
       protected:
-        double 				Value;
+        double                          Value;
       
       public:
         const_floating_point(double value);
@@ -74,31 +90,31 @@ namespace ixion {
         bool toBoolean() const;
         string toString() const;
         
-        ref<value> duplicate() const;
-	
-        ref<value> callMethod(string const &identifier,context const &ctx,parameter_list const &parameters);
-	
+        ref<value> duplicate();
+        
+        ref<value> callMethod(string const &identifier,parameter_list const &parameters);
+        
         ref<value> operatorUnary(operator_id op) const;
-        ref<value> operatorBinary(operator_id op,expression const &op2,context const &ctx) const;
+        ref<value> operatorBinary(operator_id op,ref<value> op2) const;
       };
 
     class floating_point : public const_floating_point {
       private:
-        typedef const_floating_point	super;
+        typedef const_floating_point    super;
         
       public:
         floating_point(double value);
 
         ref<value> operatorUnaryModifying(operator_id op);
-        ref<value> operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx);
+        ref<value> operatorBinaryModifying(operator_id op,ref<value> op2);
       };
       
     class const_integer : public value_with_methods {
       private:
-        typedef value_with_methods 	super;
+        typedef value_with_methods      super;
 
       protected:
-        long 				Value;
+        long                            Value;
       
       public:
         const_integer(long value);
@@ -109,31 +125,31 @@ namespace ixion {
         bool toBoolean() const;
         string toString() const;
         
-        ref<value> duplicate() const;
-	
-        ref<value> callMethod(string const &identifier,context const &ctx,parameter_list const &parameters);
-	
+        ref<value> duplicate();
+        
+        ref<value> callMethod(string const &identifier,parameter_list const &parameters);
+        
         ref<value> operatorUnary(operator_id op) const;
-        ref<value> operatorBinary(operator_id op,expression const &op2,context const &ctx) const;
+        ref<value> operatorBinary(operator_id op,ref<value> op2) const;
       };
 
     class integer : public const_integer {
       private:
-        typedef const_integer	super;
+        typedef const_integer   super;
         
       public:
         integer(long value);
 
         ref<value> operatorUnaryModifying(operator_id op);
-        ref<value> operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx);
+        ref<value> operatorBinaryModifying(operator_id op,ref<value> op2);
       };
       
     class js_string : public value_with_methods {
       private:
-        typedef value_with_methods	super;
+        typedef value_with_methods      super;
         
       protected:
-        string 				Value;
+        string                          Value;
       
       public:
         js_string(string const &value);
@@ -141,20 +157,20 @@ namespace ixion {
         value_type getType() const;
         string toString() const;
         bool toBoolean() const;
-	string stringify() const;
+        string stringify() const;
 
-        ref<value> duplicate() const;
+        ref<value> duplicate();
         
         ref<value> lookup(string const &identifier);
-        ref<value> callMethod(string const &identifier,context const &ctx,parameter_list const &parameters);
+        ref<value> callMethod(string const &identifier,parameter_list const &parameters);
 
-        ref<value> operatorBinary(operator_id op,expression const &op2,context const &ctx) const;
-        ref<value> operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx);
+        ref<value> operatorBinary(operator_id op,ref<value> op2) const;
+        ref<value> operatorBinaryModifying(operator_id op,ref<value> op2);
       };
       
     class lvalue : public value {
       protected:
-        ref<value>	Reference;
+        ref<value>      Reference;
       
       public:
         lvalue(ref<value> ref);
@@ -164,24 +180,27 @@ namespace ixion {
         int toInt() const;
         double toFloat() const;
         bool toBoolean() const;
-	string stringify() const;
+        string stringify() const;
 
-        ref<value> duplicate() const;
+        ref<value> duplicate();
         
         ref<value> lookup(string const &identifier);
         ref<value> subscript(value const &index);
-        ref<value> call(context const &ctx,parameter_list const &parameters) const;
+        ref<value> call(parameter_list const &parameters);
+        ref<value> callAsMethod(ref<value> instance,parameter_list const &parameters);
+        ref<value> construct(parameter_list const &parameters);
         ref<value> assign(ref<value> op2);
 
         ref<value> operatorUnary(operator_id op) const;
-        ref<value> operatorBinary(operator_id op,expression const &op2,context const &ctx) const;
+        ref<value> operatorBinary(operator_id op,ref<value> op2) const;
+        ref<value> operatorBinaryShortcut(operator_id op,expression const &op2,context const &ctx) const;
         ref<value> operatorUnaryModifying(operator_id op);
-        ref<value> operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx);
+        ref<value> operatorBinaryModifying(operator_id op,ref<value> op2);
       };
 
     class constant_wrapper : public value {
       protected:
-        ref<value>	Constant;
+        ref<value>      Constant;
 
       public:
         constant_wrapper(ref<value> val);
@@ -191,29 +210,42 @@ namespace ixion {
         int toInt() const;
         double toFloat() const;
         bool toBoolean() const;
-	string stringify() const;
+        string stringify() const;
 
-        ref<value> duplicate() const;
+        ref<value> duplicate();
         
         ref<value> lookup(string const &identifier);
         ref<value> subscript(value const &index);
-        ref<value> call(context const &ctx,parameter_list const &parameters) const;
+        ref<value> call(parameter_list const &parameters) const;
+        ref<value> callAsMethod(ref<value> instance,parameter_list const &parameters);
+        ref<value> construct(parameter_list const &parameters);
         ref<value> assign(ref<value> value);
 
         ref<value> operatorUnary(operator_id op) const;
-        ref<value> operatorBinary(operator_id op,expression const &op2,context const &ctx) const;
+        ref<value> operatorBinary(operator_id op,ref<value> op2) const;
+        ref<value> operatorBinaryShortcut(operator_id op,expression const &op2,context const &ctx) const;
         ref<value> operatorUnaryModifying(operator_id op);
-        ref<value> operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx);
+        ref<value> operatorBinaryModifying(operator_id op,ref<value> op2);
       };
 
-    class function : public value {
+    class callable_with_parameters : public value {
       public:
-        typedef vector<string>		parameter_name_list;
+        typedef vector<string>          parameter_name_list;
         
       protected:
-        parameter_name_list		ParameterNameList;
-        ref<expression>			Body;
-	ref<value>			LexicalScope;
+        parameter_name_list             ParameterNameList;
+      
+      public:
+        callable_with_parameters(parameter_name_list const &pnames);
+        
+        void addParametersTo(list_scope &scope,parameter_list const &parameters) const;
+        static ref<value> evaluateBody(expression &body,context const &ctx);
+      };
+    
+    class function : public callable_with_parameters {
+        typedef callable_with_parameters 	super;
+        ref<expression>                 	Body;
+        ref<value>                      	LexicalScope;
       
       public:
         function(parameter_name_list const &pnames,ref<expression> body,ref<value> lex_scope);
@@ -222,319 +254,498 @@ namespace ixion {
           return VT_FUNCTION;
           }
         
-        ref<value> duplicate() const;
+        ref<value> duplicate();
         
-        ref<value> call(context const &ctx,parameter_list const &parameters) const;
+        ref<value> call(parameter_list const &parameters);
       };
+
+    class method : public callable_with_parameters {
+        typedef callable_with_parameters 	super;
+        ref<expression>                 	Body;
+        ref<value>                      	LexicalScope;
+      
+      public:
+        method(parameter_name_list const &pnames,ref<expression> body,ref<value> lex_scope);
+
+        value_type getType() const{
+          return VT_FUNCTION;
+          }
         
-    class js_array_constructor : public javascript::value {
+        ref<value> duplicate();
+        
+        ref<value> callAsMethod(ref<value> instance,parameter_list const &parameters);
+      };
+
+    class constructor : public callable_with_parameters {
+        typedef callable_with_parameters        super;
+        ref<expression>                         Body;
+        ref<value>                      	LexicalScope;
+      
+      public:
+        constructor(parameter_name_list const &pnames,ref<expression> body,ref<value> lex_scope);
+
+        value_type getType() const{
+          return VT_FUNCTION;
+          }
+        
+        ref<value> duplicate();
+        ref<value> callAsMethod(ref<value> instance,parameter_list const &parameters);
+      };
+
+    class js_class : public value {
+        class super_instance_during_construction : public value {
+          // this object constructs the superclass 
+          // a) if it is called, by calling the super constructor
+          //    with the aprropriate parameters
+          // b) implicitly with no super constructor arguments, 
+          //    if the super object is referenced explicitly
+          
+            ref<value>                  SuperClass;
+            ref<value>                  SuperClassInstance;
+
+          public:
+            super_instance_during_construction(ref<value> super_class);
+
+            value_type getType() const {
+              return VT_OBJECT;
+              }
+            
+            ref<value> call(parameter_list const &parameters);
+            ref<value> lookup(string const &identifier);
+            
+            ref<value> getSuperClassInstance();
+          };
+
+        typedef vector<ref<expression> > declaration_list;
+    
+        ref<value>                      LexicalScope;
+        ref<value>                      SuperClass;
+        ref<value>                      Constructor;
+        ref<value>                      StaticMethodScope;
+        ref<value>                      MethodScope;
+        ref<value>                      StaticVariableScope;
+        declaration_list                VariableList;
+        
+      public:
+        js_class(ref<value> lex_scope,ref<value> super_class,ref<value> constructor,
+          ref<value> static_method_scope,ref<value> method_scope,
+          ref<value> static_variable_scope,declaration_list const &variable_list);
+      
+        value_type getType() const {
+          return VT_TYPE;
+          }
+        
+        ref<value> duplicate();
+        ref<value> lookup(string const &identifier);
+        ref<value> lookupLocal(string const &identifier);
+        ref<value> construct(parameter_list const &parameters);
+      };
+    
+    class js_class_instance : public value {
+        class bound_method : public value {
+            ref<value>                  Instance;
+            ref<value>                  Method;
+            
+          public:
+            bound_method(ref<value> instance,ref<value> method);
+
+            value_type getType() const {
+              return VT_BOUND_METHOD;
+              }
+
+            ref<value> call(parameter_list const &parameters);
+          };
+
+        ref<value>                      SuperClassInstance;
+        ref<js_class,value>             Class;
+        ref<value>                      MethodScope;
+        ref<value>                      VariableScope;
+        
+      public:
+        js_class_instance(ref<js_class,value> cls,ref<value> method_scope,
+          ref<value> variable_scope);
+          
+        void setSuperClassInstance(ref<value> super_class_instance);
+        
+        value_type getType() const {
+          return VT_OBJECT;
+          }
+          
+        ref<value> duplicate();
+        ref<value> lookup(string const &identifier);
+      };
+    
+    class js_array_constructor : public value {
       public:
         value_type getType() const {
           return VT_TYPE;
           }
         
-        ref<value> duplicate() const;
-  
-        ref<value> construct(javascript::context const &ctx,parameter_list const &parameters) const;
+        ref<value> duplicate();
+        ref<value> construct(parameter_list const &parameters);
       };
 
     // expressions ----------------------------------------------------------
-    // the constant must already be passed in in non-modifiable form
-    class constant : public expression {
-      protected:
-        ref<value>		Value;
+    class expression {
+        code_location		Location;
+	
       public:
-        constant(ref<value> val);
+        expression(code_location const &loc);
+        virtual ~expression();
+        virtual ref<value> evaluate(context const &ctx) const = 0;
+	
+	code_location const &getCodeLocation() const {
+	  return Location;
+	  }
+      };
+
+    class constant : public expression {
+        ref<value>              Value;
+      public:
+        constant(ref<value> val,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
     
     class unary_operator : public expression {
-      protected:
-        value::operator_id	Operator;
-        ref<expression>	Operand;
+        value::operator_id      Operator;
+        ref<expression>         Operand;
       
       public:
-        unary_operator(value::operator_id opt,ref<expression> opn);
+        unary_operator(value::operator_id opt,ref<expression> opn,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
 
     class modifying_unary_operator : public expression {
-      protected:
-        value::operator_id	Operator;
-        ref<expression>	Operand;
+        value::operator_id      Operator;
+        ref<expression>         Operand;
       
       public:
-        modifying_unary_operator(value::operator_id opt,ref<expression> opn);
+        modifying_unary_operator(value::operator_id opt,ref<expression> opn,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
       
     class binary_operator : public expression {
-      protected:
-        value::operator_id	Operator;
-        ref<expression>	Operand1;
-        ref<expression>	Operand2;
+        value::operator_id      Operator;
+        ref<expression>         Operand1;
+        ref<expression>         Operand2;
       
       public:
-        binary_operator(value::operator_id opt,ref<expression> opn1,ref<expression> opn2);
+        binary_operator(value::operator_id opt,ref<expression> opn1,ref<expression> opn2,code_location const &loc);
+        ref<value> evaluate(context const &ctx) const;
+      };
+
+    class binary_shortcut_operator : public expression {
+        value::operator_id      Operator;
+        ref<expression>         Operand1;
+        ref<expression>         Operand2;
+      
+      public:
+        binary_shortcut_operator(value::operator_id opt,ref<expression> opn1,ref<expression> opn2,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
 
     class modifying_binary_operator : public expression {
-      protected:
-        value::operator_id	Operator;
-        ref<expression>	Operand1;
-        ref<expression>	Operand2;
+        value::operator_id      Operator;
+        ref<expression>         Operand1;
+        ref<expression>         Operand2;
       
       public:
-        modifying_binary_operator(value::operator_id opt,ref<expression> opn1,ref<expression> opn2);
+        modifying_binary_operator(value::operator_id opt,ref<expression> opn1,ref<expression> opn2,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
     
     class ternary_operator : public expression {
-      protected:
-        ref<expression>	Operand1;
-        ref<expression>	Operand2;
-        ref<expression>	Operand3;
+        ref<expression>         Operand1;
+        ref<expression>         Operand2;
+        ref<expression>         Operand3;
       
       public:
-        ternary_operator(ref<expression> opn1,ref<expression> opn2,ref<expression> opn3);
+        ternary_operator(ref<expression> opn1,ref<expression> opn2,ref<expression> opn3,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
     
     class subscript_operation : public expression {
-      protected:
-        ref<expression>	Operand1;
-        ref<expression>	Operand2;
+        ref<expression>         Operand1;
+        ref<expression>         Operand2;
       
       public:
-        subscript_operation(ref<expression> opn1,ref<expression> opn2);
+        subscript_operation(ref<expression> opn1,ref<expression> opn2,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
 
     class lookup_operation : public expression {
-      protected:
-        ref<expression>	Operand;
-        string		Identifier;
+        ref<expression>         Operand;
+        string                  Identifier;
       
       public:
-        lookup_operation(string const &id);
-        lookup_operation(ref<expression> opn,string const &id);
+        lookup_operation(string const &id,code_location const &loc);
+        lookup_operation(ref<expression> opn,string const &id,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
     
     class assignment : public expression {
-      protected:
-        ref<expression>	Operand1;
-        ref<expression>	Operand2;
+        ref<expression>         Operand1;
+        ref<expression>         Operand2;
       
       public:
-        assignment(ref<expression> opn1,ref<expression> opn2);
+        assignment(ref<expression> opn1,ref<expression> opn2,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
     
-    class function_call : public expression {
+    class basic_call : public expression {
       public:
-        typedef vector<ref<expression> >	parameter_expression_list;
+        typedef vector<ref<expression> >        parameter_expression_list;
+        typedef vector<ref<value> >             parameter_value_list;
       
-      protected:
-        ref<expression>		Function;
-        parameter_expression_list	ParameterExpressionList;
+      private:
+        parameter_expression_list               ParameterExpressionList;
       
       public:
-        function_call(ref<expression> fun,parameter_expression_list const &pexps);
+        basic_call(parameter_expression_list const &pexps,code_location const &loc);
+        void makeParameterValueList(context const &ctx,parameter_value_list &pvalues) const;
+      };
+    
+    class function_call : public basic_call {
+        typedef basic_call              super;
+        ref<expression>                 Function;
+      
+      public:
+        function_call(ref<expression> fun,parameter_expression_list const &pexps,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
 
-    class construction : public expression {
-      public:
-        typedef vector<ref<expression> >	parameter_expression_list;
-      
-      protected:
-        ref<expression>		Class;
-        parameter_expression_list	ParameterExpressionList;
+    class construction : public basic_call {
+        typedef basic_call              super;
+        ref<expression>                 Class;
       
       public:
-        construction(ref<expression> cls,parameter_expression_list const &pexps);
+        construction(ref<expression> cls,parameter_expression_list const &pexps,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
 
-    // instructions ---------------------------------------------------------
+    // declarations -----------------------------------------------------------
     class variable_declaration : public expression {
       protected:
-        string		Identifier;
-        ref<expression>	DefaultValue;
+        string          Identifier;
+        ref<expression> DefaultValue;
       
       public:
-        variable_declaration(string const &id,ref<expression> def_value);
+        variable_declaration(string const &id,ref<expression> def_value,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
 
     class constant_declaration : public expression {
       protected:
-        string		Identifier;
-        ref<expression>	DefaultValue;
+        string          Identifier;
+        ref<expression> DefaultValue;
       
       public:
-        constant_declaration(string const &id,ref<expression> def_value);
+        constant_declaration(string const &id,ref<expression> def_value,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
 
     class function_declaration : public expression {
       public:
-        typedef function::parameter_name_list	parameter_name_list;
+        typedef function::parameter_name_list   parameter_name_list;
 
-      protected:
-        string			Identifier;
-        parameter_name_list	ParameterNameList;
-        ref<expression>		Body;
+      private:
+        string                  Identifier;
+        parameter_name_list     ParameterNameList;
+        ref<expression>         Body;
       
       public:
         function_declaration(string const &id,parameter_name_list const &pnames,
-          ref<expression> body);
+          ref<expression> body,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
-    
-    class instruction_list : public expression {
-      protected:
-        typedef vector<ref<expression> >	expression_list;
-        expression_list				ExpressionList;
+
+    class method_declaration : public expression {
+      public:
+        typedef method::parameter_name_list     parameter_name_list;
+
+      private:
+        string                  Identifier;
+        parameter_name_list     ParameterNameList;
+        ref<expression>         Body;
       
       public:
+        method_declaration(string const &id,parameter_name_list const &pnames,
+          ref<expression> body,code_location const &loc);
+        ref<value> evaluate(context const &ctx) const;
+      };
+
+    class constructor_declaration : public expression {
+      public:
+        typedef method::parameter_name_list     parameter_name_list;
+
+      private:
+        parameter_name_list     ParameterNameList;
+        ref<expression>         Body;
+      
+      public:
+        constructor_declaration(parameter_name_list const &pnames,
+          ref<expression> body,code_location const &loc);
+        ref<value> evaluate(context const &ctx) const;
+      };
+
+    class js_class_declaration : public expression {
+        typedef vector<ref<expression> >        declaration_list;
+
+        string                                  Identifier;
+        ref<expression>                         SuperClass;
+        ref<expression>                         ConstructorDeclaration;
+        declaration_list                        StaticMethodList;
+        declaration_list                        MethodList;
+        declaration_list                        StaticVariableList;
+        declaration_list                        VariableList;
+
+      public:
+        js_class_declaration(string const &id,ref<expression> superclass,
+	  code_location const &loc);
+        
+        ref<value> evaluate(context const &ctx) const;
+        
+        void setConstructor(ref<expression> decl);
+        void addStaticMethod(ref<expression> decl);
+        void addMethod(ref<expression> decl);
+        void addStaticVariable(ref<expression> decl);
+        void addVariable(ref<expression> decl);
+      };
+    
+    // instructions ---------------------------------------------------------
+    class instruction_list : public expression {
+        typedef vector<ref<expression> >        expression_list;
+        expression_list                         ExpressionList;
+      
+      public:
+        instruction_list(code_location const &loc)
+	  : expression(loc) {
+	  }
         ref<value> evaluate(context const &ctx) const;
         void add(ref<expression> expr);
       };
     
     class scoped_instruction_list : public instruction_list {
       public:
+        scoped_instruction_list(code_location const &loc)
+	  : instruction_list(loc) {
+	  }
         ref<value> evaluate(context const &ctx) const;
       };
     
     class js_if : public expression {
-      protected:
-        ref<expression>		Conditional;
-        ref<expression>		IfExpression;
-        ref<expression>		IfNotExpression;
+        ref<expression>         Conditional;
+        ref<expression>         IfExpression;
+        ref<expression>         IfNotExpression;
       
       public:
-        js_if(ref<expression> cond,ref<expression> ifex,ref<expression> ifnotex);
+        js_if(ref<expression> cond,ref<expression> ifex,ref<expression> ifnotex,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
 
     class js_while : public expression {
-      protected:
-        ref<expression>		Conditional;
-        ref<expression>		LoopExpression;
-        bool				HasLabel;
-        string			Label;
+        ref<expression>         Conditional;
+        ref<expression>         LoopExpression;
+        bool                    HasLabel;
+        string                  Label;
       
       public:
-        js_while(ref<expression> cond,ref<expression> loopex);
-        js_while(ref<expression> cond,ref<expression> loopex,string const &Label);
+        js_while(ref<expression> cond,ref<expression> loopex,code_location const &loc);
+        js_while(ref<expression> cond,ref<expression> loopex,string const &Label,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
 
     class js_do_while : public expression {
-      protected:
-        ref<expression>		Conditional;
-        ref<expression>		LoopExpression;
-        bool				HasLabel;
-        string			Label;
+        ref<expression>         Conditional;
+        ref<expression>         LoopExpression;
+        bool                    HasLabel;
+        string                  Label;
       
       public:
-        js_do_while(ref<expression> cond,ref<expression> loopex);
-        js_do_while(ref<expression> cond,ref<expression> loopex,string const &Label);
+        js_do_while(ref<expression> cond,ref<expression> loopex,code_location const &loc);
+        js_do_while(ref<expression> cond,ref<expression> loopex,string const &Label,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
 
     class js_for : public expression {
-      protected:
-        ref<expression>		Initialization;
-        ref<expression>		Conditional;
-        ref<expression>		Update;
-        ref<expression>		LoopExpression;
-        bool			HasLabel;
-        string			Label;
+        ref<expression>         Initialization;
+        ref<expression>         Conditional;
+        ref<expression>         Update;
+        ref<expression>         LoopExpression;
+        bool                    HasLabel;
+        string                  Label;
       
       public:
-        js_for(ref<expression> init,ref<expression> cond,ref<expression> update,ref<expression> loop);
-        js_for(ref<expression> init,ref<expression> cond,ref<expression> update,ref<expression> loop,string const &label);
+        js_for(ref<expression> init,ref<expression> cond,ref<expression> update,ref<expression> loop,code_location const &loc);
+        js_for(ref<expression> init,ref<expression> cond,ref<expression> update,ref<expression> loop,string const &label,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
     
     class js_for_in : public expression {
-      protected:
-        ref<expression>		Iterator;
-        ref<expression>		Array;
-        ref<expression>		LoopExpression;
-        bool			HasLabel;
-        string			Label;
+        ref<expression>         Iterator;
+        ref<expression>         Array;
+        ref<expression>         LoopExpression;
+        bool                    HasLabel;
+        string                  Label;
       
       public:
-        js_for_in(ref<expression> iter,ref<expression> array,ref<expression> loop);
-        js_for_in(ref<expression> iter,ref<expression> array,ref<expression> loop,string const &label);
+        js_for_in(ref<expression> iter,ref<expression> array,ref<expression> loop,code_location const &loc);
+        js_for_in(ref<expression> iter,ref<expression> array,ref<expression> loop,string const &label,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
     
     class js_return : public expression {
-      protected:
-        ref<expression>		ReturnValue;
-        unsigned			Line;
+        ref<expression>         ReturnValue;
       
       public:
-        js_return(unsigned line,ref<expression> retval);
+        js_return(ref<expression> retval,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
 
     class js_break : public expression {
-      protected:
-        bool				HasLabel;
-        string			Label;
-        unsigned			Line;
+        bool                    HasLabel;
+        string                  Label;
       
       public:
-        js_break(unsigned line);
-        js_break(unsigned line,string const &label);
+        js_break(code_location const &loc);
+        js_break(string const &label,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
 
     class js_continue : public expression {
-      protected:
-        bool				HasLabel;
-        string			Label;
-        unsigned			Line;
+        bool                    HasLabel;
+        string                  Label;
       
       public:
-        js_continue(unsigned line);
-        js_continue(unsigned line,string const &label);
+        js_continue(code_location const &loc);
+        js_continue(string const &label,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
     
     class break_label : public expression {
-      protected:
-        string			Label;
-        ref<expression>		Expression;
+        string                  Label;
+        ref<expression>         Expression;
       
       public:
-        break_label(string const &label,ref<expression> expr);
+        break_label(string const &label,ref<expression> expr,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
       };
 
     class js_switch : public expression {
-      protected:
-        bool 				HasLabel;
-        string			Label;
-        ref<expression>		Discriminant;
+        bool                    HasLabel;
+        string                  Label;
+        ref<expression>         Discriminant;
         
         struct case_label {
-          ref<expression>		DiscriminantValue;
-          ref<expression>		Expression;
+          ref<expression>               DiscriminantValue;
+          ref<expression>               Expression;
           };
-        typedef vector<case_label> 	case_list;
-        case_list			CaseList;
+        typedef vector<case_label>      case_list;
+        case_list                       CaseList;
       
       public:
-        js_switch(ref<expression> discriminant);
-        js_switch(ref<expression> discriminant,string const &label);
+        js_switch(ref<expression> discriminant,code_location const &loc);
+        js_switch(ref<expression> discriminant,string const &label,code_location const &loc);
         ref<value> evaluate(context const &ctx) const;
         void addCase(ref<expression> dvalue,ref<expression> expr);
       };

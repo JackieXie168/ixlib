@@ -36,7 +36,7 @@ class FlexLexer;
 // scanner_exception ----------------------------------------------------------
 namespace ixion {
   struct scanner_exception : public base_exception {
-    scanner_exception(TErrorCode const error, TIndex const line, string const &info);
+    scanner_exception(TErrorCode const error,TIndex const line,std::string const &info);
     virtual char *getText() const;
     };
 
@@ -49,13 +49,13 @@ namespace ixion {
       typedef unsigned 	token_type;
       
       struct token {
-        token_type    	Type;
-        TIndex        	Line;
-        string       	Text;
+        token_type    		Type;
+        TIndex        		Line;
+        std::string       	Text;
         };
   
-      typedef vector<token>		token_list;
-      typedef vector<token>::iterator	token_iterator;
+      typedef std::vector<token>		token_list;
+      typedef std::vector<token>::iterator	token_iterator;
   
       scanner(FlexLexer &lexer);
       token_list scan();

@@ -76,24 +76,24 @@ namespace ixion {
     public:
       class tag {
         protected:
-          string				Name; 
+          std::string					Name; 
   
         public:
-	  typedef map<string,string>		attribute_map;
-	  typedef vector<tag *>			children_list;
-	  typedef vector<string>		text_list;
+	  typedef std::map<std::string,std::string>	attribute_map;
+	  typedef std::vector<tag *>			children_list;
+	  typedef std::vector<std::string>		text_list;
 	  
-          attribute_map 			Attributes;
-          children_list				Children;
-          text_list				Text;
+          attribute_map 				Attributes;
+          children_list					Children;
+          text_list					Text;
 	  
-	  typedef children_list::iterator 	iterator;
-	  typedef children_list::const_iterator const_iterator;
+	  typedef children_list::iterator 		iterator;
+	  typedef children_list::const_iterator 	const_iterator;
   
           tag() {
             Text.push_back("");
             }
-          tag(string const &name)
+          tag(std::string const &name)
             : Name(name) {
             Text.push_back("");
             }
@@ -104,12 +104,12 @@ namespace ixion {
             }
           void insertTag(children_list::iterator before,tag *tag);
           void insertTag(text_list::iterator before,tag *tag);
-          tag *findTag(string const &name);
+          tag *findTag(std::string const &name);
           
-          void setName(string const &name) {
+          void setName(std::string const &name) {
             Name = name;
             }
-          string getName() const {
+          std::string getName() const {
             return Name;
             }
 	  
@@ -128,16 +128,16 @@ namespace ixion {
   
         protected:
           void parse(token_iterator &first, token_iterator const &last);
-          void write(ostream &ostr, TSize indent);
+          void write(std::ostream &ostr, TSize indent);
           
-          void setLastText(string const &text) {
+          void setLastText(std::string const &text) {
             Text.back() = text;
             }
   
-          friend xml_file;
+          friend class xml_file;
         };
       
-      friend tag;
+      friend class tag;
   
     protected:
       tag				*RootTag;
@@ -150,8 +150,8 @@ namespace ixion {
         if (RootTag) delete RootTag;
         }
         
-      void read(istream &istr);
-      void write(ostream &ostr);
+      void read(std::istream &istr);
+      void write(std::ostream &ostr);
       
       tag *getRootTag() {
         return RootTag;

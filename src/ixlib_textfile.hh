@@ -21,16 +21,16 @@
 
 
 namespace ixion {
-  class text_file : public vector<string> {
+  class text_file : public std::vector<std::string> {
     public:
-    void read(istream &stream);
-    void write(ostream &stream) const;
+    void read(std::istream &stream);
+    void write(std::ostream &stream) const;
     };
   
   
   
   
-  inline istream &operator>>(istream &istr,text_file &conf) {
+  inline std::istream &operator>>(std::istream &istr,text_file &conf) {
     conf.read(istr);
     return istr;
     }
@@ -38,7 +38,7 @@ namespace ixion {
   
   
   
-  inline ostream &operator<<(ostream &ostr,text_file const &conf) {
+  inline std::ostream &operator<<(std::ostream &ostr,text_file const &conf) {
     conf.write(ostr);
     return ostr;
     }

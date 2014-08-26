@@ -51,7 +51,7 @@ namespace ixion {
   
   
   
-  struct base_exception : public exception {
+  struct base_exception : public std::exception {
     TErrorCode          Error;
     char                *Module;
     TIndex             	Line;
@@ -62,7 +62,7 @@ namespace ixion {
   
     base_exception(TErrorCode error,char const *info = NULL,char *module = NULL,
       TIndex line = 0,char *category = NULL);
-    char const *what() const;
+    char const *what() const throw ();
     virtual const char *getText() const = 0;
     };
   }

@@ -14,7 +14,11 @@
 
 
 #include <vector>
-#include <hash_map>
+#if __GNUC__ < 3
+  #include <hash_map>
+#else
+  #include <ext/hash_map>
+#endif
 #include <ixlib_string.hh>
 #include <ixlib_exbase.hh>
 #include <ixlib_garbage.hh>
@@ -36,6 +40,8 @@
 #define ECJS_INVALID_NUMBER_OF_ARGUMENTS	9
 #define ECJS_INVALID_TOKEN			10
 #define ECJS_CANNOT_REDECLARE			11
+#define ECJS_DOUBLE_CONSTRUCTION		12
+#define ECJS_NO_SUPERCLASS			13
 
 
 
@@ -58,10 +64,10 @@
         value_type getType() const { \
           return VT_FUNCTION; \
           } \
-        ixion::ref<ixion::javascript::value> call(context const &ctx,parameter_list const &parameters) const; \
+        ixion::ref<ixion::javascript::value> call(parameter_list const &parameters); \
       }; \
     } \
-  ixion::ref<ixion::javascript::value> NAME::call(context const &ctx,parameter_list const &parameters) const
+  ixion::ref<ixion::javascript::value> NAME::call(parameter_list const &parameters)
 
 #define IXLIB_JS_CONVERT_PARAMETERS_0 \
   
@@ -73,23 +79,46 @@
   EX_THROW(javascript,CODE)
 #define EXJS_THROWINFO(CODE,INFO)\
   EX_THROWINFO(javascript,CODE,INFO)
+#define EXJS_THROW_NO_LOCATION(CODE)\
+  EX_THROW(no_location_javascript,CODE)
+#define EXJS_THROWINFO_NO_LOCATION(CODE,INFO)\
+  EX_THROWINFO(no_location_javascript,CODE,INFO)
+#define EXJS_THROWINFOLOCATION(CODE,INFO,LOCATION)\
+  throw ixion::javascript_exception(CODE,LOCATION,INFO,__FILE__,__LINE__);
 #define EXJS_THROWINFOTOKEN(CODE,INFO,TOKEN)\
-  EXJS_THROWINFOLINE(CODE,INFO,(TOKEN).Line)
-#define EXJS_THROWINFOLINE(CODE,INFO,LINE)\
-  throw ixion::javascript_exception(CODE,LINE,INFO,__FILE__,__LINE__);
+  EXJS_THROWINFOLOCATION(CODE,INFO,code_location(TOKEN))
+#define EXJS_THROWINFOEXPRESSION(CODE,INFO,EXPR)\
+  EXJS_THROWINFOLOCATION(CODE,INFO,(EXPR).getCodeLocation())
+
 
 
 
 
 namespace ixion {
-  // javascript_exception -----------------------------------------------------
+  namespace javascript {
+    struct code_location;
+    }
+  
+  // exceptions ---------------------------------------------------------------
+  struct no_location_javascript_exception : public base_exception {
+    no_location_javascript_exception(TErrorCode error,char const *info = NULL,char *module = NULL,
+      TIndex line = 0)
+      : base_exception(error,info,module,line,"JS") {
+      }
+    virtual char *getText() const;
+    };
+
+
+
+
   struct javascript_exception : public base_exception {
     javascript_exception(TErrorCode error,char const *info = NULL,char *module = NULL,
       TIndex line = 0)
       : base_exception(error,info,module,line,"JS") {
       }
-    javascript_exception(TErrorCode error, TIndex js_line = 0, char const *info = 0,char *module = NULL,
+    javascript_exception(TErrorCode error,javascript::code_location const &loc,char const *info = 0,char *module = NULL,
       TIndex line = 0);
+    javascript_exception(no_location_javascript_exception const &half_ex,javascript::code_location const &loc);
     virtual char *getText() const;
     };
 
@@ -99,7 +128,7 @@ namespace ixion {
   // javascript ---------------------------------------------------------------
   /**
   This code tries to be an implementation of ECMAScript 4, as available at 
-  http://www.mozilla.org/js/
+  http://www.mozilla.org/js/language/
   Note that ES4 is still in the process of standardization. 
 
   It is meant to behave like an ES4 interpreter in strict mode, none
@@ -109,8 +138,7 @@ namespace ixion {
   This is the list of its shortcomings:
   <ul>
     <li> exceptions
-    <li> proper error reporting with line numbers
-    <li> classes,namespaces,packages
+    <li> namespaces,packages
     <li> constness
     <li> Number/String constructor and class methods
     <li> real regexp's
@@ -121,7 +149,17 @@ namespace ixion {
     </ul>
   */
   namespace javascript {
-    class context;
+    class value;
+    class list_scope;
+    struct context {
+      ref<list_scope,value>     DeclarationScope;
+      ref<value>                LookupScope;
+      
+      context(ref<list_scope,value> scope);
+      context(ref<value> scope);
+      context(ref<list_scope,value> decl_scope,ref<value> lookup_scope);
+      };
+
     class expression;
     
     class value {
@@ -156,61 +194,62 @@ namespace ixion {
           VT_FUNCTION,VT_OBJECT,VT_BUILTIN,VT_HOST,
 	  VT_SCOPE,VT_BOUND_METHOD,VT_TYPE
           };
-        typedef vector<ref<value> >	parameter_list;
+        typedef std::vector<ref<value> >	parameter_list;
 
         virtual ~value() {
           }
       
         virtual value_type getType() const = 0;
-        virtual string toString() const;
+        virtual std::string toString() const;
         virtual int toInt() const;
         virtual double toFloat() const;
         virtual bool toBoolean() const;
 	// toString is meant as a type conversion, whereas stringify
 	// is for debuggers and the like
-	virtual string stringify() const;
+	virtual std::string stringify() const;
         
         // this operation is defined to eliminate any wrappers
-        virtual ref<value> duplicate() const;
+        virtual ref<value> duplicate();
 
-        virtual ref<value> lookup(string const &identifier);
+        virtual ref<value> lookup(std::string const &identifier);
         virtual ref<value> subscript(value const &index);
-        virtual ref<value> call(context const &ctx,parameter_list const &parameters) const;
-        virtual ref<value> construct(context const &ctx,parameter_list const &parameters) const;
+        virtual ref<value> call(parameter_list const &parameters);
+        virtual ref<value> callAsMethod(ref<value> instance,parameter_list const &parameters);
+        virtual ref<value> construct(parameter_list const &parameters);
         virtual ref<value> assign(ref<value> op2);
         
         virtual ref<value> operatorUnary(operator_id op) const;
-        virtual ref<value> operatorBinary(operator_id op,expression const &op2,context const &ctx) const;
+        virtual ref<value> operatorBinary(operator_id op,ref<value> op2) const;
+        virtual ref<value> operatorBinaryShortcut(operator_id op,expression const &op2,context const &ctx) const;
         virtual ref<value> operatorUnaryModifying(operator_id op);
-        virtual ref<value> operatorBinaryModifying(operator_id op,expression const &op2,context const &ctx);
+        virtual ref<value> operatorBinaryModifying(operator_id op,ref<value> op2);
         
         static operator_id token2operator(scanner::token const &token,bool unary = false,bool prefix = false);
-        static char *operator2string(operator_id op);
-	static char *valueType2string(value_type vt);
+        static std::string operator2string(operator_id op);
+	static std::string valueType2string(value_type vt);
       };
     
     // obviously, any value can have methods, but with this neat little
     // interface implementing methods has just become easier.
     class value_with_methods : public value {
-      protected:
-        class method : public value {
-          protected:
-            string			Identifier;
-            value_with_methods		*Parent;
-            ref<value>			ParentRef;
+        class bound_method : public value {
+            std::string				Identifier;
+            ref<value_with_methods,value>	Parent;
             
           public:
+            bound_method(std::string const &identifier,ref<value_with_methods,value> parent);
+
             value_type getType() const {
               return VT_BOUND_METHOD;
               }
 
-            method(string const &identifier,value_with_methods *parent);
-            ref<value> call(context const &ctx,parameter_list const &parameters) const;
+            ref<value> duplicate();
+            ref<value> call(parameter_list const &parameters);
           };
             
       public:
-        ref<value> lookup(string const &identifier);
-        virtual ref<value> callMethod(string const &identifier,context const &ctx,parameter_list const &parameters) = 0;
+        ref<value> lookup(std::string const &identifier);
+        virtual ref<value> callMethod(std::string const &identifier,parameter_list const &parameters) = 0;
       };
 
     // obviously, any value can already represent a scope ("lookup" member!).
@@ -218,8 +257,8 @@ namespace ixion {
     // (=unite with) other scopes and keeps a list of registered members
     class list_scope : public value {
       protected:
-        typedef hash_map<string,ref<value>,string_hash>		member_map;
-        typedef vector<ref<value> >				swallowed_list;
+        typedef std::hash_map<std::string,ref<value>,string_hash> member_map;
+        typedef std::vector<ref<value> >			swallowed_list;
         
         member_map	MemberMap;
         swallowed_list	SwallowedList;
@@ -229,15 +268,15 @@ namespace ixion {
 	  return VT_SCOPE;
 	  }
 
-        ref<value> lookup(string const &identifier);
+        ref<value> lookup(std::string const &identifier);
 
         void unite(ref<value> scope);
         void separate(ref<value> scope);
 	void clearScopes();
         
-        bool hasMember(string const &name) const;
-	void addMember(string const &name,ref<value> member);
-        void removeMember(string const &name);
+        bool hasMember(std::string const &name) const;
+	void addMember(std::string const &name,ref<value> member);
+        void removeMember(std::string const &name);
 	void clearMembers();
 	
 	void clear();
@@ -245,11 +284,11 @@ namespace ixion {
     
     class js_array : public value_with_methods {
       private:
-        typedef value_with_methods	super;
+        typedef value_with_methods		super;
         
       protected:
-        typedef vector<ref<value> >	value_array;
-        value_array			Array;
+        typedef std::vector<ref<value> >	value_array;
+        value_array				Array;
   
       public:
         js_array() {
@@ -266,13 +305,13 @@ namespace ixion {
           return VT_BUILTIN;
           }
 
-	string stringify() const;
+	std::string stringify() const;
         
-        ref<value> duplicate() const;
+        ref<value> duplicate();
   
-        ref<value> lookup(string const &identifier);
+        ref<value> lookup(std::string const &identifier);
         ref<value> subscript(value const &index);
-        ref<value> callMethod(string const &identifier,javascript::context const &ctx,parameter_list const &parameters);
+        ref<value> callMethod(std::string const &identifier,parameter_list const &parameters);
   
         TSize size() const {
 	  return Array.size();
@@ -281,12 +320,7 @@ namespace ixion {
 	ref<value> &operator[](TIndex idx);
       };
 
-    class expression {
-      public:
-        virtual ~expression() {
-          }
-        virtual ref<value> evaluate(context const &ctx) const = 0;
-      };
+    class expression;
     
     ref<value> makeUndefined();
     ref<value> makeNull();
@@ -302,12 +336,11 @@ namespace ixion {
     ref<value> makeConstant(unsigned int val);
     ref<value> makeValue(double val);
     ref<value> makeConstant(double val);
-    ref<value> makeValue(string const &val);
-    ref<value> makeConstant(string const &val);
+    ref<value> makeValue(std::string const &val);
+    ref<value> makeConstant(std::string const &val);
     ref<value> makeArray(TSize size = 0);
     ref<value> makeLValue(ref<value> target);
     ref<value> wrapConstant(ref<value> val);
-    ref<expression> makeConstantExpression(ref<value> val);
 
     class interpreter {
       public:
@@ -317,28 +350,14 @@ namespace ixion {
         interpreter();
 	~interpreter();
         
-        ref<expression> parse(string const &str);
-        ref<expression> parse(istream &istr);
-        ref<value> execute(string const &str);
-        ref<value> execute(istream &istr);
+        ref<expression> parse(std::string const &str);
+        ref<expression> parse(std::istream &istr);
+        ref<value> execute(std::string const &str);
+        ref<value> execute(std::istream &istr);
         ref<value> execute(ref<expression> expr);
     
       private:
         ref<value> evaluateCatchExits(ref<expression> expr);
-      
-        ref<expression> parseInstructionList(
-          scanner::token_iterator &first,scanner::token_iterator const &last,bool scoped);
-        ref<expression> parseSwitch(
-          scanner::token_iterator &first,scanner::token_iterator const &last,string const &label);
-        ref<expression> parseVariableDeclaration(
-          scanner::token_iterator &first,scanner::token_iterator const &last);
-        ref<expression> parseConstantDeclaration(
-          scanner::token_iterator &first,scanner::token_iterator const &last);
-        ref<expression> parseInstruction(
-          scanner::token_iterator &first,scanner::token_iterator const &last);
-        ref<expression> parseExpression(
-          scanner::token_iterator &first,scanner::token_iterator const &last,
-          int precedence = 0);
       };
 
     void addGlobal(interpreter &ip);

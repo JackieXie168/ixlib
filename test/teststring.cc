@@ -26,7 +26,7 @@ BEGIN_TEST
   TEST(concat(vec.begin(),vec.end(),"-") == "A-B-C")
   
   // test string replace routines
-  string weenie = "Gosh. I'm a weenie.";
+  std::string weenie = "Gosh. I'm a weenie.";
   weenie = findReplace(weenie,string("Gosh."),"Josh.");
   TEST(weenie == "Josh. I'm a weenie.") 
 
@@ -75,4 +75,33 @@ BEGIN_TEST
   TEST(removeTrailing(weenie) == "")
   TEST(removeLeadingTrailing(weenie) == "")
   
+  { string t1 = "Ich bin die uebelste Wurst des gesamten Universums, und ich "
+    "werde gleich Base64-kodiert. I am the most evil sausage of the entire "
+    "universe, and I'm gonna be Base64-encoded in a few seconds!";
+    string base64;
+    base64encode(base64,(TByte *) t1.data(),t1.size());
+    TByte buffer[getMaxBase64DecodedSize(base64.size())+1];
+    TSize size = base64decode(buffer,base64);
+    TEST(t1 == string((char *) buffer,size))
+    }
+
+  { string t1 = "Ich bin die uebelste Wurst des gesamten Universums, und ich "
+    "werde gleich Base64-kodiert. I am the most evil sausage of the entire "
+    "universe, and I'm gonna be Base64-encoded in a few seconds!!";
+    string base64;
+    base64encode(base64,(TByte *) t1.data(),t1.size());
+    TByte buffer[getMaxBase64DecodedSize(base64.size())+1];
+    TSize size = base64decode(buffer,base64);
+    TEST(t1 == string((char *) buffer,size))
+    }
+
+  { string t1 = "Ich bin die uebelste Wurst des gesamten Universums, und ich "
+    "werde gleich Base64-kodiert. I am the most evil sausage of the entire "
+    "universe, and I'm gonna be Base64-encoded in a few seconds!!!";
+    string base64;
+    base64encode(base64,(TByte *) t1.data(),t1.size());
+    TByte buffer[getMaxBase64DecodedSize(base64.size())+1];
+    TSize size = base64decode(buffer,base64);
+    TEST(t1 == string((char *) buffer,size))
+    }
 END_TEST

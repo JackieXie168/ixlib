@@ -19,77 +19,6 @@ using namespace javascript;
 
 
 
-// variable_declaration -------------------------------------------------------
-variable_declaration::variable_declaration(string const &id,ref<expression> def_value)
-  : Identifier(id),DefaultValue(def_value) {
-  }
-
-
-
-
-ref<value> variable_declaration::evaluate(context const &ctx) const {
-  if (ctx.CurrentScope->hasMember(Identifier))
-    EXJS_THROWINFO(ECJS_CANNOT_REDECLARE,Identifier.c_str())
-  
-  ref<value> def;
-  if (DefaultValue.get() != NULL) def = DefaultValue->evaluate(ctx)->duplicate();
-  else def = makeNull();
-  
-  ref<value> lv = makeLValue(def);
-  ctx.CurrentScope->addMember(Identifier,lv);
-  return lv;
-  }
-
-
-
-
-// constant_declaration -------------------------------------------------------
-constant_declaration::constant_declaration(string const &id,ref<expression> def_value)
-  : Identifier(id),DefaultValue(def_value) {
-  }
-
-
-
-
-ref<value> constant_declaration::evaluate(context const &ctx) const {
-  if (ctx.CurrentScope->hasMember(Identifier))
-    EXJS_THROWINFO(ECJS_CANNOT_REDECLARE,Identifier.c_str())
-
-  ref<value> def;
-  if (DefaultValue.get() != NULL) def = DefaultValue->evaluate(ctx)->duplicate();
-  else def = makeNull();
-  
-  ref<value> cns = wrapConstant(def);
-  ctx.CurrentScope->addMember(Identifier,cns);
-  return cns;
-  }
-
-
-
-
-// function_declaration -------------------------------------------------------
-function_declaration::
-function_declaration(string const &id,parameter_name_list const &pnames,
-ref<expression> body)
-  : Identifier(id),ParameterNameList(pnames),Body(body) {
-  }
-
-
-
-
-ref<value> function_declaration::evaluate(context const &ctx) const {
-  if (ctx.CurrentScope->hasMember(Identifier))
-    EXJS_THROWINFO(ECJS_CANNOT_REDECLARE,Identifier.c_str())
-
-  ref<value> fun = new function(ParameterNameList,Body,ctx.CurrentScope);
-  EX_MEMCHECK(fun.get())
-  ctx.CurrentScope->addMember(Identifier,fun);
-  return ref<value>(NULL);
-  }
-
-
-
-
 // instruction_list -----------------------------------------------------------
 ref<value> 
 instruction_list::evaluate(context const &ctx) const {
@@ -112,11 +41,9 @@ void instruction_list::add(ref<expression> expr) {
 // scoped_instruction_list ----------------------------------------
 ref<value> scoped_instruction_list::evaluate(context const &ctx) const {
   ref<list_scope,value> scope = new list_scope;
-  EX_MEMCHECK(scope.get())
-  scope->unite(ctx.CurrentScope);
-  context inner_context(scope);
+  scope->unite(ctx.LookupScope);
 
-  ref<value> result = instruction_list::evaluate(inner_context);
+  ref<value> result = instruction_list::evaluate(context(scope));
   if (result.get()) return result->duplicate();
   return ref<value>(NULL);
 
@@ -127,8 +54,8 @@ ref<value> scoped_instruction_list::evaluate(context const &ctx) const {
 
 
 // js_if ----------------------------------------------------------------------
-js_if::js_if(ref<expression> cond,ref<expression> ifex,ref<expression> ifnotex)
-  : Conditional(cond),IfExpression(ifex),IfNotExpression(ifnotex) {
+js_if::js_if(ref<expression> cond,ref<expression> ifex,ref<expression> ifnotex,code_location const &loc)
+  : expression(loc),Conditional(cond),IfExpression(ifex),IfNotExpression(ifnotex) {
   }
 
 
@@ -148,15 +75,15 @@ ref<value> js_if::evaluate(context const &ctx) const {
 
 
 // js_while -------------------------------------------------------------------
-js_while::js_while(ref<expression> cond,ref<expression> loopex)
-  : Conditional(cond),LoopExpression(loopex),HasLabel(false) {
+js_while::js_while(ref<expression> cond,ref<expression> loopex,code_location const &loc)
+  : expression(loc),Conditional(cond),LoopExpression(loopex),HasLabel(false) {
   }
 
 
 
 
-js_while::js_while(ref<expression> cond,ref<expression> loopex,string const &label)
-  : Conditional(cond),LoopExpression(loopex),HasLabel(true),Label(label) {
+js_while::js_while(ref<expression> cond,ref<expression> loopex,string const &label,code_location const &loc)
+  : expression(loc),Conditional(cond),LoopExpression(loopex),HasLabel(true),Label(label) {
   }
 
 
@@ -186,15 +113,15 @@ ref<value> js_while::evaluate(context const &ctx) const {
 
 
 // js_do_while ----------------------------------------------------------------
-js_do_while::js_do_while(ref<expression> cond,ref<expression> loopex)
-  : Conditional(cond),LoopExpression(loopex),HasLabel(false) {
+js_do_while::js_do_while(ref<expression> cond,ref<expression> loopex,code_location const &loc)
+  : expression(loc),Conditional(cond),LoopExpression(loopex),HasLabel(false) {
   }
 
 
 
 
-js_do_while::js_do_while(ref<expression> cond,ref<expression> loopex,string const &label)
-  : Conditional(cond),LoopExpression(loopex),HasLabel(true),Label(label) {
+js_do_while::js_do_while(ref<expression> cond,ref<expression> loopex,string const &label,code_location const &loc)
+  : expression(loc),Conditional(cond),LoopExpression(loopex),HasLabel(true),Label(label) {
   }
 
 
@@ -224,16 +151,16 @@ ref<value> js_do_while::evaluate(context const &ctx) const {
 
 
 // js_for ---------------------------------------------------------------------
-js_for::js_for(ref<expression> init,ref<expression> cond,ref<expression> update,ref<expression> loop)
-  : Initialization(init),Conditional(cond),Update(update),LoopExpression(loop),
-  HasLabel(false) {
+js_for::js_for(ref<expression> init,ref<expression> cond,ref<expression> update,ref<expression> loop,code_location const &loc)
+  : expression(loc),Initialization(init),Conditional(cond),Update(update),
+  LoopExpression(loop),HasLabel(false) {
   }
 
 
 
 
-js_for::js_for(ref<expression> init,ref<expression> cond,ref<expression> update,ref<expression> loop,string const &label)
-  : Initialization(init),Conditional(cond),Update(update),LoopExpression(loop),
+js_for::js_for(ref<expression> init,ref<expression> cond,ref<expression> update,ref<expression> loop,string const &label,code_location const &loc)
+  : expression(loc),Initialization(init),Conditional(cond),Update(update),LoopExpression(loop),
   HasLabel(true),Label(label) {
   }
 
@@ -242,8 +169,7 @@ js_for::js_for(ref<expression> init,ref<expression> cond,ref<expression> update,
 
 ref<value> js_for::evaluate(context const &ctx) const {
   ref<list_scope,value> scope = new list_scope;
-  EX_MEMCHECK(scope.get())
-  scope->unite(ctx.CurrentScope);
+  scope->unite(ctx.LookupScope);
   context inner_context(scope);
 
   ref<value> result;
@@ -270,15 +196,15 @@ ref<value> js_for::evaluate(context const &ctx) const {
 
 
 // js_for_in ------------------------------------------------------------------
-js_for_in::js_for_in(ref<expression> iter,ref<expression> array,ref<expression> loop)
-  : Iterator(iter),Array(array),LoopExpression(loop),HasLabel(false) {
+js_for_in::js_for_in(ref<expression> iter,ref<expression> array,ref<expression> loop,code_location const &loc)
+  : expression(loc),Iterator(iter),Array(array),LoopExpression(loop),HasLabel(false) {
   }
 
 
 
 
-js_for_in::js_for_in(ref<expression> iter,ref<expression> array,ref<expression> loop,string const &label)
-  : Iterator(iter),Array(array),LoopExpression(loop),
+js_for_in::js_for_in(ref<expression> iter,ref<expression> array,ref<expression> loop,string const &label,code_location const &loc)
+  : expression(loc),Iterator(iter),Array(array),LoopExpression(loop),
   HasLabel(true),Label(label) {
   }
 
@@ -287,8 +213,7 @@ js_for_in::js_for_in(ref<expression> iter,ref<expression> array,ref<expression> 
 
 ref<value> js_for_in::evaluate(context const &ctx) const {
   ref<list_scope,value> scope = new list_scope;
-  EX_MEMCHECK(scope.get())
-  scope->unite(ctx.CurrentScope);
+  scope->unite(ctx.LookupScope);
   context inner_context(scope);
 
   ref<value> result;
@@ -323,8 +248,8 @@ ref<value> js_for_in::evaluate(context const &ctx) const {
 
 
 // js_return ------------------------------------------------------------------
-js_return::js_return(unsigned line,ref<expression> retval)
-  : ReturnValue(retval),Line(line) {
+js_return::js_return(ref<expression> retval,code_location const &loc)
+  : expression(loc),ReturnValue(retval) {
   }
 
 
@@ -334,70 +259,60 @@ ref<value> js_return::evaluate(context const &ctx) const {
   ref<value> retval;
   if (ReturnValue.get())
     retval = ReturnValue->evaluate(ctx);
-  return_exception rex;
-  rex.ReturnValue = retval;
-  rex.Line = Line;
-  throw rex;
+
+  throw return_exception(retval,getCodeLocation());
   }
 
 
 
 
 // js_break -------------------------------------------------------------------
-js_break::js_break(unsigned line)
-  : HasLabel(false),Line(line) {
+js_break::js_break(code_location const &loc)
+  : expression(loc),HasLabel(false) {
   }
 
 
 
 
-js_break::js_break(unsigned line,string const &label)
-  : HasLabel(true),Label(label),Line(line) {
+js_break::js_break(string const &label,code_location const &loc)
+  : expression(loc),HasLabel(true),Label(label) {
   }
 
 
 
 
 ref<value> js_break::evaluate(context const &ctx) const {
-  break_exception be;
-  be.HasLabel = HasLabel;
-  be.Label = Label;
-  be.Line = Line;
-  throw be;
+  throw break_exception(HasLabel,Label,getCodeLocation());
   }
 
 
 
 
 // js_continue ----------------------------------------------------------------
-js_continue::js_continue(unsigned line)
-  : HasLabel(false),Line(line) {
+js_continue::js_continue(code_location const &loc)
+  : expression(loc),HasLabel(false) {
   }
 
 
 
 
-js_continue::js_continue(unsigned line,string const &label)
-  : HasLabel(true),Label(label),Line(line) {
+js_continue::js_continue(string const &label,code_location const &loc)
+  : expression(loc),HasLabel(true),Label(label) {
   }
 
 
 
 
 ref<value> js_continue::evaluate(context const &ctx) const {
-  continue_exception ce;
-  ce.HasLabel = HasLabel;
-  ce.Label = Label;
-  ce.Line = Line;
-  throw ce;
+  throw continue_exception(HasLabel,Label,getCodeLocation());
   }
 
 
 
 
 // break_label ----------------------------------------------------------------
-break_label::break_label(string const &label,ref<expression> expr)
-  : Label(label),Expression(expr) {
+break_label::break_label(string const &label,ref<expression> expr,code_location const &loc)
+  : expression(loc),Label(label),Expression(expr) {
   }
 
 
@@ -418,15 +333,15 @@ break_label::evaluate(context const &ctx) const {
 
 
 // js_switch  -----------------------------------------------------------------
-js_switch::js_switch(ref<expression> discriminant)
-  : HasLabel(false),Discriminant(discriminant) {
+js_switch::js_switch(ref<expression> discriminant,code_location const &loc)
+  : expression(loc),HasLabel(false),Discriminant(discriminant) {
   }
 
 
 
 
-js_switch::js_switch(ref<expression> discriminant,string const &label)
-  : HasLabel(true),Label(label),Discriminant(discriminant) {
+js_switch::js_switch(ref<expression> discriminant,string const &label,code_location const &loc)
+  : expression(loc),HasLabel(true),Label(label),Discriminant(discriminant) {
   }
 
 
@@ -436,8 +351,7 @@ ref<value>
 js_switch::
 evaluate(context const &ctx) const {
   ref<list_scope,value> scope = new list_scope;
-  EX_MEMCHECK(scope.get())
-  scope->unite(ctx.CurrentScope);
+  scope->unite(ctx.LookupScope);
   context inner_context(scope);
   
   ref<value> discr = Discriminant->evaluate(inner_context);
@@ -447,7 +361,7 @@ evaluate(context const &ctx) const {
   FOREACH_CONST(first,CaseList,case_list) {
     if (first->DiscriminantValue.get()) {
       if (first->DiscriminantValue->evaluate(inner_context)->
-      operatorBinary(value::OP_EQUAL,*Discriminant,inner_context)->toBoolean()) {
+      operatorBinary(value::OP_EQUAL,Discriminant->evaluate(inner_context))->toBoolean()) {
         expr = first;
 	expr_found = true;
 	break;

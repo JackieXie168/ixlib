@@ -6,12 +6,17 @@ function TEST(NAME,CONDITION) {
   }
 
 var failed_tests = "",tests = 0;
-
 // test null ------------------------------------------------------------------
 { var counter;
   TEST("null 1",null == null);
   TEST("null 2",counter == null);
   TEST("null 3",null == counter);
+  TEST("null 4",3 != null);
+  TEST("null 5",!(3 == null));
+  TEST("null 6",4.0 != null);
+  TEST("null 7",!(4.0 == null));
+  TEST("null 8","stuff" != null);
+  TEST("null 9",!("stuff" == null));
   }
 
 // test strings ---------------------------------------------------------------
@@ -254,7 +259,7 @@ var failed_tests = "",tests = 0;
 
 // test library ---------------------------------------------------------------
 { var u = 20;
-  // TEST("lib 1",eval("4+3+2+1+u;") == 30);
+  TEST("lib 1",eval("4+3+2+1;") == 10);
   TEST("lib 2",parseInt("0xaffe") == 0xAFFE);
   TEST("lib 3",parseFloat("3.14") == 3.14);
   TEST("lib 4",!isFinite(Infinity));
@@ -265,11 +270,46 @@ var failed_tests = "",tests = 0;
   TEST("lib 9",!isNaN(5));
   TEST("lib 10",0 <= Math.random() && Math.random() <= 1);
   TEST("lib 11",Math.abs(Math.sin(Math.PI)) < 0.0001);
+  
+  var usin = Math.sin;
+  TEST("lib 12",Math.abs(usin(Math.PI)) < 0.0001);
+  }
+
+// test classes ---------------------------------------------------------------
+{ class flupp {
+    static const gravity = 9.81;
+    static var u = new Array();
+    var v = new Array();
+    
+    constructor function flupp(x) {
+      v.push(x);
+      }
+    static function getGravity() {
+      return gravity;
+      }
+    }
+  class gummiflupp extends flupp {
+    var elasticity;
+    
+    constructor function gummiflupp(_elasticity) {
+      elasticity = _elasticity;
+      super(17);
+      }
+    function f(x) {
+      return elasticity*Math.cos(x)*getGravity();
+      }
+    }
+  
+  TEST("class 1",gummiflupp.gravity == gummiflupp.getGravity());
+  
+  var f = new gummiflupp(7);
+  TEST("class 2",f.f(0) > 7*9.8);
+  TEST("class 3",f.v[0] == 17);
   }
 
 // output main result ---------------------------------------------------------
 if (failed_tests == "") {
-  "OK: " + tests + " tests completed";
+  "OK: " + tests.toString() + " tests completed";
   }
 else {
   "failed: " + failed_tests;

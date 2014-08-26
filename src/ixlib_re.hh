@@ -87,16 +87,16 @@ namespace ixion {
       class backref_stack {
         private:
           struct backref_entry {
-            enum { OPEN,CLOSE }           Type;
-            TIndex                        Index;
+            enum { OPEN,CLOSE }           	Type;
+            TIndex                        	Index;
             };
           
-          typedef vector<backref_entry>   internal_stack;
+          typedef std::vector<backref_entry>	internal_stack;
           
-          internal_stack                  Stack;
+          internal_stack                  	Stack;
         
 	public:
-          typedef TSize                   rewind_info;
+          typedef TSize                   	rewind_info;
           
           void open(TIndex index);
           void close(TIndex index);
@@ -314,7 +314,7 @@ namespace ixion {
             };
 
           typedef matcher		  super;
-	  typedef vector<matcher *>       alt_list;
+	  typedef std::vector<matcher *>  alt_list;
           alt_list                        AltList;
           connector                       Connector;
       
@@ -350,7 +350,7 @@ namespace ixion {
         };
     
       // instance data --------------------------------------------------------
-      auto_ptr<matcher>           ParsedRegex;
+      std::auto_ptr<matcher>      ParsedRegex;
       backref_stack               BackrefStack;
       T                           LastCandidate;
       TIndex                      MatchIndex;
@@ -373,7 +373,7 @@ namespace ixion {
       TSize getMatchLength() { 
         return MatchLength; 
 	}
-      string getMatch() { 
+      std::string getMatch() { 
         return T(LastCandidate.begin()+MatchIndex,
 	   LastCandidate.begin()+MatchIndex+MatchLength); 
 	}
@@ -415,28 +415,28 @@ namespace ixion {
   None of these is actually hard to hack in. If you want them,
   pester me or try for yourself (and submit patches!)
   */
-  class regex_string : public regex<string> {
+  class regex_string : public regex<std::string> {
     private:
-      class class_matcher : public regex<string>::matcher {
+      class class_matcher : public regex<std::string>::matcher {
         private:
-	  typedef regex<string>::matcher	super;
+	  typedef regex<std::string>::matcher	super;
           static TSize const      		CharValues = 256;
           bool                    		Set[CharValues];
           bool                    		Negated;
 
         public:
 	  class_matcher();
-          class_matcher(string const &cls);
+          class_matcher(std::string const &cls);
 
 	  matcher *duplicate() const;
 
           TSize minimumMatchLength() const {
             return 1;
             }
-          bool match(backref_stack &brstack,string const &candidate,TIndex at);
+          bool match(backref_stack &brstack,std::string const &candidate,TIndex at);
       
         private:
-          void expandClass(string const &cls);
+          void expandClass(std::string const &cls);
 	
 	protected:
 	  void copy(class_matcher const *src);
@@ -445,7 +445,7 @@ namespace ixion {
 
 
 
-      class special_class_matcher : public regex<string>::matcher {
+      class special_class_matcher : public regex<std::string>::matcher {
         public:
           enum type { DIGIT,NONDIGIT,ALNUM,NONALNUM,SPACE,NONSPACE };
   
@@ -460,7 +460,7 @@ namespace ixion {
           TSize minimumMatchLength() const {
             return 1;
             }
-          bool match(backref_stack &brstack,string const &candidate,TIndex at);
+          bool match(backref_stack &brstack,std::string const &candidate,TIndex at);
         };
 
 
@@ -469,22 +469,22 @@ namespace ixion {
     public:
       regex_string() {
         }
-      regex_string(string const &str) {
+      regex_string(std::string const &str) {
 	parse(str);
 	}
       regex_string(char const *s) {
 	parse(s);
         }
 
-      void parse(string const &expr);
+      void parse(std::string const &expr);
 
-      string replaceAll(string const &candidate,string const &replacement,
+      std::string replaceAll(std::string const &candidate,std::string const &replacement,
         TIndex from = 0);
 
     private:
-      regex<string>::matcher *parseRegex(string const &expr);
-      quantifier *parseQuantifier(string const &expr,TIndex &at);
-      bool isGreedy(string const &expr,TIndex &at);
+      regex<std::string>::matcher *parseRegex(std::string const &expr);
+      quantifier *parseQuantifier(std::string const &expr,TIndex &at);
+      bool isGreedy(std::string const &expr,TIndex &at);
     };
   }
 

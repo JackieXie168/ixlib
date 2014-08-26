@@ -65,7 +65,15 @@ namespace ixion {
           }
         return true;
         }
-  
+
+      template <class TP>
+      bool operator!=(coord_vector<TP, DIM> const &vec) const {
+        for (int i=0; i<DIM; i++) {
+          if (Data[i] != vec[i]) return true;
+          }
+        return false;
+        }
+
       template <class TP>
       coord_vector &operator=(TP data[]) { 
         for (int i=0; i<DIM; i++) Data[i] = data[i]; 
@@ -171,7 +179,7 @@ namespace ixion {
   
   template<class T>
   inline double getAngle(coord_vector<T,2> const &vec) {
-    return atan2(vec[1],vec[0]);
+    return atan2(double(vec[1]),double(vec[0]));
     }
   
   
@@ -202,39 +210,53 @@ namespace ixion {
       return *this;
       }
   
-    T getSizeX() const
-      { return B[0]-A[0]; }
-    T getSizeY() const
-      { return B[1]-A[1]; }
-    bool doesContain(T x, T y) const
-      { return (A[0] <= x) && (x < B[0]) && (A[1] <= y) && (y < B[1]); }
-    bool doesContain(coord_vector<T> const &point) const
-      { return (A[0] <= point[0]) && (point[0] < B[0]) &&
-          (A[1] <= point[1]) && (point[1] < B[1]); }
-    bool doesIntersect(rectangle<T> const &rect) const
-      { return NUM_OVERLAP(A[0],B[0],rect.A[0],rect.B[0]) && 
-          NUM_OVERLAP(A[1],B[1],rect.A[1],rect.B[1]); }
-    bool isEmpty() const
-      { return (B[0] <= A[0]) || (B[1] <= A[1]); }
+    T getWidth() const { 
+      return B[0]-A[0]; 
+      }
+    T getHeight() const { 
+      return B[1]-A[1]; 
+      }
+    T getArea() const { 
+      return getWidth()*getHeight(); 
+      }
+    bool doesContain(T x, T y) const { 
+      return (A[0] <= x) && (x < B[0]) && (A[1] <= y) && (y < B[1]); 
+      }
+    bool doesContain(coord_vector<T> const &point) const { 
+      return (A[0] <= point[0]) && (point[0] < B[0]) &&
+          (A[1] <= point[1]) && (point[1] < B[1]); 
+      }
+    bool doesIntersect(rectangle<T> const &rect) const { 
+      return NUM_OVERLAP(A[0],B[0],rect.A[0],rect.B[0]) && 
+          NUM_OVERLAP(A[1],B[1],rect.A[1],rect.B[1]); 
+      }
+    bool isEmpty() const { 
+      return (B[0] <= A[0]) || (B[1] <= A[1]); }
   
-    void clear()
-      { B = A; }
+    void clear() { 
+      B = A; 
+      }
   
-    void set(T ax, T ay, T bx, T by)
-      { A.set(ax,ay); B.set(bx,by); }
+    void set(T ax, T ay, T bx, T by) { 
+      A.set(ax,ay); 
+      B.set(bx,by); 
+      }
     template <class TP>
-    void set(coord_vector<TP> const &a,coord_vector<TP> const &b)
-      { A = a; B = b; }
+    void set(coord_vector<TP> const &a,coord_vector<TP> const &b) { 
+      A = a; B = b; 
+      }
   
-    void setSize(T sizex,T sizey)
-      { B = A + coord_vector<T>(sizex,sizey); }
+    void setSize(T sizex,T sizey) { 
+      B = A + coord_vector<T>(sizex,sizey); 
+      }
     template <class TP>
     void setSize(coord_vector<TP> const &p) {
       B = A+p;
       }
   
-    void resize(T dx,T dy)
-      { B.move(dx,dy); }
+    void resize(T dx,T dy) { 
+      B.move(dx,dy); 
+      }
     template <class TP>
     void resize(coord_vector<TP> const &p) {
       B += p;
@@ -274,6 +296,12 @@ namespace ixion {
       copy.move(p*(-1));
       return copy;
       }
+
+    // obsolete:
+    T getSizeX() const
+      { return B[0]-A[0]; }
+    T getSizeY() const
+      { return B[1]-A[1]; }
     };
 
 
@@ -283,40 +311,53 @@ namespace ixion {
   template <class T>
   class region {
     protected:
-    vector< rectangle<T> > Rects;
+    std::vector< rectangle<T> > Rects;
   
     public:
-    typedef typename vector< rectangle<T> >::iterator iterator;
-    typedef typename vector< rectangle<T> >::const_iterator const_iterator;
+    typedef typename std::vector< rectangle<T> >::iterator iterator;
+    typedef typename std::vector< rectangle<T> >::const_iterator const_iterator;
     
-    iterator begin() 
-      { return Rects.begin(); }
-    const_iterator begin() const
-      { return Rects.begin(); }
-    iterator end() 
-      { return Rects.end(); }
-    const_iterator end() const
-      { return Rects.end(); }
+    TSize size() const {
+      return Rects.size();
+      }
+    iterator begin() { 
+      return Rects.begin(); 
+      }
+    const_iterator begin() const { 
+      return Rects.begin(); 
+      }
+    iterator end() { 
+      return Rects.end(); 
+      }
+    const_iterator end() const { 
+      return Rects.end(); 
+      }
     
     void add(rectangle<T> const &rect);
     void intersect(rectangle<T> const &rect);
     void subtract(rectangle<T> const &rect);
-    void operator+=(rectangle<T> const &rect)
-      { add(rect); }
-    void operator*=(rectangle<T> const &rect)
-      { intersect(rect); }
-    void operator-=(rectangle<T> const &rect)
-      { subtract(rect); }
+    void operator+=(rectangle<T> const &rect) { 
+      add(rect); 
+      }
+    void operator*=(rectangle<T> const &rect) { 
+      intersect(rect); 
+      }
+    void operator-=(rectangle<T> const &rect) { 
+      subtract(rect); 
+      }
       
-    bool doesContain(T x, T y) const
-      { return doesContain(coord_vector<T>(x,y)); }
+    bool doesContain(T x, T y) const { 
+      return doesContain(coord_vector<T>(x,y)); 
+      }
     bool doesContain(coord_vector<T> const &point) const;
     bool doesIntersect(rectangle<T> const &rect) const;
-    bool isEmpty() const
-      { return Rects.empty(); }
+    bool isEmpty() const { 
+      return Rects.empty(); 
+      }
   
-    void clear()
-      { Rects.clear(); }
+    void clear() { 
+      Rects.clear(); 
+      }
   
     protected:
     void deleteEmptyRectangles();

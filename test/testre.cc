@@ -20,6 +20,7 @@ using namespace ixion;
 
 string duplicate(string const &src,TSize count) {
   string result;
+  result.reserve(count*src.size());
   while (count--) result += src;
   return result;
   }

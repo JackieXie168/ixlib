@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p4 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -72,6 +72,8 @@ CC = @CC@
 CXX = @CXX@
 DATADIRNAME = @DATADIRNAME@
 DLLTOOL = @DLLTOOL@
+ECHO = @ECHO@
+EXEEXT = @EXEEXT@
 GENCAT = @GENCAT@
 GMOFILES = @GMOFILES@
 GMSGFMT = @GMSGFMT@
@@ -92,10 +94,12 @@ MAKEINFO = @MAKEINFO@
 MKINSTALLDIRS = @MKINSTALLDIRS@
 MSGFMT = @MSGFMT@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 POFILES = @POFILES@
 POSUB = @POSUB@
 RANLIB = @RANLIB@
+STRIP = @STRIP@
 USE_INCLUDED_LIBINTL = @USE_INCLUDED_LIBINTL@
 USE_NLS = @USE_NLS@
 VERSION = @VERSION@
@@ -115,7 +119,7 @@ basic_objects = base.cc exbase.cc exgen.cc exio.cc   string.cc numconv.cc numeri
 advanced_headers = ixlib_cmdline.hh   ixlib_geometry.hh ixlib_geometry_impl.hh   ixlib_polygon.hh ixlib_polygon_impl.hh   ixlib_matrix.hh ixlib_matrix_impl.hh   ixlib_textfile.hh ixlib_scanner.hh ixlib_token_lex.hh   ixlib_xml.hh   ixlib_javascript.hh   ixlib_drawing_functions.hh 
 
 
-advanced_objects = cmdline.cc textfile.cc scanner.cc xml.cc   js_value.cc js_expression.cc js_instruction.cc js_array.cc js_library.cc   js_interpreter.cc
+advanced_objects = cmdline.cc textfile.cc scanner.cc xml.cc   js_value.cc js_expression.cc js_declaration.cc   js_instruction.cc js_array.cc js_library.cc   js_interpreter.cc
 
 
 internal_headers = ixlib_token_xml.hh ixlib_scanxml.hh ixlib_scanjs.hh   ixlib_js_internals.hh ixlib_token_javascript.hh   ixlib_i18n.hh 
@@ -123,11 +127,11 @@ internal_headers = ixlib_token_xml.hh ixlib_scanxml.hh ixlib_scanjs.hh   ixlib_j
 
 internal_objects = lex.xml.cc lex.javascript.cc
 
-BUILT_SOURCES = lex.xml.cc lex.javascript.cc
+BUILT_SOURCES = lex.xml.cc lex.javascript.cc 
 
 CLEANFILES = lex.xml.cc lex.javascript.cc
 
-EXTRA_DIST = lex.xml.yy lex.javascript.yy
+EXTRA_DIST = lex.xml.yy lex.javascript.yy flex-gcc3-patch.ed
 
 # Targets ---------------------------------------------------------------------
 lib_LTLIBRARIES = libixion.la
@@ -151,8 +155,9 @@ LIBS = @LIBS@
 libixion_la_DEPENDENCIES = 
 libixion_la_OBJECTS =  base.lo exbase.lo exgen.lo exio.lo string.lo \
 numconv.lo numeric.lo re.lo cmdline.lo textfile.lo scanner.lo xml.lo \
-js_value.lo js_expression.lo js_instruction.lo js_array.lo \
-js_library.lo js_interpreter.lo lex.xml.lo lex.javascript.lo
+js_value.lo js_expression.lo js_declaration.lo js_instruction.lo \
+js_array.lo js_library.lo js_interpreter.lo lex.xml.lo \
+lex.javascript.lo
 CXXFLAGS = @CXXFLAGS@
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -177,7 +182,7 @@ OBJECTS = $(libixion_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .cc .lo .o .s
+.SUFFIXES: .S .c .cc .lo .o .obj .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps src/Makefile
 
@@ -214,6 +219,11 @@ uninstall-libLTLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -222,6 +232,7 @@ uninstall-libLTLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 
@@ -253,6 +264,8 @@ libixion.la: $(libixion_la_OBJECTS) $(libixion_la_DEPENDENCIES)
 	$(CXXLINK) -rpath $(libdir) $(libixion_la_LDFLAGS) $(libixion_la_OBJECTS) $(libixion_la_LIBADD) $(LIBS)
 .cc.o:
 	$(CXXCOMPILE) -c $<
+.cc.obj:
+	$(CXXCOMPILE) -c `cygpath -w $<`
 .cc.lo:
 	$(LTCXXCOMPILE) -c $<
 
@@ -308,7 +321,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
@@ -330,6 +343,11 @@ js_array.lo js_array.o : js_array.cc ixlib_js_internals.hh \
 	ixlib_javascript.hh ixlib_string.hh ixlib_base.hh \
 	../ixlib_config.hh ixlib_exgen.hh ixlib_exbase.hh \
 	ixlib_garbage.hh ixlib_scanner.hh
+js_declaration.lo js_declaration.o : js_declaration.cc \
+	ixlib_js_internals.hh ixlib_javascript.hh ixlib_string.hh \
+	ixlib_base.hh ../ixlib_config.hh ixlib_exgen.hh ixlib_exbase.hh \
+	ixlib_garbage.hh ixlib_scanner.hh ixlib_token_javascript.hh \
+	ixlib_token_lex.hh
 js_expression.lo js_expression.o : js_expression.cc \
 	ixlib_js_internals.hh ixlib_javascript.hh ixlib_string.hh \
 	ixlib_base.hh ../ixlib_config.hh ixlib_exgen.hh ixlib_exbase.hh \
@@ -349,15 +367,15 @@ js_library.lo js_library.o : js_library.cc ixlib_js_internals.hh \
 	ixlib_javascript.hh ixlib_string.hh ixlib_base.hh \
 	../ixlib_config.hh ixlib_exgen.hh ixlib_exbase.hh \
 	ixlib_garbage.hh ixlib_scanner.hh ixlib_numconv.hh \
-	ixlib_random.hh
+	ixlib_random.hh ixlib_numeric.hh
 js_value.lo js_value.o : js_value.cc ixlib_i18n.hh ixlib_numconv.hh \
 	ixlib_base.hh ../ixlib_config.hh ixlib_string.hh ixlib_exgen.hh \
 	ixlib_exbase.hh ixlib_re.hh ixlib_js_internals.hh \
 	ixlib_javascript.hh ixlib_garbage.hh ixlib_scanner.hh \
 	ixlib_token_javascript.hh ixlib_token_lex.hh
 lex.javascript.lo lex.javascript.o : lex.javascript.cc \
-	ixlib_javascript.hh ixlib_string.hh ixlib_base.hh \
-	../ixlib_config.hh ixlib_exgen.hh ixlib_exbase.hh \
+	ixlib_js_internals.hh ixlib_javascript.hh ixlib_string.hh \
+	ixlib_base.hh ../ixlib_config.hh ixlib_exgen.hh ixlib_exbase.hh \
 	ixlib_garbage.hh ixlib_scanner.hh ixlib_token_javascript.hh \
 	ixlib_token_lex.hh
 lex.xml.lo lex.xml.o : lex.xml.cc ixlib_xml.hh ixlib_exbase.hh \
@@ -468,9 +486,11 @@ mostlyclean distclean maintainer-clean
 # Generated sources -----------------------------------------------------------
 lex.xml.cc: lex.xml.yy
 	$(LEX) $< 
+	ed $@ < flex-gcc3-patch.ed
 
 lex.javascript.cc: lex.javascript.yy
 	$(LEX) $< 
+	ed $@ < flex-gcc3-patch.ed
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

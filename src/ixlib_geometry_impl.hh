@@ -65,7 +65,7 @@ template <class T>
 void ixion::region<T>::subtract(rectangle<T> const &rect) {
   iterator first = begin(),last = end();
 
-  vector< rectangle<T> > newrects;
+  std::vector< rectangle<T> > newrects;
   while (first != last) {
     if (rect.doesIntersect(*first)) {
       rectangle<T> upper(rect.A[0],first->A[1],rect.B[0],rect.A[1]);
@@ -93,7 +93,7 @@ template <class T>
 void ixion::region<T>::deleteEmptyRectangles() {
   iterator first = begin(),last = end();
 
-  vector< rectangle<T> > newrects;
+  std::vector< rectangle<T> > newrects;
   while (first != last) {
     if (!first->isEmpty()) newrects.push_back(*first);
     first++;

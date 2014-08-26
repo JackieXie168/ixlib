@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p4 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -72,6 +72,8 @@ CC = @CC@
 CXX = @CXX@
 DATADIRNAME = @DATADIRNAME@
 DLLTOOL = @DLLTOOL@
+ECHO = @ECHO@
+EXEEXT = @EXEEXT@
 GENCAT = @GENCAT@
 GMOFILES = @GMOFILES@
 GMSGFMT = @GMSGFMT@
@@ -92,10 +94,12 @@ MAKEINFO = @MAKEINFO@
 MKINSTALLDIRS = @MKINSTALLDIRS@
 MSGFMT = @MSGFMT@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 POFILES = @POFILES@
 POSUB = @POSUB@
 RANLIB = @RANLIB@
+STRIP = @STRIP@
 USE_INCLUDED_LIBINTL = @USE_INCLUDED_LIBINTL@
 USE_NLS = @USE_NLS@
 VERSION = @VERSION@
@@ -108,7 +112,8 @@ check_PROGRAMS = teststring testnumconv testre testcmdline testtextfile   testge
 
 noinst_PROGRAMS = javascript
 
-EXTRA_DIST = test.xml src.txt frobnitz.par runem test.js
+EXTRA_DIST = src.txt frobnitz.par runem test.js invertmap.js   test-big.xml test-structure.xml
+
 
 noinst_SCRIPTS = runem
 
@@ -128,6 +133,11 @@ javascript_SOURCES = javascript.cc
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../ixlib_config.hh
 CONFIG_CLEAN_FILES = 
+check_PROGRAMS =  teststring$(EXEEXT) testnumconv$(EXEEXT) \
+testre$(EXEEXT) testcmdline$(EXEEXT) testtextfile$(EXEEXT) \
+testgeo$(EXEEXT) testxml$(EXEEXT) testmat$(EXEEXT) testjs$(EXEEXT) \
+testgarbage$(EXEEXT)
+noinst_PROGRAMS =  javascript$(EXEEXT)
 PROGRAMS =  $(noinst_PROGRAMS)
 
 
@@ -135,47 +145,47 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I..
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-teststring_OBJECTS =  teststring.o
+teststring_OBJECTS =  teststring.$(OBJEXT)
 teststring_LDADD = $(LDADD)
 teststring_DEPENDENCIES =  ../src/libixion.la
 teststring_LDFLAGS = 
-testnumconv_OBJECTS =  testnumconv.o
+testnumconv_OBJECTS =  testnumconv.$(OBJEXT)
 testnumconv_LDADD = $(LDADD)
 testnumconv_DEPENDENCIES =  ../src/libixion.la
 testnumconv_LDFLAGS = 
-testre_OBJECTS =  testre.o
+testre_OBJECTS =  testre.$(OBJEXT)
 testre_LDADD = $(LDADD)
 testre_DEPENDENCIES =  ../src/libixion.la
 testre_LDFLAGS = 
-testcmdline_OBJECTS =  testcmdline.o
+testcmdline_OBJECTS =  testcmdline.$(OBJEXT)
 testcmdline_LDADD = $(LDADD)
 testcmdline_DEPENDENCIES =  ../src/libixion.la
 testcmdline_LDFLAGS = 
-testtextfile_OBJECTS =  testtextfile.o
+testtextfile_OBJECTS =  testtextfile.$(OBJEXT)
 testtextfile_LDADD = $(LDADD)
 testtextfile_DEPENDENCIES =  ../src/libixion.la
 testtextfile_LDFLAGS = 
-testgeo_OBJECTS =  testgeo.o
+testgeo_OBJECTS =  testgeo.$(OBJEXT)
 testgeo_LDADD = $(LDADD)
 testgeo_DEPENDENCIES =  ../src/libixion.la
 testgeo_LDFLAGS = 
-testxml_OBJECTS =  testxml.o
+testxml_OBJECTS =  testxml.$(OBJEXT)
 testxml_LDADD = $(LDADD)
 testxml_DEPENDENCIES =  ../src/libixion.la
 testxml_LDFLAGS = 
-testmat_OBJECTS =  testmat.o
+testmat_OBJECTS =  testmat.$(OBJEXT)
 testmat_LDADD = $(LDADD)
 testmat_DEPENDENCIES =  ../src/libixion.la
 testmat_LDFLAGS = 
-testjs_OBJECTS =  testjs.o
+testjs_OBJECTS =  testjs.$(OBJEXT)
 testjs_LDADD = $(LDADD)
 testjs_DEPENDENCIES =  ../src/libixion.la
 testjs_LDFLAGS = 
-testgarbage_OBJECTS =  testgarbage.o
+testgarbage_OBJECTS =  testgarbage.$(OBJEXT)
 testgarbage_LDADD = $(LDADD)
 testgarbage_DEPENDENCIES =  ../src/libixion.la
 testgarbage_LDFLAGS = 
-javascript_OBJECTS =  javascript.o
+javascript_OBJECTS =  javascript.$(OBJEXT)
 javascript_LDADD = $(LDADD)
 javascript_DEPENDENCIES =  ../src/libixion.la
 javascript_LDFLAGS = 
@@ -203,7 +213,7 @@ OBJECTS = $(teststring_OBJECTS) $(testnumconv_OBJECTS) $(testre_OBJECTS) $(testc
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .cc .lo .o .s
+.SUFFIXES: .S .c .cc .lo .o .obj .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps test/Makefile
 
@@ -233,6 +243,11 @@ maintainer-clean-noinstPROGRAMS:
 .c.o:
 	$(COMPILE) -c $<
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -241,6 +256,7 @@ maintainer-clean-noinstPROGRAMS:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 
@@ -268,51 +284,53 @@ distclean-libtool:
 
 maintainer-clean-libtool:
 
-teststring: $(teststring_OBJECTS) $(teststring_DEPENDENCIES)
-	@rm -f teststring
+teststring$(EXEEXT): $(teststring_OBJECTS) $(teststring_DEPENDENCIES)
+	@rm -f teststring$(EXEEXT)
 	$(CXXLINK) $(teststring_LDFLAGS) $(teststring_OBJECTS) $(teststring_LDADD) $(LIBS)
 
-testnumconv: $(testnumconv_OBJECTS) $(testnumconv_DEPENDENCIES)
-	@rm -f testnumconv
+testnumconv$(EXEEXT): $(testnumconv_OBJECTS) $(testnumconv_DEPENDENCIES)
+	@rm -f testnumconv$(EXEEXT)
 	$(CXXLINK) $(testnumconv_LDFLAGS) $(testnumconv_OBJECTS) $(testnumconv_LDADD) $(LIBS)
 
-testre: $(testre_OBJECTS) $(testre_DEPENDENCIES)
-	@rm -f testre
+testre$(EXEEXT): $(testre_OBJECTS) $(testre_DEPENDENCIES)
+	@rm -f testre$(EXEEXT)
 	$(CXXLINK) $(testre_LDFLAGS) $(testre_OBJECTS) $(testre_LDADD) $(LIBS)
 
-testcmdline: $(testcmdline_OBJECTS) $(testcmdline_DEPENDENCIES)
-	@rm -f testcmdline
+testcmdline$(EXEEXT): $(testcmdline_OBJECTS) $(testcmdline_DEPENDENCIES)
+	@rm -f testcmdline$(EXEEXT)
 	$(CXXLINK) $(testcmdline_LDFLAGS) $(testcmdline_OBJECTS) $(testcmdline_LDADD) $(LIBS)
 
-testtextfile: $(testtextfile_OBJECTS) $(testtextfile_DEPENDENCIES)
-	@rm -f testtextfile
+testtextfile$(EXEEXT): $(testtextfile_OBJECTS) $(testtextfile_DEPENDENCIES)
+	@rm -f testtextfile$(EXEEXT)
 	$(CXXLINK) $(testtextfile_LDFLAGS) $(testtextfile_OBJECTS) $(testtextfile_LDADD) $(LIBS)
 
-testgeo: $(testgeo_OBJECTS) $(testgeo_DEPENDENCIES)
-	@rm -f testgeo
+testgeo$(EXEEXT): $(testgeo_OBJECTS) $(testgeo_DEPENDENCIES)
+	@rm -f testgeo$(EXEEXT)
 	$(CXXLINK) $(testgeo_LDFLAGS) $(testgeo_OBJECTS) $(testgeo_LDADD) $(LIBS)
 
-testxml: $(testxml_OBJECTS) $(testxml_DEPENDENCIES)
-	@rm -f testxml
+testxml$(EXEEXT): $(testxml_OBJECTS) $(testxml_DEPENDENCIES)
+	@rm -f testxml$(EXEEXT)
 	$(CXXLINK) $(testxml_LDFLAGS) $(testxml_OBJECTS) $(testxml_LDADD) $(LIBS)
 
-testmat: $(testmat_OBJECTS) $(testmat_DEPENDENCIES)
-	@rm -f testmat
+testmat$(EXEEXT): $(testmat_OBJECTS) $(testmat_DEPENDENCIES)
+	@rm -f testmat$(EXEEXT)
 	$(CXXLINK) $(testmat_LDFLAGS) $(testmat_OBJECTS) $(testmat_LDADD) $(LIBS)
 
-testjs: $(testjs_OBJECTS) $(testjs_DEPENDENCIES)
-	@rm -f testjs
+testjs$(EXEEXT): $(testjs_OBJECTS) $(testjs_DEPENDENCIES)
+	@rm -f testjs$(EXEEXT)
 	$(CXXLINK) $(testjs_LDFLAGS) $(testjs_OBJECTS) $(testjs_LDADD) $(LIBS)
 
-testgarbage: $(testgarbage_OBJECTS) $(testgarbage_DEPENDENCIES)
-	@rm -f testgarbage
+testgarbage$(EXEEXT): $(testgarbage_OBJECTS) $(testgarbage_DEPENDENCIES)
+	@rm -f testgarbage$(EXEEXT)
 	$(CXXLINK) $(testgarbage_LDFLAGS) $(testgarbage_OBJECTS) $(testgarbage_LDADD) $(LIBS)
 
-javascript: $(javascript_OBJECTS) $(javascript_DEPENDENCIES)
-	@rm -f javascript
+javascript$(EXEEXT): $(javascript_OBJECTS) $(javascript_DEPENDENCIES)
+	@rm -f javascript$(EXEEXT)
 	$(CXXLINK) $(javascript_LDFLAGS) $(javascript_OBJECTS) $(javascript_LDADD) $(LIBS)
 .cc.o:
 	$(CXXCOMPILE) -c $<
+.cc.obj:
+	$(CXXCOMPILE) -c `cygpath -w $<`
 .cc.lo:
 	$(LTCXXCOMPILE) -c $<
 
@@ -353,7 +371,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

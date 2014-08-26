@@ -118,7 +118,7 @@ void ixion::polygon_segment<T>::push_back_c(T x,T y) {
 
 
 template<class T>
-void ixion::polygon_segment<T>::insert_c(iterator it,T x,T y) {
+void ixion::polygon_segment<T>::insert_c(super::iterator it,T x,T y) {
   insert(it,vertex_2d(x,y));
   }
 
@@ -252,7 +252,7 @@ void ixion::polygon_segment<T>::makeConvexHull(polygon_segment &dest) const {
   vertex_2d center = getWeightedCenter();
   
   // create list of vertices, sorted by angle with center and x axis
-  typedef vector<vertex_and_angle<T> > angle_list;
+  typedef std::vector<vertex_and_angle<T> > angle_list;
   angle_list angles;
   
   FOREACH_CONST(first,*this,polygon_segment<T>)
@@ -369,7 +369,6 @@ template<class T>
 ixion::polygon<T>::polygon(polygon const &src) {
   FOREACH_CONST(first,src,polygon) {
     polygon_segment<T> *copy = new polygon_segment<T>(**first);
-    EX_MEMCHECK(copy)
     push_back(copy);
     }
   }
@@ -382,7 +381,6 @@ ixion::polygon<T> &polygon<T>::operator=(polygon const &src) {
   clear();
   FOREACH_CONST(first,src,polygon) {
     polygon_segment<T> *copy = new polygon_segment<T>(**first);
-    EX_MEMCHECK(copy)
     push_back(copy);
     }
   return *this;
@@ -423,7 +421,6 @@ template<class T>
 void ixion::polygon<T>::smooth() {
   FOREACH(first,*this,polygon) {
     polygon_segment<T> *copy = new polygon_segment<T>;
-    EX_MEMCHECK(copy)
     (*first)->smooth(*copy);
     delete *first;
     *first = copy;
@@ -437,7 +434,6 @@ template<class T>
 void ixion::polygon<T>::subdivide() {
   FOREACH(first,*this,polygon) {
     polygon_segment<T> *copy = new polygon_segment<T>;
-    EX_MEMCHECK(copy)
     (*first)->subdivide(*copy);
     delete *first;
     *first = copy;
@@ -524,7 +520,7 @@ ixion::polygon<T>::vertex_2d ixion::polygon<T>::getWeightedCenter() const {
 template<class T>
 template<class HLineRoutine>
 void ixion::polygon<T>::drawScanlines(HLineRoutine const &hlr,T step = 1) const {
-  typedef vector<vertex_identifier<T> > line_list;
+  typedef std::vector<vertex_identifier<T> > line_list;
   line_list all_vertices;
 
   // create list of all vertices, sorted by y coordinate
@@ -545,7 +541,7 @@ void ixion::polygon<T>::drawScanlines(HLineRoutine const &hlr,T step = 1) const 
     next = all_vertices.begin(),
     end_all = all_vertices.end();
   
-  typedef vector<T> intersection_list;
+  typedef std::vector<T> intersection_list;
   intersection_list intersections;
   
   rectangle<T> bobox = getBoundingBox();
@@ -617,7 +613,7 @@ void ixion::polygon<T>::drawScanlines(HLineRoutine const &hlr,T step = 1) const 
       T dy = (*end)[1] - (*start)[1];
       intersections.push_back((*start)[0] + (y - (*start)[1]) * dx / dy);
       }
-    sort(intersections.begin(),intersections.end());
+    std::sort(intersections.begin(),intersections.end());
     
     // draw hlines appropriately
     // assuming we have an even number of intersections

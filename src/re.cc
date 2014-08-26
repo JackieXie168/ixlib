@@ -19,6 +19,7 @@
 
 
 
+using namespace std;
 using namespace ixion;
 
 
@@ -85,7 +86,6 @@ regex_string::class_matcher::class_matcher(string const &cls)
 
 ixion::regex<string>::matcher *ixion::regex_string::class_matcher::duplicate() const {
   class_matcher *dupe = new class_matcher();
-  EX_MEMCHECK(dupe)
   dupe->copy(this);
   return dupe;
   }
@@ -146,7 +146,6 @@ regex_string::special_class_matcher::special_class_matcher(type tp)
 
 ixion::regex<string>::matcher *ixion::regex_string::special_class_matcher::duplicate() const {
   special_class_matcher *dupe = new special_class_matcher(Type);
-  EX_MEMCHECK(dupe)
   dupe->copy(this);
   return dupe;
   }
@@ -260,28 +259,22 @@ regex_string::matcher *regex_string::parseRegex(string const &expr) {
 	      default: object = new sequence_matcher(string(1,ch));
 	      }
 	    }
-          EX_MEMCHECK(object)
           break;
         }
       case XSTRRE_ANYCHAR:
         object = new any_matcher;
-        EX_MEMCHECK(object)
         break;
       case XSTRRE_START:
         quantified = false;
         object = new start_matcher;
-        EX_MEMCHECK(object)
         break;
       case XSTRRE_END:
         quantified = false;
         object = new end_matcher;
-        EX_MEMCHECK(object)
         break;
       case XSTRRE_ALTERNATIVE: {
-          if (!alternative) {
+          if (!alternative) 
             alternative = new alternative_matcher;
-            EX_MEMCHECK(alternative)
-            }
           alternative->addAlternative(firstobject);
           firstobject = NULL;
           lastobject = NULL;
@@ -292,7 +285,6 @@ regex_string::matcher *regex_string::parseRegex(string const &expr) {
           if (classend == string::npos)
             EX_THROW(regex,ECRE_UNTERMCLASS)
           object = new class_matcher(expr.substr(index,classend-index));
-          EX_MEMCHECK(object)
   
           index = classend+1;
           break;
@@ -321,11 +313,9 @@ regex_string::matcher *regex_string::parseRegex(string const &expr) {
           if (!parsed) EX_THROW(regex,ECRE_UNBALBACKREF)
 
           object = new backref_open_matcher;
-          EX_MEMCHECK(object)
           object->setNext(parsed);
 
           matcher *closer = new backref_close_matcher;
-          EX_MEMCHECK(closer);
 
           matcher *searchlast = parsed,*foundlast;
           while (searchlast) {
@@ -340,7 +330,6 @@ regex_string::matcher *regex_string::parseRegex(string const &expr) {
         EX_THROW(regex,ECRE_UNBALBACKREF)
       default:
         object = new sequence_matcher(expr.substr(index-1,1));
-        EX_MEMCHECK(object)
         break;
       }
 
@@ -380,17 +369,14 @@ regex_string::quantifier *regex_string::parseQuantifier(string const &expr,TInde
   if (at == expr.size()) return NULL;
   if (expr[at] == XSTRREQ_0PLUS) {
     quant = new quantifier(isGreedy(expr,++at),0);
-    EX_MEMCHECK(quant)
     return quant;
     }
   if (expr[at] == XSTRREQ_1PLUS) {
     quant = new quantifier(isGreedy(expr,++at),1);
-    EX_MEMCHECK(quant)
     return quant;
     }
   if (expr[at] == XSTRREQ_01) {
     quant = new quantifier(isGreedy(expr,++at),0,1);
-    EX_MEMCHECK(quant)
     return quant;
     }
   if (expr[at] == XSTRREQ_START) {
@@ -420,7 +406,6 @@ regex_string::quantifier *regex_string::parseQuantifier(string const &expr,TInde
         max = evalUnsigned(quantspec.substr(rangeindex+1));
         quant = new quantifier(isGreedy(expr,at),min,max);
         }
-      EX_MEMCHECK(quant)
       return quant;
       }
     EX_CONVERT(generic,EC_CANNOTEVALUATE,regex,ECRE_INVQUANTIFIER)
@@ -440,4 +425,3 @@ bool regex_string::isGreedy(string const &expr,TIndex &at)
   }
   else return true;
 }
-

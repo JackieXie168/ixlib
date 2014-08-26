@@ -33,7 +33,8 @@ advanced_headers=ixlib_cmdline.hh \
   ixlib_drawing_functions.hh 
 
 advanced_objects=cmdline.cc textfile.cc scanner.cc xml.cc \
-  js_value.cc js_expression.cc js_instruction.cc js_array.cc js_library.cc \
+  js_value.cc js_expression.cc js_declaration.cc \
+  js_instruction.cc js_array.cc js_library.cc \
   js_interpreter.cc
 
 internal_headers=ixlib_token_xml.hh ixlib_scanxml.hh ixlib_scanjs.hh \
@@ -45,15 +46,17 @@ internal_objects=lex.xml.cc lex.javascript.cc
 # Generated sources -----------------------------------------------------------
 lex.xml.cc: lex.xml.yy
 	$(LEX) $< 
+	ed $@ < flex-gcc3-patch.ed
 
 lex.javascript.cc: lex.javascript.yy
 	$(LEX) $< 
+	ed $@ < flex-gcc3-patch.ed
 
-BUILT_SOURCES=lex.xml.cc lex.javascript.cc
+BUILT_SOURCES=lex.xml.cc lex.javascript.cc 
 
 CLEANFILES=lex.xml.cc lex.javascript.cc
 
-EXTRA_DIST=lex.xml.yy lex.javascript.yy
+EXTRA_DIST=lex.xml.yy lex.javascript.yy flex-gcc3-patch.ed
 
 # Targets ---------------------------------------------------------------------
 lib_LTLIBRARIES=libixion.la

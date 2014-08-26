@@ -7,6 +7,8 @@
 
 
 
+#include <fstream>
+#include <iostream>
 #include <locale.h>
 #include <ixlib_config.hh>
 #include <ixlib_javascript.hh>
@@ -14,6 +16,7 @@
 
 
 
+using namespace std;
 using namespace ixion;
 using namespace javascript;
 
@@ -25,13 +28,13 @@ class callIn : public value {
     value_type getType() const { 
       return VT_FUNCTION; 
       } 
-    ref<value> call(context const &ctx,parameter_list const &parameters) const;
+    ref<value> call(parameter_list const &parameters);
   };
 
 
 
 
-ref<value> callIn::call(context const &ctx,parameter_list const &parameters) const {
+ref<value> callIn::call(parameter_list const &parameters) {
   if (parameters.size() != 1) {
     cout << "callIn needs exactly one parameter" << endl;
     return makeNull();
@@ -61,12 +64,9 @@ ref<value> callIn::call(context const &ctx,parameter_list const &parameters) con
 
 
 // simple call-in example -----------------------------------------------------
-IXLIB_JS_DECLARE_FUNCTION(callIn2) {
-  if (parameters.size() == 1) {
-    cout << "callIn2 needs exactly not one parameter" << endl;
-    return makeNull();
-    }
-  cout << "callIn2 called" << endl;
+IXLIB_JS_DECLARE_FUNCTION(write) {
+  FOREACH_CONST(first,parameters,parameter_list)
+    cout << (*first)->toString();
   return makeNull();
   }
 // end simple call-in example -------------------------------------------------
@@ -74,7 +74,19 @@ IXLIB_JS_DECLARE_FUNCTION(callIn2) {
 
 
 
-int main() {
+// simple call-in example -----------------------------------------------------
+IXLIB_JS_DECLARE_FUNCTION(writeLn) {
+  FOREACH_CONST(first,parameters,parameter_list)
+    cout << (*first)->toString();
+  cout << endl;
+  return makeNull();
+  }
+// end simple call-in example -------------------------------------------------
+
+
+
+
+int main(int argc,char **argv) {
   try {
     ixlibInitI18n();
     
@@ -83,40 +95,55 @@ int main() {
 
     // complex call-in example ------------------------------------------------
     ref<value> ev = new callIn;
-    EX_MEMCHECK(ev.get())
     ip.RootScope->addMember("callIn",ev);
     // end complex call-in example --------------------------------------------
     
     // simple call-in example -------------------------------------------------
-    ev = new callIn2;
-    EX_MEMCHECK(ev.get())
-    ip.RootScope->addMember("callIn2",ev);
+    ev = new write;
+    ip.RootScope->addMember("write",ev);
+    // end simple call-in example ---------------------------------------------
+
+    // simple call-in example -------------------------------------------------
+    ev = new writeLn;
+    ip.RootScope->addMember("writeLn",ev);
     // end simple call-in example ---------------------------------------------
     
-    string command = "";
-    while (!cin.eof()) {
-      char buffer[1024];
-      if (command.size() == 0)
-        cout << ">> ";
-      else
-        cout << "... ";
-      cin.getline(buffer,1024);
-      command += buffer;
-      try {
-        try {
-          ref<javascript::value> value = ip.execute(command);
-          if (value.get())
-            cout << value->stringify() << endl;
-          command = "";
-          }
-        EX_CATCHCODE(javascript,ECJS_UNEXPECTED_EOF,)
+    if (argc > 1) {
+      for (int i = 1;i < argc;i++) {
+        ifstream file(argv[i]);
+	if (file.bad()) {
+	  cerr << "not found: " << argv[i];
+	  return 1;
+	  }
+	ip.execute(file);
 	}
-      catch (exception &ex) { 
-        cerr << ex.what() << endl; 
-	command = "";
-        } 
       }
-    cout << endl;
+    else {
+      string command = "";
+      while (!cin.eof()) {
+        char buffer[1024];
+        if (command.size() == 0)
+          cout << ">> ";
+        else
+          cout << "... ";
+        cin.getline(buffer,1024);
+        command += buffer;
+        try {
+          try {
+            ref<javascript::value> value = ip.execute(command);
+            if (value.get() && value->getType() != value::VT_NULL)
+              cout << value->stringify() << endl;
+            command = "";
+            }
+          EX_CATCHCODE(javascript,ECJS_UNEXPECTED_EOF,)
+          }
+        catch (exception &ex) { 
+          cerr << ex.what() << endl; 
+          command = "";
+          } 
+        }
+      cout << endl;
+      }
     }
   catch (exception &ex) { 
     cerr << ex.what() << endl; 

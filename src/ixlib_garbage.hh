@@ -120,7 +120,7 @@ namespace ixion {
     </code>
   */
   template<class T,class T_Managed>
-  class ref : public ref_base<T>{
+  class ref : public ref_base<T> {
     public:
       // we have to have an explicit copy constructor, otherwise the
       // compiler generates one, which is *ahem* - fatal
@@ -453,7 +453,6 @@ namespace ixion {
 	// not found, add new at front
         instance_data *link = Instances[hash(instance)];
 	data = new instance_data;
-	EX_MEMCHECK(data)
 	
 	data->Instance = instance;
 	data->ReferenceCount = 0;

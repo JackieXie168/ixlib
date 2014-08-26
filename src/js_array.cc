@@ -50,9 +50,8 @@ string js_array::stringify() const {
 
 ref<javascript::value> 
 js_array::
-duplicate() const { 
+duplicate() { 
   ref<value> result = new js_array(*this);
-  EX_MEMCHECK(result.get())
   return result;
   }
 
@@ -81,7 +80,7 @@ subscript(value const &index) {
 
 ref<javascript::value> 
 js_array::
-callMethod(string const &id,javascript::context const &ctx,parameter_list const &parameters) {
+callMethod(string const &id,parameter_list const &parameters) {
   if (id == "pop" && parameters.size() == 0) {
     if (Array.size() == 0) return javascript::makeNull();
     else {
@@ -113,7 +112,6 @@ callMethod(string const &id,javascript::context const &ctx,parameter_list const 
     value_array::const_iterator last = Array.begin() + parameters[1]->toInt();
     
     auto_ptr<js_array> array(new js_array(first,last));
-    EX_MEMCHECK(array.get())
     return array.release();
     }
   else if (id == "unshift") {
@@ -157,9 +155,9 @@ ref<value> &js_array::operator[](TIndex idx) {
 
 
 // js_array_constructor -------------------------------------------------------
-ref<javascript::value> js_array_constructor::duplicate() const {
+ref<javascript::value> js_array_constructor::duplicate() {
   // array_constructor is not mutable
-  return const_cast<js_array_constructor *>(this);
+  return this;
   }
 
 
@@ -167,12 +165,11 @@ ref<javascript::value> js_array_constructor::duplicate() const {
 
 ref<javascript::value> 
 js_array_constructor::
-construct(javascript::context const &ctx,parameter_list const &parameters) const {
+construct(parameter_list const &parameters) {
   if (parameters.size() == 0) return makeArray();
   else if (parameters.size() == 1) return makeArray(parameters[0]->toInt());
   else /* parameters.size() >= 2 */ {
     auto_ptr<js_array> result(new js_array(parameters.size()));
-    EX_MEMCHECK(result.get())
     
     TIndex i = 0;
     FOREACH_CONST(first,parameters,parameter_list) {

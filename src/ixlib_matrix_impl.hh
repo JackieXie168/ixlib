@@ -352,7 +352,7 @@ ixion::matrix<T,Traits> ixion::matrix<T,Traits>::getGaussJordan(scalar_type pivo
     TIndex pivot = step;
     scalar_type pmax = traits_type::norm(target(step,step));
     for (TIndex row = step+1;row<Height;row++) 
-      if (fabs(target(row,step)) > pmax) {
+      if (Traits::norm(target(row,step)) > pmax) {
         pivot = row;
 	pmax = traits_type::norm(target(row,step));
         }
@@ -466,7 +466,7 @@ void ixion::matrix<T,Traits>::getLR(matrix &l,matrix &r) const {
 
 template <class T,class Traits>
 ixion::matrix<T,Traits> &ixion::matrix<T,Traits>::normalize() {
-  for (TIndex i = 0;i<Width;i++)
+  for (TIndex i = 0;i<Height;i++)
     multiplyRowSelf(i,1/operator()(i,i),i);
   return *this;
   }
@@ -534,7 +534,7 @@ void ixion::matrix<T,Traits>::setDimension(TSize height,TSize width) {
 
 
 template <class T,class Traits>
-void ixion::matrix<T,Traits>::outMatrix(ostream &ostr,void (*item_formatter)(ostream &os,bool first,bool last)) const {
+void ixion::matrix<T,Traits>::outMatrix(std::ostream &ostr,void (*item_formatter)(std::ostream &os,bool first,bool last)) const {
   ostr << Height << 'x' << Width << endl;
   for (TIndex y = 0;y < Height;y++) {
     for (TIndex x = 0;x < Width;x++) {

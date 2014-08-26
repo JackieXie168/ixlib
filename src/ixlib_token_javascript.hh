@@ -36,6 +36,11 @@
 #define TT_JS_DEFAULT			(TT_USER + 14)
 #define TT_JS_IN			(TT_USER + 15)
 #define TT_JS_CONST			(TT_USER + 16)
+#define TT_JS_CLASS			(TT_USER + 17)
+#define TT_JS_EXTENDS			(TT_USER + 18)
+#define TT_JS_NAMESPACE			(TT_USER + 19)
+#define TT_JS_STATIC			(TT_USER + 20)
+#define TT_JS_CONSTRUCTOR		(TT_USER + 21)
 
 // operators
 #define TT_JS_NEW			(TT_USER + 1024)

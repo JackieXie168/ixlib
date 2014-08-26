@@ -24,8 +24,8 @@
 #ifdef __cplusplus
 
 #include <stdlib.h>
-class istream;
 #include <unistd.h>
+#include <iostream.h>
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -240,7 +240,6 @@ static void yy_flex_free YY_PROTO(( void * ));
 #define FLEX_DEBUG
 typedef unsigned char YY_CHAR;
 #define yytext_ptr yytext
-#define YY_INTERACTIVE
 
 #define FLEX_DEBUG
 
@@ -397,7 +396,7 @@ goto find_rule; \
 #define Comment 2
 
 /* -------- rules -------- */
-#line 401 "lex.xml.cc"
+#line 400 "lex.xml.cc"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -527,7 +526,7 @@ YY_DECL
 #line 21 "lex.xml.yy"
 
 
-#line 531 "lex.xml.cc"
+#line 530 "lex.xml.cc"
 
 	if ( yy_init )
 		{
@@ -582,7 +581,7 @@ yy_match:
 			*yy_state_ptr++ = yy_current_state;
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 106 );
+		while ( yy_current_state != 43 );
 
 yy_find_action:
 		yy_current_state = *--yy_state_ptr;
@@ -716,7 +715,7 @@ YY_RULE_SETUP
 #line 42 "lex.xml.yy"
 ECHO;
 	YY_BREAK
-#line 720 "lex.xml.cc"
+#line 719 "lex.xml.cc"
 
 	case YY_END_OF_BUFFER:
 		{

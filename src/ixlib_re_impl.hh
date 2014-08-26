@@ -203,7 +203,6 @@ ixion::regex<T>::quantifier::~quantifier() {
 template<class T>
 ixion::regex<T>::matcher *ixion::regex<T>::quantifier::duplicate() const {
   quantifier *dupe = new quantifier();
-  EX_MEMCHECK(dupe)
   dupe->copy(this);
   return dupe;
   }
@@ -261,7 +260,7 @@ bool ixion::regex<T>::quantifier::match(backref_stack &brstack,T const &candidat
     // try to gobble up as many matches of quantified part as possible
     // (speculative)
     
-    stack<backtrack_stack_entry> successful_indices;
+    std::stack<backtrack_stack_entry> successful_indices;
     { backtrack_stack_entry entry = { idx,brstack.getRewindInfo() };
       successful_indices.push(entry);
       }
@@ -331,7 +330,6 @@ ixion::regex<T>::sequence_matcher::sequence_matcher(T const &matchstr)
 template<class T>
 ixion::regex<T>::matcher *ixion::regex<T>::sequence_matcher::duplicate() const {
   sequence_matcher *dupe = new sequence_matcher(MatchStr);
-  EX_MEMCHECK(dupe)
   dupe->copy(this);
   return dupe;
   }
@@ -353,7 +351,6 @@ bool ixion::regex<T>::sequence_matcher::match(backref_stack &brstack,T const &ca
 template<class T>
 ixion::regex<T>::matcher *ixion::regex<T>::any_matcher::duplicate() const {
   any_matcher *dupe = new any_matcher();
-  EX_MEMCHECK(dupe)
   dupe->copy(this);
   return dupe;
   }
@@ -365,7 +362,6 @@ ixion::regex<T>::matcher *ixion::regex<T>::any_matcher::duplicate() const {
 template<class T>
 ixion::regex<T>::matcher *ixion::regex<T>::start_matcher::duplicate() const {
   start_matcher *dupe = new start_matcher();
-  EX_MEMCHECK(dupe)
   dupe->copy(this);
   return dupe;
   }
@@ -385,7 +381,6 @@ bool ixion::regex<T>::start_matcher::match(backref_stack &brstack,T const &candi
 template<class T>
 ixion::regex<T>::matcher *ixion::regex<T>::end_matcher::duplicate() const {
   end_matcher *dupe = new end_matcher();
-  EX_MEMCHECK(dupe)
   dupe->copy(this);
   return dupe;
   }
@@ -405,7 +400,6 @@ bool ixion::regex<T>::end_matcher::match(backref_stack &brstack,T const &candida
 template<class T>
 ixion::regex<T>::matcher *ixion::regex<T>::backref_open_matcher::duplicate() const {
   backref_open_matcher *dupe = new backref_open_matcher();
-  EX_MEMCHECK(dupe)
   dupe->copy(this);
   return dupe;
   }
@@ -432,7 +426,6 @@ bool ixion::regex<T>::backref_open_matcher::match(backref_stack &brstack,T const
 template<class T>
 ixion::regex<T>::matcher *ixion::regex<T>::backref_close_matcher::duplicate() const {
   backref_close_matcher *dupe = new backref_close_matcher();
-  EX_MEMCHECK(dupe)
   dupe->copy(this);
   return dupe;
   }
@@ -479,7 +472,6 @@ ixion::regex<T>::alternative_matcher::~alternative_matcher() {
 template<class T>
 ixion::regex<T>::matcher *ixion::regex<T>::alternative_matcher::duplicate() const {
   alternative_matcher *dupe = new alternative_matcher();
-  EX_MEMCHECK(dupe)
   dupe->copy(this);
   return dupe;
   }
@@ -532,7 +524,7 @@ void ixion::regex<T>::alternative_matcher::addAlternative(matcher *alternative) 
 
 template<class T>
 bool ixion::regex<T>::alternative_matcher::match(backref_stack &brstack,T const &candidate,TIndex at) {
-  vector<matcher *>::iterator first = AltList.begin(),last = AltList.end();
+  std::vector<matcher *>::iterator first = AltList.begin(),last = AltList.end();
   while (first != last) {
     if ((*first)->match(brstack,candidate,at)) {
       MatchLength = 0;
@@ -575,7 +567,6 @@ ixion::regex<T>::backref_matcher::backref_matcher(TIndex backref)
 template<class T>
 ixion::regex<T>::matcher *ixion::regex<T>::backref_matcher::duplicate() const {
   backref_matcher *dupe = new backref_matcher(Backref);
-  EX_MEMCHECK(dupe)
   dupe->copy(this);
   return dupe;
   }
@@ -616,7 +607,7 @@ ixion::regex<T>::regex(regex const &src)
 
 template<class T>
 ixion::regex<T> &ixion::regex<T>::operator=(regex const &src) {
-  auto_ptr<matcher> regex_copy(src.ParsedRegex->duplicate());
+  std::auto_ptr<matcher> regex_copy(src.ParsedRegex->duplicate());
   ParsedRegex = regex_copy;
   return *this;
   }

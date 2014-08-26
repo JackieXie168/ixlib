@@ -72,7 +72,7 @@ main ()
   tmp_version = strdup("$min_ixlib_version");
   if (sscanf(tmp_version, "%d.%d.%d", &major, &minor, &micro) != 3) {
      printf("%s, bad version string\n", "$min_ixlib_version");
-     exit(1);
+     return 1;
    }
 
   if ((ixlibGetMajorVersion() != $ixlib_config_major_version) ||

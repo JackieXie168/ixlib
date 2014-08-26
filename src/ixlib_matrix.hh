@@ -16,6 +16,7 @@
 #include <iostream>
 #include <ixlib_exgen.hh>
 #include <ixlib_array.hh>
+#include <ixlib_numeric.hh>
 
 
 
@@ -29,7 +30,7 @@ namespace ixion {
     static const number_type zero = 0;
     
     static scalar_type norm(number_type value) {
-      return fabs(value);
+      return NUM_ABS(value);
       }
     static number_type sqrt(number_type value) {
       return ::sqrt(value);
@@ -172,7 +173,7 @@ namespace ixion {
       void wipe(entry_type value = traits_type::zero);
       void setDimension(TSize height,TSize width);
       
-      void outMatrix(ostream &ostr,void (*item_formatter)(ostream &os,bool first,bool last) = NULL) const;
+      void outMatrix(std::ostream &ostr,void (*item_formatter)(std::ostream &os,bool first,bool last) = NULL) const;
     
     protected:
       void setup(TSize height,TSize width);
@@ -194,9 +195,9 @@ inline ixion::matrix<T,Traits> operator*(T scalar,ixion::matrix<T,Traits> const 
 template <class T,class Traits>
 inline ixion::matrix<T,Traits> operator*(ixion::matrix<T,Traits> const &mat,T scalar);
 template <class T,class Traits>
-inline istream &operator>>(istream &istr,ixion::matrix<T,Traits> &mat);
+inline std::istream &operator>>(std::istream &istr,ixion::matrix<T,Traits> &mat);
 template <class T,class Traits>
-inline ostream &operator<<(ostream &ostr,ixion::matrix<T,Traits> const &mat);
+inline std::ostream &operator<<(std::ostream &ostr,ixion::matrix<T,Traits> const &mat);
 
 
 
@@ -238,7 +239,7 @@ inline ixion::matrix<T,Traits> operator*(ixion::matrix<T,Traits> const &mat,ixio
 
 
 template <class T,class Traits>
-inline istream &operator>>(istream &istr,ixion::matrix<T,Traits> &mat) {
+inline std::istream &operator>>(std::istream &istr,ixion::matrix<T,Traits> &mat) {
   ixion::TSize height,width;
   char c;
   istr >> height >> c >> width;
@@ -253,7 +254,7 @@ inline istream &operator>>(istream &istr,ixion::matrix<T,Traits> &mat) {
 
 
 template <class T,class Traits>
-inline ostream &operator<<(ostream &ostr,ixion::matrix<T,Traits> const &mat) {
+inline std::ostream &operator<<(std::ostream &ostr,ixion::matrix<T,Traits> const &mat) {
   mat.outMatrix(ostr);
   return ostr;
   }

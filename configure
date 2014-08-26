@@ -544,9 +544,9 @@ fi
 
 ix_ixlib_major_version=0
 ix_ixlib_minor_version=95
-ix_ixlib_micro_version=0
+ix_ixlib_micro_version=1
 
-IXLIB_BINARY_IFACE_VERSION=1
+IXLIB_BINARY_IFACE_VERSION=2
 IXLIB_BINARY_REVISION=$ix_ixlib_minor_version
 IXLIB_BINARY_AGE=0
 
@@ -4104,7 +4104,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "ixlib-config po/Makefile.in intl/Makefile Makefile src/Makefile test/Makefile ixlib_config.hh" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "ixlib.lsm ixlib-config po/Makefile.in intl/Makefile Makefile src/Makefile test/Makefile ixlib_config.hh" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -4232,7 +4232,7 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"ixlib-config po/Makefile.in intl/Makefile Makefile src/Makefile test/Makefile"}
+CONFIG_FILES=\${CONFIG_FILES-"ixlib.lsm ixlib-config po/Makefile.in intl/Makefile Makefile src/Makefile test/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then

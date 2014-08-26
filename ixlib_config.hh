@@ -150,7 +150,7 @@
 #define PACKAGE "ixlib"
 
 /* Version number of package */
-#define VERSION "0.95.0"
+#define VERSION "0.95.1"
 
 /* The major version of the library. */
 #define IXLIB_MAJOR_VERSION 0
@@ -159,7 +159,7 @@
 #define IXLIB_MINOR_VERSION 95
 
 /* The micro version of the library. */
-#define IXLIB_MICRO_VERSION 0
+#define IXLIB_MICRO_VERSION 1
 
 /* Substitute 'bool' by 'unsigned char' if necessary */
 /* #undef bool */

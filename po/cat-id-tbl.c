@@ -126,15 +126,16 @@ const struct _msg_ent _msg_tbl[] = {
   {"Invalid escape sequence", 117},
   {"Invalid backreference", 118},
   {"Unterminated character class", 119},
-  {"Unknown token", 120},
-  {"End of input", 121},
-  {"Syntax error", 122},
-  {"No text expected in this context", 123},
-  {"No literal expected in this context", 124},
-  {"Literal expected", 125},
-  {"Unexpected end of input", 126},
-  {"Close tag expected", 127},
-  {"Close tag has different name", 128},
+  {"Unable to match without expression", 120},
+  {"Unknown token", 121},
+  {"End of input", 122},
+  {"Syntax error", 123},
+  {"No text expected in this context", 124},
+  {"No literal expected in this context", 125},
+  {"Literal expected", 126},
+  {"Unexpected end of input", 127},
+  {"Close tag expected", 128},
+  {"Close tag has different name", 129},
 };
 
-int _msg_tbl_length = 128;
+int _msg_tbl_length = 129;

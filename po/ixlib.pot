@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-03-23 21:07+0100\n"
+"POT-Creation-Date: 2001-04-17 18:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -465,28 +465,32 @@ msgstr ""
 msgid "unknown value type"
 msgstr ""
 
-#: src/js_value.cc:1148
+#: src/js_value.cc:1152
 msgid "by assignment"
 msgstr ""
 
-#: src/re.cc:28
+#: src/re.cc:35
 msgid "Invalid quantifier"
 msgstr ""
 
-#: src/re.cc:29
+#: src/re.cc:36
 msgid "Unbalanced backreference"
 msgstr ""
 
-#: src/re.cc:30
+#: src/re.cc:37
 msgid "Invalid escape sequence"
 msgstr ""
 
-#: src/re.cc:31
+#: src/re.cc:38
 msgid "Invalid backreference"
 msgstr ""
 
-#: src/re.cc:32
+#: src/re.cc:39
 msgid "Unterminated character class"
+msgstr ""
+
+#: src/re.cc:40
+msgid "Unable to match without expression"
 msgstr ""
 
 #: src/scanner.cc:26

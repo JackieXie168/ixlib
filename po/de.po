@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ixlib\n"
-"POT-Creation-Date: 2001-03-23 21:07+0100\n"
+"POT-Creation-Date: 2001-04-17 18:05+0200\n"
 "PO-Revision-Date: 2001-03-18\n"
 "Last-Translator: Andreas Kloeckner <ak@ixion.net>\n"
 "MIME-Version: 1.0\n"
@@ -463,29 +463,33 @@ msgstr "Typ"
 msgid "unknown value type"
 msgstr "unbekannter Wertetyp"
 
-#: src/js_value.cc:1148
+#: src/js_value.cc:1152
 msgid "by assignment"
 msgstr "durch Zuweisung"
 
-#: src/re.cc:28
+#: src/re.cc:35
 msgid "Invalid quantifier"
 msgstr "Ungueltiger Quantifizierer"
 
-#: src/re.cc:29
+#: src/re.cc:36
 msgid "Unbalanced backreference"
 msgstr "Unausgeglichene Backreference"
 
-#: src/re.cc:30
+#: src/re.cc:37
 msgid "Invalid escape sequence"
 msgstr "Ungueltige Escape-Sequenz"
 
-#: src/re.cc:31
+#: src/re.cc:38
 msgid "Invalid backreference"
 msgstr "Ungueltige Backreference"
 
-#: src/re.cc:32
+#: src/re.cc:39
 msgid "Unterminated character class"
 msgstr "Nicht beendete Zeichenklasse"
+
+#: src/re.cc:40
+msgid "Unable to match without expression"
+msgstr "Ohne Muster kann nicht gematcht werden"
 
 #: src/scanner.cc:26
 msgid "Unknown token"

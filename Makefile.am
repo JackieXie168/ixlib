@@ -32,4 +32,4 @@ bin_SCRIPTS=ixlib-config
 m4datadir=$(datadir)/aclocal
 m4data_DATA=ixlib.m4
 
-EXTRA_DIST=ixlib.m4 ABOUT-NLS doxygen.cfg ixlib.doc
+EXTRA_DIST=ixlib.m4 ABOUT-NLS doxygen.cfg ixlib.doc ixlib.lsm.in

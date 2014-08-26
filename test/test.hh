@@ -53,7 +53,10 @@ int main() {\
   
 #define TEST(INVARIANT) \
   try { \
-    if (INVARIANT) PASSED else FAILED \
+    if (INVARIANT) PASSED else { \
+      FAILED \
+      cerr << "*** " << #INVARIANT << endl; \
+      }\
     } \
   catch (exception &e) { \
     FAILEDEX \

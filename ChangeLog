@@ -1,7 +1,28 @@
+2001-04-17  Andreas Kloeckner  <ak@ixion.net>
+
+	* Released version 0.95.1
+
+	* configure.in (ix_ixlib_micro_version): bumped version to 0.95.1
+
+	* src/re.cc: fixed range parsing, added test cases
+
+	* src/ixlib_re.hh: redesign, regex_string is no more a string
+	  subclass (which is nonsense, if you think about it).
+          It is now subclass to a more generic regex matcher that 
+          is a template and can be used outside the domain of strings.
+          !! This breaks binary compatibility !!
+          !! This might break source compatibility in some rare and
+             screwed-up cases !!
+
+2001-03-24  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/js_value.cc: added toFloat to float type and toInt to int type
+
 2001-03-23  Andreas Kloeckner  <ak@ixion.net>
 
-	* src/Makefile.am (libixion_la_LIBADD): small win32 build fix
-	  (libintl related)
+	* Released version 0.95.0
+	
+	* src/base.cc: disabled i18n for win32
 
 	* src/js_value.cc: function parameters were involuntarily passed by
 	  reference, fixed

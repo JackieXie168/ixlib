@@ -6,9 +6,9 @@ AC_INIT(src/ixlib_base.hh)
 
 ix_ixlib_major_version=0
 ix_ixlib_minor_version=95
-ix_ixlib_micro_version=0
+ix_ixlib_micro_version=1
 
-IXLIB_BINARY_IFACE_VERSION=1
+IXLIB_BINARY_IFACE_VERSION=2
 IXLIB_BINARY_REVISION=$ix_ixlib_minor_version
 IXLIB_BINARY_AGE=0
 AC_SUBST(IXLIB_BINARY_IFACE_VERSION)
@@ -63,5 +63,5 @@ INSTALL="$INSTALL -p"
 # -----------------------------------------------------------------------------
 
 AM_CONFIG_HEADER(ixlib_config.hh)
-AC_OUTPUT([ixlib-config po/Makefile.in intl/Makefile Makefile src/Makefile test/Makefile],
+AC_OUTPUT([ixlib.lsm ixlib-config po/Makefile.in intl/Makefile Makefile src/Makefile test/Makefile],
   [chmod +x ixlib-config; ln -s ixlib_config.hh config.h])

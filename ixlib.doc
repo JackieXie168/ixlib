@@ -84,7 +84,9 @@ ixlib functionality can be roughly subdivided into the following areas:
     look at class ixion::javascript::interpreter.
     Parts of the standard JavaScript library have also been implemented,
     see ixion::javascript::addStandardLibrary().
-  <li> regular expressions, see ixion::regex_string
+  <li> regular expressions, see ixion::regex_string for a Perl-compatible
+    regex parser and matcher, and ixion::regex for a more general
+    matching component.
   <li> xml parsing (non-DTD), see ixion::xml_file.
   </ul>
 

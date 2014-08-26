@@ -16,7 +16,7 @@ INCLUDES = -I..
 # Source files ----------------------------------------------------------------
 basic_headers=ixlib_base.hh ixlib_array.hh ixlib_garbage.hh \
   ixlib_exbase.hh ixlib_exgen.hh ixlib_exio.hh \
-  ixlib_string.hh ixlib_re.hh \
+  ixlib_string.hh ixlib_re.hh ixlib_re_impl.hh \
   ixlib_numconv.hh ixlib_numeric.hh \
   ixlib_random.hh ixlib_ring_queue.hh
 

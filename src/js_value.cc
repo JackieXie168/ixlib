@@ -390,6 +390,8 @@ const_floating_point::
 callMethod(string const &identifier,context const &ctx,parameter_list const &parameters) {
   IXLIB_JS_IF_METHOD("toInt",0,0)
     return makeConstant((signed long) Value);
+  IXLIB_JS_IF_METHOD("toFloat",0,0)
+    return makeConstant(Value);
   IXLIB_JS_IF_METHOD("toString",0,1) {
     unsigned radix = 10;
     if (parameters.size() == 1) radix = parameters[0]->toInt();
@@ -615,6 +617,8 @@ ref<value> const_integer::duplicate() const {
 ref<value> 
 const_integer::
 callMethod(string const &identifier,context const &ctx,parameter_list const &parameters) {
+  IXLIB_JS_IF_METHOD("toInt",0,0)
+    return makeConstant(Value);
   IXLIB_JS_IF_METHOD("toFloat",0,0) 
     return makeConstant((double) Value);
   IXLIB_JS_IF_METHOD("toString",0,1) {

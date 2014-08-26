@@ -106,7 +106,7 @@ DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 INCLUDES = -I..
 
 # Source files ----------------------------------------------------------------
-basic_headers = ixlib_base.hh ixlib_array.hh ixlib_garbage.hh   ixlib_exbase.hh ixlib_exgen.hh ixlib_exio.hh   ixlib_string.hh ixlib_re.hh   ixlib_numconv.hh ixlib_numeric.hh   ixlib_random.hh ixlib_ring_queue.hh
+basic_headers = ixlib_base.hh ixlib_array.hh ixlib_garbage.hh   ixlib_exbase.hh ixlib_exgen.hh ixlib_exio.hh   ixlib_string.hh ixlib_re.hh ixlib_re_impl.hh   ixlib_numconv.hh ixlib_numeric.hh   ixlib_random.hh ixlib_ring_queue.hh
 
 
 basic_objects = base.cc exbase.cc exgen.cc exio.cc   string.cc numconv.cc numeric.cc re.cc
@@ -371,7 +371,8 @@ numeric.lo numeric.o : numeric.cc ixlib_numeric.hh ixlib_base.hh \
 	../ixlib_config.hh ixlib_exgen.hh ixlib_exbase.hh
 re.lo re.o : re.cc ixlib_i18n.hh ixlib_exgen.hh ixlib_exbase.hh \
 	ixlib_base.hh ../ixlib_config.hh ixlib_numeric.hh \
-	ixlib_numconv.hh ixlib_string.hh ixlib_re.hh
+	ixlib_numconv.hh ixlib_string.hh ixlib_re.hh ixlib_re_impl.hh \
+	ixlib_i18n.hh
 scanner.lo scanner.o : scanner.cc ixlib_i18n.hh ixlib_numconv.hh \
 	ixlib_base.hh ../ixlib_config.hh ixlib_string.hh ixlib_exgen.hh \
 	ixlib_exbase.hh ixlib_token_lex.hh ixlib_scanner.hh

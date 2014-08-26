@@ -146,6 +146,26 @@ Q: How can I find out what syntax variants the javascript interpreter
 supports without digging into the source?
 A: Look into test/test.js. Almost every construct that is supported
 is exercised in that file.
+
+Q: How do I create an ixlib release?
+A: [This is mainly my own checklist for doing it, you're not really
+supposed to do ixlib releases, at least, not yet :-]
+
+- enter release into changelog
+- cvs commit
+- make dist
+- test package on other computer
+- test package on win32-cross build
+- enter news item on web page (web/ directory)
+- make update-web
+- enter news item on sourceforge
+- cvs tag RELEASE_0_95_0
+- do sourceforge release of package
+- do sourceforge release of documentation
+- do sourceforge release notification
+- upload to sunsite
+- post to announcement list
+- post on freshmeat
   
 -------------------------------------------------------------------------------
 5. Documentation

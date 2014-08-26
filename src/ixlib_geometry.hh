@@ -210,28 +210,29 @@ namespace ixion {
       return *this;
       }
   
-    T getWidth() const { 
+    T width() const { 
       return B[0]-A[0]; 
       }
-    T getHeight() const { 
+    T height() const { 
       return B[1]-A[1]; 
       }
-    T getArea() const { 
-      return getWidth()*getHeight(); 
+    T area() const { 
+      return width()*height(); 
       }
-    bool doesContain(T x, T y) const { 
+    bool contains(T x, T y) const { 
       return (A[0] <= x) && (x < B[0]) && (A[1] <= y) && (y < B[1]); 
       }
-    bool doesContain(coord_vector<T> const &point) const { 
+    bool contains(coord_vector<T> const &point) const { 
       return (A[0] <= point[0]) && (point[0] < B[0]) &&
           (A[1] <= point[1]) && (point[1] < B[1]); 
       }
-    bool doesIntersect(rectangle<T> const &rect) const { 
+    bool intersects(rectangle<T> const &rect) const { 
       return NUM_OVERLAP(A[0],B[0],rect.A[0],rect.B[0]) && 
           NUM_OVERLAP(A[1],B[1],rect.A[1],rect.B[1]); 
       }
-    bool isEmpty() const { 
-      return (B[0] <= A[0]) || (B[1] <= A[1]); }
+    bool empty() const { 
+      return (B[0] <= A[0]) || (B[1] <= A[1]); 
+      }
   
     void clear() { 
       B = A; 
@@ -297,11 +298,42 @@ namespace ixion {
       return copy;
       }
 
-    // obsolete:
-    T getSizeX() const
-      { return B[0]-A[0]; }
-    T getSizeY() const
-      { return B[1]-A[1]; }
+    /// \deprecated use width() instead.
+    T getSizeX() const { 
+      return width(); 
+      }
+    /// \deprecated use height() instead.
+    T getSizeY() const { 
+      return height(); 
+      }
+    /// \deprecated use width() instead.
+    T getWidth() const { 
+      return width(); 
+      }
+    /// \deprecated use height() instead.
+    T getHeight() const { 
+      return height(); 
+      }
+    /// \deprecated use area() instead.
+    T getArea() const { 
+      return area(); 
+      }
+    /// \deprecated use contains() instead.
+    bool doesContain(T x, T y) const { 
+      return contains(x,y); 
+      }
+    /// \deprecated use contains() instead.
+    bool doesContain(coord_vector<T> const &point) const { 
+      return contains(point); 
+      }
+    /// \deprecated use intersects() instead.
+    bool doesIntersect(rectangle<T> const &rect) const { 
+      return intersects(rect); 
+      }
+    /// \deprecated use empty() instead.
+    bool isEmpty() const { 
+      return empty(); 
+      }
     };
 
 
@@ -311,56 +343,73 @@ namespace ixion {
   template <class T>
   class region {
     protected:
-    std::vector< rectangle<T> > Rects;
+      std::vector< rectangle<T> > Rects;
   
     public:
-    typedef typename std::vector< rectangle<T> >::iterator iterator;
-    typedef typename std::vector< rectangle<T> >::const_iterator const_iterator;
-    
-    TSize size() const {
-      return Rects.size();
-      }
-    iterator begin() { 
-      return Rects.begin(); 
-      }
-    const_iterator begin() const { 
-      return Rects.begin(); 
-      }
-    iterator end() { 
-      return Rects.end(); 
-      }
-    const_iterator end() const { 
-      return Rects.end(); 
-      }
-    
-    void add(rectangle<T> const &rect);
-    void intersect(rectangle<T> const &rect);
-    void subtract(rectangle<T> const &rect);
-    void operator+=(rectangle<T> const &rect) { 
-      add(rect); 
-      }
-    void operator*=(rectangle<T> const &rect) { 
-      intersect(rect); 
-      }
-    void operator-=(rectangle<T> const &rect) { 
-      subtract(rect); 
-      }
+      typedef typename std::vector< rectangle<T> >::iterator iterator;
+      typedef typename std::vector< rectangle<T> >::const_iterator const_iterator;
       
-    bool doesContain(T x, T y) const { 
-      return doesContain(coord_vector<T>(x,y)); 
-      }
-    bool doesContain(coord_vector<T> const &point) const;
-    bool doesIntersect(rectangle<T> const &rect) const;
-    bool isEmpty() const { 
-      return Rects.empty(); 
-      }
-  
-    void clear() { 
-      Rects.clear(); 
-      }
-  
+      TSize size() const {
+        return Rects.size();
+        }
+      iterator begin() { 
+        return Rects.begin(); 
+        }
+      const_iterator begin() const { 
+        return Rects.begin(); 
+        }
+      iterator end() { 
+        return Rects.end(); 
+        }
+      const_iterator end() const { 
+        return Rects.end(); 
+        }
+      
+      void add(rectangle<T> const &rect);
+      void intersect(rectangle<T> const &rect);
+      void subtract(rectangle<T> const &rect);
+      void operator+=(rectangle<T> const &rect) { 
+        add(rect); 
+        }
+      void operator*=(rectangle<T> const &rect) { 
+        intersect(rect); 
+        }
+      void operator-=(rectangle<T> const &rect) { 
+        subtract(rect); 
+        }
+        
+      bool contains(T x, T y) const { 
+        return contains(coord_vector<T>(x,y)); 
+        }
+      bool contains(coord_vector<T> const &point) const;
+      bool intersects(rectangle<T> const &rect) const;
+      bool empty() const { 
+        return Rects.empty(); 
+        }
+    
+      void clear() { 
+        Rects.clear(); 
+        }
+    
+      /// \deprecated use contains() instead.
+      bool doesContain(T x, T y) const { 
+        return contains(coord_vector<T>(x,y)); 
+        }
+      /// \deprecated use contains() instead.
+      bool doesContain(coord_vector<T> const &point) const {
+        return contains(point);
+	}
+      /// \deprecated use intersects() instead.
+      bool doesIntersect(rectangle<T> const &rect) const {
+        return intersects(rect);
+	}
+      /// \deprecated use empty() instead.
+      bool isEmpty() const { 
+        return empty(); 
+        }
+
     protected:
-    void deleteEmptyRectangles();
+      void deleteEmptyRectangles();
     };
   }
 

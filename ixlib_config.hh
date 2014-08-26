@@ -21,7 +21,7 @@
 #define PACKAGE "ixlib"
 
 /* Define to the version of the distribution.  */
-#define VERSION "0.96.0"
+#define VERSION "0.96.1"
 
 /* Define if you have obstacks.  */
 /* #undef HAVE_OBSTACK */
@@ -156,7 +156,7 @@
 #define IXLIB_MAJOR_VERSION 0
 
 /* The micro version of the library. */
-#define IXLIB_MICRO_VERSION 0
+#define IXLIB_MICRO_VERSION 1
 
 /* The minor version of the library. */
 #define IXLIB_MINOR_VERSION 96
@@ -176,7 +176,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.96.0"
+#define VERSION "0.96.1"
 
 /* Define if `lex' declares `yytext' as a `char *' by default, not a `char[]'.
    */

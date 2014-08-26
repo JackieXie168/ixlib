@@ -21,6 +21,6 @@ Primary-site: http://ixlib.sourceforge.net
   ixlib-doc-@VERSION@.tar.gz
 Platforms: Linux and Win32 (w/mingw) tested, other platforms might work.
   ixlib needs a strict-ANSI C++ compiler with SGI STL hash_map libraries.
-  gcc 2.95.2 is known to work, others might, too.
+  gcc 2.95.2 and gcc 3.0 are known to work, others might, too.
 Copying-policy: LGPL
 End

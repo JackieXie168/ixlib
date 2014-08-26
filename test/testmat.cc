@@ -38,7 +38,8 @@ BEGIN_TEST
   double u[] = { 9,-7,2,-7,11,-3,2,-3,4 };
 
   mat A(3,3,u);
-  mat cholesky = A.getCholesky();
-  mat B = cholesky*cholesky.getTransposed();
+  mat cholesky = A.cholesky();
+  mat B = cholesky*cholesky.transposed();
   mat diff = A - B;
+  TEST(diff.norm() < 1e-5)
 END_TEST

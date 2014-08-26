@@ -113,10 +113,10 @@ namespace ixion {
         return Data.get()+getSize();
         }
       
-      TSize getWidth() const {
+      TSize width() const {
         return Width;
         }
-      TSize getHeight() const {
+      TSize height() const {
         return Height;
         }
       
@@ -151,19 +151,24 @@ namespace ixion {
       matrix &swapRowSelf(TIndex row1,TIndex row2);
       matrix &swapColumnSelf(TIndex col1,TIndex col2);
   
-      static const int infty = -1;
-  
+      enum TMatrixNorm {
+        NORM_TOTAL,       // = n max( a(i,j) )
+	NORM_ROW_SUM,     // natural for the maximum norm
+	NORM_COLUMN_SUM,  // natural for the absolute value sum norm
+	NORM_SCHUR,	  // = sqrt(sum(a(i,j)^2))
+	};
+	
+      entry_type norm(TMatrixNorm norm = NORM_SCHUR) const;
       entry_type det() const;
-      entry_type getVectorNorm(int index = 2) const;
       entry_type trace() const;
       entry_type diagonalProduct() const;
-      matrix getTransposed() const;
-      matrix getInverted() const;
-      matrix getGaussElim(scalar_type pivot_threshold = 0,TSize *swapcount = NULL) const;
-      matrix getGaussJordan(scalar_type pivot_threshold = 0,TSize *swapcount = NULL) const;
+      matrix transposed() const;
+      matrix inverted() const;
+      matrix gauss(scalar_type pivot_threshold = 0,TSize *swapcount = NULL) const;
+      matrix gaussJordan(scalar_type pivot_threshold = 0,TSize *swapcount = NULL) const;
       matrix linearSolve(matrix const &vec,scalar_type pivot_threshold = 0) const;
-      matrix getCholesky() const;
-      void getLR(matrix &l,matrix &r) const;
+      matrix cholesky() const;
+      void decomposeLR(matrix &l,matrix &r) const;
       
       // operations for triangular matrices
       matrix &normalize();
@@ -175,6 +180,39 @@ namespace ixion {
       
       void outMatrix(std::ostream &ostr,void (*item_formatter)(std::ostream &os,bool first,bool last) = NULL) const;
     
+      /// \deprecated use width() instead.
+      TSize getWidth() const {
+        return Width;
+        }
+      /// \deprecated use height() instead.
+      TSize getHeight() const {
+        return Height;
+        }
+      /// \deprecated use transpose() instead.
+      matrix getTransposed() const {
+        return transposed();
+	}
+      /// \deprecated use invert() instead.
+      matrix getInverted() const {
+        return inverted();
+	}
+      /// \deprecated use gauss() instead.
+      matrix getGaussElim(scalar_type pivot_threshold = 0,TSize *swapcount = NULL) const {
+        return gauss(pivot_threshold,swapcount);
+	}
+      /// \deprecated use gaussJordan() instead.
+      matrix getGaussJordan(scalar_type pivot_threshold = 0,TSize *swapcount = NULL) const {
+        return gaussJordan(pivot_threshold,swapcount);
+	}
+      /// \deprecated use cholesky() instead.
+      matrix getCholesky() const {
+        return cholesky();
+	}
+      /// \deprecated use decomposeLR() instead.
+      void getLR(matrix &l,matrix &r) const {
+        decomposeLR(l,r);
+	}
+      
     protected:
       void setup(TSize height,TSize width);
       TSize getSize() const {

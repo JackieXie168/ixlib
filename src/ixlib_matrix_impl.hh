@@ -246,8 +246,47 @@ ixion::matrix<T,Traits>::entry_type ixion::matrix<T,Traits>::det() const {
 
 
 template <class T,class Traits>
-ixion::matrix<T,Traits>::entry_type ixion::matrix<T,Traits>::getVectorNorm(int index = 2) const {
-  EXGEN_NYI
+ixion::matrix<T,Traits>::entry_type ixion::matrix<T,Traits>::norm(TMatrixNorm norm) const {
+  entry_type result,sum,entry;
+  switch (norm) {
+    case NORM_TOTAL:
+      // the total norm can only be applied to symmetrical matrices
+      if (Width != Height) EX_DIMEN
+      
+      result = 0;
+      for (TIndex i = 0;i < Height;i++)
+        for (TIndex j = 0;j < Width;j++)
+	  result = NUM_MAX(result,traits_type::norm(operator()(i,j)));
+      return Width*result;
+    case NORM_ROW_SUM:
+      result = 0;
+      for (TIndex i = 0;i < Height;i++) {
+        sum = 0;
+        for (TIndex j = 0;j < Width;j++)
+	  sum += traits_type::norm(operator()(i,j));
+	result = NUM_MAX(result,sum);
+	}
+      return result;
+    case NORM_COLUMN_SUM:
+      result = 0;
+      for (TIndex i = 0;i < Height;i++) {
+        sum = 0;
+        for (TIndex j = 0;j < Width;j++)
+	  sum += traits_type::norm(operator()(j,i));
+	result = NUM_MAX(result,sum);
+	}
+      return result;
+    case NORM_SCHUR:
+      result = 0;
+      for (TIndex i = 0;i < Height;i++)
+        for (TIndex j = 0;j < Width;j++) {
+	  entry = traits_type::norm(operator()(j,i));
+	  result += entry*entry;
+	  }
+      return traits_type::sqrt(result);
+    default:
+      EXGEN_NYI
+    }
   }
 
 
@@ -278,7 +317,7 @@ ixion::matrix<T,Traits>::entry_type ixion::matrix<T,Traits>::diagonalProduct() c
 
 
 template <class T,class Traits>
-ixion::matrix<T,Traits> ixion::matrix<T,Traits>::getTransposed() const {
+ixion::matrix<T,Traits> ixion::matrix<T,Traits>::transposed() const {
   matrix target(Width,Height);
   for (TIndex x = 0;x<Width;x++)
     for (TIndex y = 0;y<Height;y++)
@@ -290,7 +329,7 @@ ixion::matrix<T,Traits> ixion::matrix<T,Traits>::getTransposed() const {
 
 
 template <class T,class Traits>
-ixion::matrix<T,Traits> ixion::matrix<T,Traits>::getInverted() const {
+ixion::matrix<T,Traits> ixion::matrix<T,Traits>::inverted() const {
   if (Width != Height) EX_DIMEN
   matrix temp(Height,Width*2);
   temp.set(0,0,*this);
@@ -304,7 +343,7 @@ ixion::matrix<T,Traits> ixion::matrix<T,Traits>::getInverted() const {
 
 
 template <class T,class Traits>
-ixion::matrix<T,Traits> ixion::matrix<T,Traits>::getGaussElim(scalar_type pivot_threshold,TSize *swapcount) const {
+ixion::matrix<T,Traits> ixion::matrix<T,Traits>::gauss(scalar_type pivot_threshold,TSize *swapcount) const {
   matrix target(*this);
   if (swapcount) *swapcount = 0;
   
@@ -341,7 +380,7 @@ ixion::matrix<T,Traits> ixion::matrix<T,Traits>::getGaussElim(scalar_type pivot_
 
 
 template <class T,class Traits>
-ixion::matrix<T,Traits> ixion::matrix<T,Traits>::getGaussJordan(scalar_type pivot_threshold,TSize *swapcount) const {
+ixion::matrix<T,Traits> ixion::matrix<T,Traits>::gaussJordan(scalar_type pivot_threshold,TSize *swapcount) const {
   matrix target(*this);
   if (swapcount) *swapcount = 0;
   
@@ -396,7 +435,7 @@ ixion::matrix<T,Traits> ixion::matrix<T,Traits>::linearSolve(matrix const &vec,s
 
 
 template <class T,class Traits>
-ixion::matrix<T,Traits> ixion::matrix<T,Traits>::getCholesky() const {
+ixion::matrix<T,Traits> ixion::matrix<T,Traits>::cholesky() const {
   if (Width != Height) EX_DIMEN
   matrix result(Height,Width);
   result.wipe();
@@ -425,7 +464,7 @@ ixion::matrix<T,Traits> ixion::matrix<T,Traits>::getCholesky() const {
 
 
 template <class T,class Traits>
-void ixion::matrix<T,Traits>::getLR(matrix &l,matrix &r) const {
+void ixion::matrix<T,Traits>::decomposeLR(matrix &l,matrix &r) const {
   if (Width != Height) EX_DIMEN
   l.setDimension(Height,Height);
   r.setDimension(Height,Width);

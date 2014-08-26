@@ -1,3 +1,20 @@
+2001-07-06  Andreas Kloeckner  <ak@ixion.net>
+
+	* released version 0.96.1 without big announcements - done to
+	  ease SDLucid 0.90.0 release.
+
+2001-07-05  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_matrix_impl.hh: implemented matrix norm,
+	  more get***() to ***() renaming
+
+2001-07-01  Andreas Kloeckner  <ak@ixion.net>
+
+	* configure.in: bumped version to 0.96.1
+
+	* src/ixlib_geometry.hh,ixlib_xml.hh: 
+	  changed names from get***() to ***(), deprecated the old versions.
+
 2001-06-29  Andreas Kloeckner  <ak@ixion.net>
 
 	* released version 0.96.0

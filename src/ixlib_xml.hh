@@ -106,10 +106,10 @@ namespace ixion {
           void insertTag(text_list::iterator before,tag *tag);
           tag *findTag(std::string const &name);
           
-          void setName(std::string const &name) {
+          void name(std::string const &name) {
             Name = name;
             }
-          std::string getName() const {
+          std::string name() const {
             return Name;
             }
 	  
@@ -126,6 +126,15 @@ namespace ixion {
             return Children.end();
             }
   
+	  /// \deprecated use name(n) instead
+          void setName(std::string const &n) {
+            name(n);
+            }
+	  /// \deprecated use name() instead
+          std::string getName() const {
+            return name();
+            }
+
         protected:
           void parse(token_iterator &first, token_iterator const &last);
           void write(std::ostream &ostr, TSize indent);
@@ -153,10 +162,10 @@ namespace ixion {
       void read(std::istream &istr);
       void write(std::ostream &ostr);
       
-      tag *getRootTag() {
+      tag *rootTag() const {
         return RootTag;
         }
-      void setRootTag(tag *newroot) {
+      void rootTag(tag *newroot) {
         if (RootTag) delete RootTag;
         RootTag = newroot;
         }
@@ -164,6 +173,14 @@ namespace ixion {
         setRootTag(NULL);
         }
         
+      /// \deprecated use rootTag() instead
+      tag *getRootTag() const {
+        return rootTag();
+        }
+      /// \deprecated use rootTag(t) instead
+      void setRootTag(tag *newroot) {
+        rootTag(newroot);
+        }
     protected:
       void parse(scanner::token_list const &tokenlist);
       

@@ -169,7 +169,7 @@ supposed to do ixlib releases, at least, not yet :-]
 - do sourceforge release of package
 - do sourceforge release of documentation
 - do sourceforge release notification
-- upload to sunsite
+- upload package and lsm to ftp://ftp.ibiblio.org/incoming/Linux
 - post to announcement list
 - post on freshmeat
   

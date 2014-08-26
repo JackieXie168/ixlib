@@ -105,7 +105,7 @@ void ixion::region<T>::deleteEmptyRectangles() {
 
 
 template <class T>
-bool ixion::region<T>::doesContain(coord_vector<T> const &point) const {
+bool ixion::region<T>::contains(coord_vector<T> const &point) const {
   const_iterator first = begin(),last = end();
   while (first != last) {
     if (first->doesContain(point)) return true;
@@ -118,7 +118,7 @@ bool ixion::region<T>::doesContain(coord_vector<T> const &point) const {
 
 
 template <class T>
-bool ixion::region<T>::doesIntersect(rectangle<T> const &rect) const {
+bool ixion::region<T>::intersects(rectangle<T> const &rect) const {
   const_iterator first = begin(),last = end();
   while (first != last) {
     if (first->doesIntersect(rect)) return true;

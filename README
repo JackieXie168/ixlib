@@ -22,7 +22,8 @@ out without too much trouble. Though it is quite a bag of mixed stuff,
 I'm sure you'll like at least one or two components.
 
 Its earliest roots go back to a library Hardy and I wrote for Watcom
-C++ under DOS.
+C++ under DOS. Right now, it compiles fine under Linux, Win32 and 
+FreeBSD.
 
 Have fun!
 Andreas
@@ -172,7 +173,20 @@ supposed to do ixlib releases, at least, not yet :-]
 - upload package and lsm to ftp://ftp.ibiblio.org/incoming/Linux
 - post to announcement list
 - post on freshmeat
-  
+
+Q: I get an error compiling lex.xml.cc or lex.javascript.cc. What's up?
+A: Do the following
+
+cd src
+ed lex.xml.cc < flex-gcc3-patch.ed
+ed lex.javascript.cc < flex-gcc3-patch.ed
+cd ..
+make
+
+That should do the trick. (older flex-generated files break with gcc3)
+Another solution would be to upgrade your flex package. The one from
+Debian woody works for me.
+
 -------------------------------------------------------------------------------
 5. Documentation
 -------------------------------------------------------------------------------

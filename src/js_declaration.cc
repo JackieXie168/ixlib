@@ -38,7 +38,7 @@ variable_declaration::variable_declaration(string const &id,ref<expression> def_
 ref<value> variable_declaration::evaluate(context const &ctx) const {
   try {
     ref<value> def;
-    if (DefaultValue.get() != NULL) def = DefaultValue->evaluate(ctx)->duplicate();
+    if (DefaultValue.get() != NULL) def = DefaultValue->evaluate(ctx)->eliminateWrappers()->duplicate();
     else def = makeNull();
     
     ref<value> lv = makeLValue(def);
@@ -62,7 +62,7 @@ constant_declaration::constant_declaration(string const &id,ref<expression> def_
 ref<value> constant_declaration::evaluate(context const &ctx) const {
   try {
     ref<value> def;
-    if (DefaultValue.get() != NULL) def = DefaultValue->evaluate(ctx)->duplicate();
+    if (DefaultValue.get() != NULL) def = DefaultValue->evaluate(ctx)->eliminateWrappers()->duplicate();
     else def = makeNull();
     
     ref<value> cns = wrapConstant(def);
@@ -158,8 +158,10 @@ ref<value> js_class_declaration::evaluate(context const &ctx) const {
     if (SuperClass.get())
       sc = SuperClass->evaluate(ctx);
     
-    ref<value> cls(new js_class(ctx.LookupScope,sc,
-      ConstructorDeclaration->evaluate(ctx),sml,ml,svl,VariableList));
+    ref<value> constructor;
+    if (ConstructorDeclaration.get())
+      constructor = ConstructorDeclaration->evaluate(ctx);
+    ref<value> cls(new js_class(ctx.LookupScope,sc,constructor,sml,ml,svl,VariableList));
   
     ref<list_scope,value> static_scope(new list_scope);
     static_scope->unite(ctx.LookupScope);

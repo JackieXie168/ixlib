@@ -66,6 +66,7 @@ POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
 AS = @AS@
+BUILD_INCLUDED_LIBINTL = @BUILD_INCLUDED_LIBINTL@
 CATALOGS = @CATALOGS@
 CATOBJEXT = @CATOBJEXT@
 CC = @CC@
@@ -75,19 +76,19 @@ DLLTOOL = @DLLTOOL@
 ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 GENCAT = @GENCAT@
+GLIBC21 = @GLIBC21@
 GMOFILES = @GMOFILES@
 GMSGFMT = @GMSGFMT@
-GT_NO = @GT_NO@
-GT_YES = @GT_YES@
-INCLUDE_LOCALE_H = @INCLUDE_LOCALE_H@
 INSTOBJEXT = @INSTOBJEXT@
-INTLDEPS = @INTLDEPS@
+INTLBISON = @INTLBISON@
 INTLLIBS = @INTLLIBS@
 INTLOBJS = @INTLOBJS@
+INTL_LIBTOOL_SUFFIX_PREFIX = @INTL_LIBTOOL_SUFFIX_PREFIX@
 IXLIB_BINARY_AGE = @IXLIB_BINARY_AGE@
 IXLIB_BINARY_IFACE_VERSION = @IXLIB_BINARY_IFACE_VERSION@
 IXLIB_BINARY_REVISION = @IXLIB_BINARY_REVISION@
 LEX = @LEX@
+LIBICONV = @LIBICONV@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
@@ -103,7 +104,6 @@ STRIP = @STRIP@
 USE_INCLUDED_LIBINTL = @USE_INCLUDED_LIBINTL@
 USE_NLS = @USE_NLS@
 VERSION = @VERSION@
-l = @l@
 
 SUBDIRS = intl src test po 
 
@@ -128,8 +128,8 @@ HEADERS =  $(include_HEADERS)
 DIST_COMMON =  README ./stamp-h.in ABOUT-NLS AUTHORS COPYING ChangeLog \
 INSTALL Makefile.am Makefile.in NEWS acconfig.h acinclude.m4 aclocal.m4 \
 config.guess config.sub configure configure.in install-sh \
-ixlib-config.in ixlib.lsm.in ixlib_config.hh.in ltconfig ltmain.sh \
-missing mkinstalldirs
+ixlib-config.in ixlib.lsm.in ixlib_config.hh.in ltmain.sh missing \
+mkinstalldirs
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -470,8 +470,8 @@ mrproper:
 	find -name '*.bck' -exec rm '{}' \;
 
 documentation:
-	rm -R doc
-	mkdir doc
+	rm -R doc/* || true
+	mkdir doc || true
 	doxygen doxygen.cfg
 
 dist-hook: documentation

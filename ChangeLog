@@ -1,3 +1,50 @@
+2001-10-24  Andreas Kloeckner  <ak@ixion.net>
+
+	* released 0.96.2 to prepare for encryption and bigint functions
+
+2001-10-23  Andreas Kloeckner  <ak@ixion.net>
+
+	* javascript: fixed js_string.split, Array.join 
+          (Thanks to Martin Oberzalek <kingleo@gmx.at>)
+
+2001-10-18  Andreas Kloeckner  <ak@ixion.net>
+
+	* javascript: added js_string.split, js_array::push_back,
+	  test cases for split (Thanks to Martin Oberzalek <kingleo@gmx.at>)
+
+2001-10-04  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/js_declaration.cc: fixed variable instatiation bug,
+	  result of introduction of eliminateWrappers()
+
+2001-10-03  Andreas Kloeckner  <ak@ixion.net>
+
+	* js: fixed class scoping, so that lexical scope variables don't
+          shadow instance variables
+
+	* js: fixed makeValue("string") by
+	  removing makeValue(bool); (breaks binary compatibility)
+
+	* bumped shlib version to 6
+
+	* js: added traps for division by zero
+
+2001-09-15  Andreas Kloeckner  <ak@ixion.net>
+
+	* added FreeBSD support (libintl fixes,math.h) 
+
+2001-07-31  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/js_declaration.cc: Silly me - constructorless classes would
+	  segfault the interpreter. Fixed.
+
+2001-07-17  Andreas Kloeckner  <ak@ixion.net>
+
+	* bumped version to 0.96.2, iface version to 5.
+	
+	* javascript: separated wrapper elimination and duplication,
+	  that functionality is now in two separate methods.
+
 2001-07-06  Andreas Kloeckner  <ak@ixion.net>
 
 	* released version 0.96.1 without big announcements - done to

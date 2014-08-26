@@ -6,13 +6,6 @@
 
 
 
-
-#define _BSD_SOURCE
-#define _ISOC9X_SOURCE
-
-
-
-
 #include <cmath>
 #include <string>
 #include <vector>
@@ -107,7 +100,7 @@ IXLIB_JS_DECLARE_FUNCTION(parseFloat) {
 
 
 // isNaN ----------------------------------------------------------------------
-#ifndef WIN32
+#ifdef ADVANCED_MATH_AVAILABLE
 IXLIB_JS_DECLARE_FUNCTION(isNaN) {
   if (parameters.size() != 1) {
     EXJS_THROWINFO(ECJS_INVALID_NUMBER_OF_ARGUMENTS,"isNaN")
@@ -121,7 +114,7 @@ IXLIB_JS_DECLARE_FUNCTION(isNaN) {
 
 
 // isFinite -------------------------------------------------------------------
-#ifndef WIN32
+#ifdef ADVANCED_MATH_AVAILABLE
 IXLIB_JS_DECLARE_FUNCTION(isFinite) {
   if (parameters.size() != 1) {
     EXJS_THROWINFO(ECJS_INVALID_NUMBER_OF_ARGUMENTS,"isFinite")
@@ -180,7 +173,7 @@ ref<value> Math::callMethod(string const &identifier,parameter_list const &param
   MATH_FUNCTION("exp",exp)
   MATH_FUNCTION("floor",floor)
   MATH_FUNCTION("log",log)
-  #ifndef WIN32
+  #ifdef ADVANCED_MATH_AVAILABLE
   MATH_FUNCTION("round",round)
   #endif
   MATH_FUNCTION("sin",sin)
@@ -238,7 +231,7 @@ void javascript::addGlobal(interpreter &ip) {
 
   ADD_GLOBAL_OBJECT("parseInt",parseInt)
   ADD_GLOBAL_OBJECT("parseFloat",parseFloat)
-  #ifndef WIN32
+  #ifdef ADVANCED_MATH_AVAILABLE
   ADD_GLOBAL_OBJECT("isNaN",isNaN)
   ADD_GLOBAL_OBJECT("isFinite",isFinite)
   #endif

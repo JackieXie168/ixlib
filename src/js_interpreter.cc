@@ -74,6 +74,7 @@ static char *(PlainText[]) ={
   N_("Cannot redeclare identifier"),
   N_("Constructor called on constructed object"),
   N_("No superclass available"),
+  N_("Division by zero"),
   };
 
 

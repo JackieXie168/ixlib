@@ -24,8 +24,10 @@
 #ifdef __cplusplus
 
 #include <stdlib.h>
+#include <fstream>
+using std::istream;
+using std::ostream;
 #include <unistd.h>
-#include <iostream.h>
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -563,7 +565,7 @@ using namespace javascript;
 
 /* Rules ----------------------------------------------------------------------
 */
-#line 567 "lex.javascript.cc"
+#line 569 "lex.javascript.cc"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -693,7 +695,7 @@ YY_DECL
 #line 72 "lex.javascript.yy"
 
 
-#line 697 "lex.javascript.cc"
+#line 699 "lex.javascript.cc"
 
 	if ( yy_init )
 		{
@@ -1223,7 +1225,7 @@ YY_RULE_SETUP
 #line 169 "lex.javascript.yy"
 ECHO;
 	YY_BREAK
-#line 1227 "lex.javascript.cc"
+#line 1229 "lex.javascript.cc"
 
 	case YY_END_OF_BUFFER:
 		{

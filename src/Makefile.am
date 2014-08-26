@@ -46,11 +46,9 @@ internal_objects=lex.xml.cc lex.javascript.cc
 # Generated sources -----------------------------------------------------------
 lex.xml.cc: lex.xml.yy
 	$(LEX) $< 
-	ed $@ < flex-gcc3-patch.ed
 
 lex.javascript.cc: lex.javascript.yy
 	$(LEX) $< 
-	ed $@ < flex-gcc3-patch.ed
 
 BUILT_SOURCES=lex.xml.cc lex.javascript.cc 
 
@@ -64,7 +62,7 @@ lib_LTLIBRARIES=libixion.la
 libixion_la_SOURCES=$(basic_headers) $(basic_objects) \
    $(advanced_headers) $(advanced_objects) \
    $(internal_headers) $(internal_objects)
-libixion_la_LIBADD=@LEXLIB@
+libixion_la_LIBADD=@LEXLIB@ $(INTLLIBS)
 libixion_la_LDFLAGS=-version-info @IXLIB_BINARY_IFACE_VERSION@:@IXLIB_BINARY_REVISION@:@IXLIB_BINARY_AGE@ \
   -no-undefined
 

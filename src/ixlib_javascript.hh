@@ -42,6 +42,7 @@
 #define ECJS_CANNOT_REDECLARE			11
 #define ECJS_DOUBLE_CONSTRUCTION		12
 #define ECJS_NO_SUPERCLASS			13
+#define ECJS_DIVISION_BY_ZERO                   14
 
 
 
@@ -147,6 +148,14 @@ namespace ixion {
     <li> Grammatical semicolon insertion [won't be]
     <li> type declaration [won't be]
     </ul>
+
+  Be advised that a javascript value that is passed to you through the
+  interpreter, e.g. as a call parameter, may not be of the type that
+  you expect. For example, in "var x = 4; f(x);", what comes in as
+  the parameter x into f is a wrapper value that adds assign()ability
+  to a value that is wrapped inside. The advised solution to get the
+  object that you expect is to call eliminateWrappers() on the potentially
+  wrapped value.
   */
   namespace javascript {
     class value;
@@ -208,7 +217,7 @@ namespace ixion {
 	// is for debuggers and the like
 	virtual std::string stringify() const;
         
-        // this operation is defined to eliminate any wrappers
+        virtual ref<value> eliminateWrappers();
         virtual ref<value> duplicate();
 
         virtual ref<value> lookup(std::string const &identifier);
@@ -318,14 +327,13 @@ namespace ixion {
 	  }
 	void resize(TSize size);
 	ref<value> &operator[](TIndex idx);
+        void push_back(ref<value> val);
       };
 
     class expression;
     
     ref<value> makeUndefined();
     ref<value> makeNull();
-    ref<value> makeValue(bool val);
-    ref<value> makeConstant(bool val);
     ref<value> makeValue(signed long val);
     ref<value> makeConstant(signed long val);
     ref<value> makeValue(signed int val);

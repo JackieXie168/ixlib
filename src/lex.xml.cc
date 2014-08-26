@@ -24,8 +24,10 @@
 #ifdef __cplusplus
 
 #include <stdlib.h>
+#include <fstream>
+using std::istream;
+using std::ostream;
 #include <unistd.h>
-#include <iostream.h>
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -396,7 +398,7 @@ goto find_rule; \
 #define Comment 2
 
 /* -------- rules -------- */
-#line 400 "lex.xml.cc"
+#line 402 "lex.xml.cc"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -526,7 +528,7 @@ YY_DECL
 #line 21 "lex.xml.yy"
 
 
-#line 530 "lex.xml.cc"
+#line 532 "lex.xml.cc"
 
 	if ( yy_init )
 		{
@@ -715,7 +717,7 @@ YY_RULE_SETUP
 #line 42 "lex.xml.yy"
 ECHO;
 	YY_BREAK
-#line 719 "lex.xml.cc"
+#line 721 "lex.xml.cc"
 
 	case YY_END_OF_BUFFER:
 		{

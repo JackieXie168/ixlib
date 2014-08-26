@@ -121,7 +121,20 @@ callMethod(string const &id,parameter_list const &parameters) {
       }
     return javascript::makeConstant(Array.size());
     }
-  // *** FIXME: implement join, splice and sort
+  else if (id == "join" && parameters.size() == 1) {
+    string sep = parameters[0]->toString();
+    string result;
+
+    for( TIndex i = 0; i < Array.size(); ++i ) {
+      if (i != 0)
+	result += sep;
+
+      result += Array[i]->toString();
+      }
+
+    return javascript::makeValue(result);
+    }
+  // *** FIXME: implement splice and sort
   
   EXJS_THROWINFO(ECJS_UNKNOWN_IDENTIFIER,("Array."+id).c_str())
   }
@@ -146,9 +159,17 @@ void js_array::resize(TSize size) {
 
 ref<value> &js_array::operator[](TIndex idx) {
   if (idx >= Array.size())
-    resize(idx+1);
+    resize((Array.size()+1)*2);
     
   return Array[idx];
+  }
+
+
+
+
+
+void js_array::push_back(ref<value> val) {
+  Array.push_back(val);
   }
 
 

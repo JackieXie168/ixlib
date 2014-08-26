@@ -27,6 +27,12 @@ var failed_tests = "",tests = 0;
   TEST("string 5","gagagaratzgaratzga".lastIndexOf("ratz") == 12);
   TEST("string 6","gagagaratzgaratzga".slice(6,10) == "ratz");
   TEST("string 7","gagagaratzgaratzga".substring(6,10) == "ratz");
+  var a = "de en fr ch hallo";
+  TEST("string 8",a.split(" ").length == 5);
+  TEST("string 9",a.split("").length == a.length);
+  TEST("string 10",a.split().length == a.length);
+  TEST("string 11",a.split(" ",3).length == 3);
+  TEST("string 12",a.split(" ").join(" ") == "de en fr ch hallo");
   }
 
 // test prefix stuff ----------------------------------------------------------
@@ -45,6 +51,10 @@ var failed_tests = "",tests = 0;
   TEST("variables 1",broesel == 5);
   TEST("variables 2",bramm == 6);
   TEST("variables 3",brusel == 1);
+  
+  var u = "HALLO";
+  u += "DU!";
+  TEST("variables 4",u == "HALLODU!");
   }
 
 // test if --------------------------------------------------------------------
@@ -262,12 +272,6 @@ var failed_tests = "",tests = 0;
   TEST("lib 1",eval("4+3+2+1;") == 10);
   TEST("lib 2",parseInt("0xaffe") == 0xAFFE);
   TEST("lib 3",parseFloat("3.14") == 3.14);
-  TEST("lib 4",!isFinite(Infinity));
-  TEST("lib 5",!isFinite(NaN));
-  TEST("lib 6",isFinite(5));
-  TEST("lib 7",isNaN(NaN));
-  TEST("lib 8",!isNaN(Infinity));
-  TEST("lib 9",!isNaN(5));
   TEST("lib 10",0 <= Math.random() && Math.random() <= 1);
   TEST("lib 11",Math.abs(Math.sin(Math.PI)) < 0.0001);
   
@@ -276,7 +280,8 @@ var failed_tests = "",tests = 0;
   }
 
 // test classes ---------------------------------------------------------------
-{ class flupp {
+{ 
+  class flupp {
     static const gravity = 9.81;
     static var u = new Array();
     var v = new Array();
@@ -305,6 +310,16 @@ var failed_tests = "",tests = 0;
   var f = new gummiflupp(7);
   TEST("class 2",f.f(0) > 7*9.8);
   TEST("class 3",f.v[0] == 17);
+
+  var u = 3;
+  class scope_test {
+    var u = 4;
+    function test() {
+      u;
+      }
+    };
+  var v = new scope_test();
+  TEST("class 4",v.test() == 4);
   }
 
 // output main result ---------------------------------------------------------

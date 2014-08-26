@@ -182,6 +182,7 @@ namespace ixion {
         bool toBoolean() const;
         string stringify() const;
 
+        ref<value> eliminateWrappers();
         ref<value> duplicate();
         
         ref<value> lookup(string const &identifier);
@@ -212,6 +213,7 @@ namespace ixion {
         bool toBoolean() const;
         string stringify() const;
 
+        ref<value> eliminateWrappers();
         ref<value> duplicate();
         
         ref<value> lookup(string const &identifier);

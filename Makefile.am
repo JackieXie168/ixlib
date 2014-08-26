@@ -10,8 +10,8 @@ mrproper:
 	find -name '*.bck' -exec rm '{}' \;
 
 documentation:
-	rm -R doc
-	mkdir doc
+	rm -R doc/* || true
+	mkdir doc || true
 	doxygen doxygen.cfg
 
 dist-hook: documentation

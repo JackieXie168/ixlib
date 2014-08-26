@@ -239,7 +239,7 @@ assignment(ref<expression> opn1,ref<expression> opn2,code_location const &loc)
 ref<value> 
 assignment::evaluate(context const &ctx) const {
   try {
-    return Operand1->evaluate(ctx)->assign(Operand2->evaluate(ctx)->duplicate());
+    return Operand1->evaluate(ctx)->assign(Operand2->evaluate(ctx)->eliminateWrappers()->duplicate());
     }
   EXJS_ADD_CODE_LOCATION
   }

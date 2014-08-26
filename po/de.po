@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ixlib\n"
-"POT-Creation-Date: 2001-07-05 19:08+0200\n"
+"POT-Creation-Date: 2001-10-24 14:35-0400\n"
 "PO-Revision-Date: 2001-05-20\n"
 "Last-Translator: Andreas Kloeckner <ak@ixion.net>\n"
 "MIME-Version: 1.0\n"
@@ -168,7 +168,7 @@ msgstr "Ungueltiger Chunk"
 msgid "CRC error"
 msgstr "CRC-Fehler"
 
-#: src/js_interpreter.cc:33 src/js_interpreter.cc:463
+#: src/js_interpreter.cc:28 src/js_interpreter.cc:33 src/js_interpreter.cc:464
 msgid "instead of "
 msgstr "anstatt "
 
@@ -224,300 +224,304 @@ msgstr "Konstruktor an existierendem Objekt aufgerufen"
 msgid "No superclass available"
 msgstr "Keine Superklasse vorhanden"
 
-#: src/js_interpreter.cc:221
+#: src/js_interpreter.cc:77
+msgid "Division by zero"
+msgstr ""
+
+#: src/js_interpreter.cc:222
 msgid "'(' in switch statement"
 msgstr "'(' in switch-Anweisung"
 
-#: src/js_interpreter.cc:225
+#: src/js_interpreter.cc:226
 msgid "')' in switch statement"
 msgstr "')' in switch-Anweisung"
 
-#: src/js_interpreter.cc:228
+#: src/js_interpreter.cc:229
 msgid "'{' in switch statement"
 msgstr "'{' in switch-Anweisung"
 
-#: src/js_interpreter.cc:255
+#: src/js_interpreter.cc:256
 msgid "':' in case label"
 msgstr "':' in case-Label"
 
-#: src/js_interpreter.cc:267
+#: src/js_interpreter.cc:268
 msgid "':' in default label"
 msgstr "':' in default-Label"
 
-#: src/js_interpreter.cc:280
+#: src/js_interpreter.cc:281
 msgid "'}' in switch statement"
 msgstr "'}' in switch-Anweisung"
 
-#: src/js_interpreter.cc:293 src/js_interpreter.cc:313
+#: src/js_interpreter.cc:294 src/js_interpreter.cc:314
 msgid "variable identifier"
 msgstr "Variablenbezeichner"
 
-#: src/js_interpreter.cc:337 src/js_interpreter.cc:357
+#: src/js_interpreter.cc:338 src/js_interpreter.cc:358
 msgid "constant identifier"
 msgstr "Konstantenbezeichner"
 
-#: src/js_interpreter.cc:342 src/js_interpreter.cc:361
+#: src/js_interpreter.cc:343 src/js_interpreter.cc:362
 msgid "initializer for constant"
 msgstr "Konstanten-Initialisierer"
 
-#: src/js_interpreter.cc:381
+#: src/js_interpreter.cc:382
 msgid "function identifier"
 msgstr "Funktionsbezeichner"
 
-#: src/js_interpreter.cc:385
+#: src/js_interpreter.cc:386
 msgid "'(' in function declaration"
 msgstr "'(' in Funktionsdeklaration"
 
-#: src/js_interpreter.cc:391 src/js_interpreter.cc:431
-#: src/js_interpreter.cc:473
+#: src/js_interpreter.cc:392 src/js_interpreter.cc:432
+#: src/js_interpreter.cc:474
 msgid "parameter identifier"
 msgstr "Parameter-Bezeichner"
 
-#: src/js_interpreter.cc:399
+#: src/js_interpreter.cc:400
 msgid "')' in function declaration"
 msgstr "')' in Funktionsdeklaration"
 
-#: src/js_interpreter.cc:402
+#: src/js_interpreter.cc:403
 msgid "'{' in function definition"
 msgstr "'{' in Funktionsdefinition"
 
-#: src/js_interpreter.cc:421
+#: src/js_interpreter.cc:422
 msgid "method identifier"
 msgstr "Methoden-Bezeichner"
 
-#: src/js_interpreter.cc:425
+#: src/js_interpreter.cc:426
 msgid "'(' in method declaration"
 msgstr "'(' in Methodendeklaration"
 
-#: src/js_interpreter.cc:439
+#: src/js_interpreter.cc:440
 msgid "')' in method declaration"
 msgstr "')' in Methodendeklaration"
 
-#: src/js_interpreter.cc:442
+#: src/js_interpreter.cc:443
 msgid "'{' in method definition"
 msgstr "'{' in Methodendefinition"
 
-#: src/js_interpreter.cc:461
+#: src/js_interpreter.cc:462
 msgid "constructor identifier"
 msgstr "Konstruktorbezeichner"
 
-#: src/js_interpreter.cc:463 src/js_interpreter.cc:503
+#: src/js_interpreter.cc:464 src/js_interpreter.cc:504
 msgid "class identifier"
 msgstr "Klassenbezeichner"
 
-#: src/js_interpreter.cc:467
+#: src/js_interpreter.cc:468
 msgid "'(' in constructor declaration"
 msgstr "'(' in Konstruktordeklaration"
 
-#: src/js_interpreter.cc:481
+#: src/js_interpreter.cc:482
 msgid "')' in constructor declaration"
 msgstr "')' in Konstruktordeklaration"
 
-#: src/js_interpreter.cc:484
+#: src/js_interpreter.cc:485
 msgid "'{' in constructor definition"
 msgstr "'{' in Konstruktordefinition"
 
-#: src/js_interpreter.cc:513
+#: src/js_interpreter.cc:514
 msgid "'{' in class declaration"
 msgstr "'(' in Klassendeklaration"
 
-#: src/js_interpreter.cc:547
+#: src/js_interpreter.cc:548
 msgid "'function' keyword"
 msgstr "Schlüsselwort 'function'"
 
-#: src/js_interpreter.cc:623
+#: src/js_interpreter.cc:624
 msgid "'(' in if statement"
 msgstr "'(' in if-Anweisung"
 
-#: src/js_interpreter.cc:627
+#: src/js_interpreter.cc:628
 msgid "')' in if statement"
 msgstr "')' in if-Anweisung"
 
-#: src/js_interpreter.cc:645
+#: src/js_interpreter.cc:646
 msgid "'(' in while statement"
 msgstr "'(' in while-Anweisung"
 
-#: src/js_interpreter.cc:649
+#: src/js_interpreter.cc:650
 msgid "')' in while statement"
 msgstr "')' in while-Anweisung"
 
-#: src/js_interpreter.cc:667
+#: src/js_interpreter.cc:668
 msgid "'while' in do-while"
 msgstr "'while' in do-while-Anweisung"
 
-#: src/js_interpreter.cc:670
+#: src/js_interpreter.cc:671
 msgid "'(' in do-while statement"
 msgstr "')' in do-while-Anweisung"
 
-#: src/js_interpreter.cc:674
+#: src/js_interpreter.cc:675
 msgid "')' in do-while statement"
 msgstr "')' in do-while-Anweisung"
 
-#: src/js_interpreter.cc:689
+#: src/js_interpreter.cc:690
 msgid "'(' in for statement"
 msgstr "'(' in for-Anweisung"
 
-#: src/js_interpreter.cc:706 src/js_interpreter.cc:730
+#: src/js_interpreter.cc:707 src/js_interpreter.cc:731
 msgid "')' in for statement"
 msgstr "')' in for-Anweisung"
 
 #. for (;;) ...
-#: src/js_interpreter.cc:720 src/js_interpreter.cc:725
+#: src/js_interpreter.cc:721 src/js_interpreter.cc:726
 msgid "';' in for statement"
 msgstr "';' in for-Anweisung"
 
-#: src/js_interpreter.cc:760
+#: src/js_interpreter.cc:761
 msgid "break label"
 msgstr "break-Marke"
 
-#: src/js_interpreter.cc:775
+#: src/js_interpreter.cc:776
 msgid "continue label"
 msgstr "continue-Marke"
 
-#: src/js_interpreter.cc:854
+#: src/js_interpreter.cc:855
 msgid "'(' in 'new' expression"
 msgstr "'(' in new-Ausdruck"
 
-#: src/js_interpreter.cc:866
+#: src/js_interpreter.cc:867
 msgid "')' in 'new' expression"
 msgstr "')' in new-Ausdruck"
 
-#: src/js_interpreter.cc:953
+#: src/js_interpreter.cc:954
 msgid "')' in function call"
 msgstr "')' in Funktionsaufruf"
 
-#: src/js_interpreter.cc:979
+#: src/js_interpreter.cc:980
 msgid "']' in subscript"
 msgstr "']' in Indizierung"
 
-#: src/js_value.cc:31
+#: src/js_value.cc:29
 msgid "-> string"
 msgstr "-> String"
 
-#: src/js_value.cc:39
+#: src/js_value.cc:37
 msgid " -> int"
 msgstr "-> Ganzzahl"
 
-#: src/js_value.cc:47
+#: src/js_value.cc:45
 msgid " -> float"
 msgstr "-> Fließkommazahl"
 
-#: src/js_value.cc:55
+#: src/js_value.cc:53
 msgid " -> bool"
 msgstr "-> Wahrheitswert"
 
-#: src/js_value.cc:75
+#: src/js_value.cc:80
 msgid ": duplication"
 msgstr ": Duplizierung"
 
-#: src/js_value.cc:84
+#: src/js_value.cc:89
 msgid ": lookup of "
 msgstr ": Lookup von "
 
-#: src/js_value.cc:93
+#: src/js_value.cc:98
 msgid ": subscript"
 msgstr ": Indizierung"
 
-#: src/js_value.cc:102
+#: src/js_value.cc:107
 msgid ": call"
 msgstr ": Aufruf"
 
-#: src/js_value.cc:111
+#: src/js_value.cc:116
 #, fuzzy
 msgid ": call as method"
 msgstr ": Methodenaufruf"
 
-#: src/js_value.cc:120
+#: src/js_value.cc:125
 msgid ": construction"
 msgstr ": Konstruktion"
 
-#: src/js_value.cc:128
+#: src/js_value.cc:133
 #, fuzzy
 msgid ": assignment"
 msgstr ": Zuweisung"
 
-#: src/js_value.cc:137
+#: src/js_value.cc:142
 #, fuzzy
 msgid ": operator "
 msgstr ": Operator"
 
-#: src/js_value.cc:171 src/js_value.cc:180
+#: src/js_value.cc:176 src/js_value.cc:185
 msgid " on "
 msgstr " auf "
 
-#: src/js_value.cc:242
+#: src/js_value.cc:247
 msgid "prefix ++"
 msgstr "Präfix ++"
 
-#: src/js_value.cc:243 src/js_value.cc:245
+#: src/js_value.cc:248 src/js_value.cc:250
 msgid "postfix ++"
 msgstr "Postfix ++"
 
-#: src/js_value.cc:244
+#: src/js_value.cc:249
 msgid "prefix --"
 msgstr "Präfix --"
 
-#: src/js_value.cc:247
+#: src/js_value.cc:252
 msgid "unary +"
 msgstr "Unäres +"
 
-#: src/js_value.cc:248
+#: src/js_value.cc:253
 msgid "unary -"
 msgstr "Unäres -"
 
-#: src/js_value.cc:297
+#: src/js_value.cc:302
 msgid "undefined"
 msgstr "undefined"
 
-#: src/js_value.cc:298
+#: src/js_value.cc:303
 msgid "null"
 msgstr "null"
 
-#: src/js_value.cc:299
+#: src/js_value.cc:304
 msgid "integer"
 msgstr "Ganzzahl"
 
-#: src/js_value.cc:300
+#: src/js_value.cc:305
 msgid "floating point"
 msgstr "Fließkommazahl"
 
-#: src/js_value.cc:301
+#: src/js_value.cc:306
 msgid "string"
 msgstr "String"
 
-#: src/js_value.cc:302
+#: src/js_value.cc:307
 msgid "function"
 msgstr "Funktion"
 
-#: src/js_value.cc:303
+#: src/js_value.cc:308
 msgid "object"
 msgstr "Objekt"
 
-#: src/js_value.cc:304
+#: src/js_value.cc:309
 msgid "built-in object"
 msgstr "eingebautes Objekt"
 
-#: src/js_value.cc:305
+#: src/js_value.cc:310
 msgid "host object"
 msgstr "Host-Objekt"
 
-#: src/js_value.cc:306
+#: src/js_value.cc:311
 msgid "scope"
 msgstr "Gültigkeitsbereich"
 
-#: src/js_value.cc:307
+#: src/js_value.cc:312
 msgid "bound method"
 msgstr "gebundene Methode"
 
-#: src/js_value.cc:308
+#: src/js_value.cc:313
 msgid "type"
 msgstr "Typ"
 
-#: src/js_value.cc:309
+#: src/js_value.cc:314
 msgid "unknown value type"
 msgstr "unbekannter Wertetyp"
 
-#: src/js_value.cc:1268
+#: src/js_value.cc:1355
 msgid "by assignment"
 msgstr "durch Zuweisung"
 

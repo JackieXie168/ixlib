@@ -6,9 +6,9 @@ AC_INIT(src/ixlib_base.hh)
 
 ix_ixlib_major_version=0
 ix_ixlib_minor_version=96
-ix_ixlib_micro_version=1
+ix_ixlib_micro_version=2
 
-IXLIB_BINARY_IFACE_VERSION=4
+IXLIB_BINARY_IFACE_VERSION=6
 IXLIB_BINARY_REVISION=$ix_ixlib_minor_version
 IXLIB_BINARY_AGE=0
 AC_SUBST(IXLIB_BINARY_IFACE_VERSION)

@@ -16,8 +16,6 @@
 #include <ixlib_token_javascript.hh>
 
 
-
-
 using namespace std;
 using namespace ixion;
 using namespace javascript;
@@ -65,6 +63,13 @@ string value::stringify() const {
   catch (...) {
     return string("#<")+valueType2string(getType())+">";
     }
+  }
+
+
+
+
+ref<value> value::eliminateWrappers() {
+  return this;
   }
 
 
@@ -499,7 +504,12 @@ const_floating_point::operatorBinary(operator_id op,ref<value> op2) const {
       FLOAT_OPERATOR(*)
       PASS_UP
     case OP_DIVIDE: 
-      FLOAT_OPERATOR(/)
+      if (op2->getType() == VT_FLOATING_POINT || op2->getType() == VT_INTEGER) {
+        double op2value = op2->toFloat();
+	if (op2value == 0)
+          EXJS_THROW(ECJS_DIVISION_BY_ZERO)
+        return makeConstant(Value / op2value);
+	}
       PASS_UP
     case OP_EQUAL: 
       FLOAT_OPERATOR(==)
@@ -573,9 +583,13 @@ floating_point::operatorBinaryModifying(operator_id op,ref<value> op2) {
     case OP_MUTLIPLY_ASSIGN:
       Value *= op2->toFloat();
       return ref<value>(this);
-    case OP_DIVIDE_ASSIGN:
-      Value /= op2->toFloat();
+    case OP_DIVIDE_ASSIGN: {
+      double op2value = op2->toFloat();
+      if (op2value == 0)
+        EXJS_THROW(ECJS_DIVISION_BY_ZERO)
+      Value /= op2value;
       return ref<value>(this);
+      }
     case OP_MODULO_ASSIGN:
       val = (int) Value;
       val %= (int) op2->toFloat();
@@ -722,6 +736,8 @@ const_integer::operatorBinary(operator_id op,ref<value> op2) const {
       INT_OPERATOR(*)
       PASS_UP
     case OP_DIVIDE: 
+      if (op2->toFloat() == 0) 
+        EXJS_THROW(ECJS_DIVISION_BY_ZERO)
       FLOAT_OPERATOR(/)
       INT_OPERATOR(/)
       PASS_UP
@@ -812,47 +828,50 @@ integer::operatorUnaryModifying(operator_id op) {
 ref<value> 
 integer::operatorBinaryModifying(operator_id op,ref<value> op2) {
   int val;
+  int op2value = op2->toInt();
   switch (op) {
     case OP_PLUS_ASSIGN:
-      Value += op2->toInt();
+      Value += op2value;
       return ref<value>(this);
     case OP_MINUS_ASSIGN:
-      Value -= op2->toInt();
+      Value -= op2value;
       return ref<value>(this);
     case OP_MUTLIPLY_ASSIGN:
-      Value *= op2->toInt();
+      Value *= op2value;
       return ref<value>(this);
     case OP_DIVIDE_ASSIGN:
-      Value /= op2->toInt();
+      if (op2value == 0)
+        EXJS_THROW(ECJS_DIVISION_BY_ZERO)
+      Value /= op2value;
       return ref<value>(this);
     case OP_MODULO_ASSIGN:
-      val = (int) Value;
-      val %= (int) op2->toInt();
+      val = Value;
+      val %= op2value;
       Value = val;
       return ref<value>(this);
     case OP_BIT_AND_ASSIGN:
-      val = (int) Value;
-      val &= (int) op2->toInt();
+      val = Value;
+      val &= op2value;
       Value = val;
       return ref<value>(this);
     case OP_BIT_OR_ASSIGN:
-      val = (int) Value;
-      val |= (int) op2->toInt();
+      val = Value;
+      val |= op2value;
       Value = val;
       return ref<value>(this);
     case OP_BIT_XOR_ASSIGN:
-      val = (int) Value;
-      val ^= (int) op2->toInt();
+      val = Value;
+      val ^= op2value;
       Value = val;
       return ref<value>(this);
     case OP_LEFT_SHIFT_ASSIGN:
-      val = (int) Value;
-      val <<= (int) op2->toInt();
+      val = Value;
+      val <<= op2value;
       Value = val;
       return ref<value>(this);
     case OP_RIGHT_SHIFT_ASSIGN:
-      val = (int) Value;
-      val >>= (int) op2->toInt();
+      val = Value;
+      val >>= op2value;
       Value = val;
       return ref<value>(this);
     default:
@@ -958,7 +977,60 @@ ref<value> js_string::callMethod(string const &identifier,parameter_list const &
     TIndex start = parameters[0]->toInt(),end = parameters[1]->toInt();
     return makeConstant(string(Value,start,end-start));
     }
-  // *** FIXME implement split
+
+  /*
+    Allow 2 parameters here, the first one is the separator and the second
+    one is the maximum allowed number of elements of the resulting array
+    if the function is called without a parameter the string is split
+    into a character array.
+    The second parameter sets the maximum number of elements of the
+    resulting array.
+  */
+
+  IXLIB_JS_IF_METHOD("split", 0, 2 ) {
+    string::size_type start = 0, last = 0;
+    int count = 0;
+    int max = -1;
+
+    if (parameters.size() == 2) 
+      max = parameters[1]->toInt();
+
+    string sep;
+
+    auto_ptr<js_array> result(new js_array(0));
+
+    if (parameters.size() == 0 || (sep = parameters[0]->toString()).empty()) {
+      for (string::size_type i = 0; i < Value.size(); ++i) {
+	string s;
+	s += Value[i];
+	result->push_back(makeValue(s));
+	}
+      } 
+    else {
+      while (true) {
+	if (max > 0)
+	  count++;
+
+	if (count >= max && max > 0) {
+	  result->push_back(makeValue(Value.substr(last)));
+	  break;
+	  }
+
+	start = Value.find(sep, last);
+
+	if (start == string::npos) {
+	  result->push_back(makeValue(Value.substr(last)));
+	  break;
+	  }
+
+	result->push_back(makeValue(Value.substr(last, start - last)));
+	last = start + sep.size();
+        }
+      }
+
+    return result.release();
+    }
+
   IXLIB_JS_IF_METHOD("substring",2,2) {
     TIndex start = parameters[0]->toInt(),end = parameters[1]->toInt();
     if (start > end) swap(start,end);
@@ -1068,8 +1140,15 @@ string lvalue::stringify() const {
 
 
 
+ref<value> lvalue::eliminateWrappers() {
+  return Reference.get();
+  }
+
+
+
+
 ref<value> lvalue::duplicate() {
-  return Reference->duplicate();
+  return makeLValue(Reference->duplicate());
   }
 
 
@@ -1216,8 +1295,16 @@ string constant_wrapper::stringify() const {
 
 
 ref<value> 
+constant_wrapper::eliminateWrappers() {
+  return Constant.get();
+  }
+
+
+
+
+ref<value> 
 constant_wrapper::duplicate() {
-  return Constant->duplicate();
+  return wrapConstant(Constant->duplicate());
   }
 
 
@@ -1412,7 +1499,7 @@ void callable_with_parameters::addParametersTo(list_scope &scope,parameter_list 
     if (firstp == lastp)
       scope.addMember(*first,makeLValue(makeNull()));
     else
-      scope.addMember(*first,makeLValue((*firstp)->duplicate()));
+      scope.addMember(*first,makeLValue((*firstp)->eliminateWrappers()->duplicate()));
     
     firstp++;
     }
@@ -1442,7 +1529,7 @@ ref<value> callable_with_parameters::evaluateBody(expression &body,context const
     else
       EXJS_THROWINFOLOCATION(ECJS_INVALID_NON_LOCAL_EXIT,"continue",ce.Location)
     }
-  if (result.get()) return result->duplicate();
+  if (result.get()) return result->eliminateWrappers()->duplicate();
   return ref<value>(NULL);
   }
 
@@ -1500,8 +1587,8 @@ ref<value>
 method::
 callAsMethod(ref<value> instance,parameter_list const &parameters) {
   ref<list_scope,value> scope = new list_scope;
-  scope->unite(LexicalScope);
   scope->unite(instance);
+  scope->unite(LexicalScope);
   scope->addMember("this",instance);
   
   addParametersTo(*scope,parameters);
@@ -1744,22 +1831,6 @@ ref<value>
 javascript::makeNull() {
   ref<value> result(new null());
   return result;
-  }
-
-
-
-
-ref<value> 
-javascript::makeValue(bool val) {
-  return makeConstant((int) val);
-  }
-
-
-
-
-ref<value> 
-javascript::makeConstant(bool val) {
-  return makeConstant((int) val);
   }
 
 

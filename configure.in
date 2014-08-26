@@ -1,0 +1,57 @@
+# -----------------------------------------------------------------------------
+# Initialize everything
+# -----------------------------------------------------------------------------
+
+AC_INIT(src/ixlib_base.hh)
+
+ix_ixlib_major_version=0
+ix_ixlib_minor_version=90
+ix_ixlib_micro_version=0
+
+IXLIB_BINARY_IFACE_VERSION=0
+IXLIB_BINARY_REVISION=$ix_ixlib_minor_version
+IXLIB_BINARY_AGE=0
+AC_SUBST(IXLIB_BINARY_IFACE_VERSION)
+AC_SUBST(IXLIB_BINARY_REVISION)
+AC_SUBST(IXLIB_BINARY_AGE)
+
+AM_INIT_AUTOMAKE(ixlib,"$ix_ixlib_major_version.$ix_ixlib_minor_version.$ix_ixlib_micro_version")
+
+AC_DEFINE_UNQUOTED(IXLIB_MAJOR_VERSION,$ix_ixlib_major_version,
+  [The major version of the library.])
+AC_DEFINE_UNQUOTED(IXLIB_MINOR_VERSION,$ix_ixlib_minor_version,
+  [The minor version of the library.])
+AC_DEFINE_UNQUOTED(IXLIB_MICRO_VERSION,$ix_ixlib_micro_version,
+  [The micro version of the library.])
+
+# -----------------------------------------------------------------------------
+# Checks 
+# -----------------------------------------------------------------------------
+
+ALL_LINGUAS="de"
+
+AC_PROG_CC
+AC_PROG_CXX
+AM_PROG_LEX
+AM_PROG_LIBTOOL
+AM_GNU_GETTEXT
+IX_CXX_SUPPORTS_CLASS_TEMPLATES
+IX_CXX_SUPPORTS_EXCEPTIONS
+IX_CXX_SUPPORTS_BOOL
+
+AC_ARG_ENABLE(dosline,
+  [  --enable-dosline        have DOS/Win line endings (obsolete)],
+  AC_DEFINE(IXLIB_DOS_LINES,1,[Select DOS line ends.])
+)
+
+AC_ARG_ENABLE(debug,
+  [  --enable-debug          have debug info compiled in],
+CXXFLAGS=-g)  
+
+# -----------------------------------------------------------------------------
+# Output
+# -----------------------------------------------------------------------------
+
+AM_CONFIG_HEADER(ixlib_config.hh)
+AC_OUTPUT([ixlib-config po/Makefile.in intl/Makefile Makefile src/Makefile test/Makefile],
+  [chmod +x ixlib-config])

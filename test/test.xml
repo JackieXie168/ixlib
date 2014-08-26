@@ -1,0 +1,6 @@
+<GRAPHIC size="100" color>
+  <!- this is a comment ->
+  This is some Text
+  <CHARACTER bold size="23"/>
+  Some other text
+</GRAPHIC>

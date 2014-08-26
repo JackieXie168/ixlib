@@ -1,0 +1,65 @@
+Welcome to ixlib.
+
+ixlib is a small c++ tools library based upon the standard template library.
+It provides 
+
+* an exception handling framework [ixlib_exbase.hh]
+* basic integer types with bit size (such as "TUnsigned16") [ixlib_base.hh]
+* garbage collection [ixlib_garbage.hh]
+* automatic array management [ixlib_array.hh]
+* planar geometry (rectangles, regions) [ixlib_geometry.hh]
+* matrices (including linear system solver, Cholesky and LU decomposition,
+  determinants, inversion, Gauss and Gauss-Jordan elimination)
+  [ixlib_matrix.hh]
+* command line parsing [ixlib_cmdline.hh]
+* versatile int <-> string conversions [ixlib_numconv.hh]
+* regular expressions [ixlib_re.hh]
+* xml parsing [ixlib_xml.hh]
+
+It mixes well with STL code and has templates where they make sense. It
+hides in its own namespace and it is written in such a way that the header 
+file will suffice as documentation. If not, tell me, because that's a bug.
+You can use every component of ixlib separately without incurring extra 
+cost. Furthermore, every component of ixlib has been thoroughly tested
+and is considered production-quality code. All but the garbage collector
+interfaces are frozen.
+
+Using ixlib is as easy as abc. To compile, just type
+
+c++ -c my_program.cc `ixlib-config --cflags`
+
+To link, type
+
+c++ my_program.o -o my_program `ixlib-config --libs`
+
+One word on the usage of the templates. In order to avoid incurring the
+overhead of compiling/inlining every included template into every source file,
+the following scheme is used: The declaration goes into a ixlib_*.hh
+file, and the corresponding implementation goes into ixlib_*_impl.hh.
+This implementation does not inline by default, so you will use the following
+in *one* of your c++ files for every type you desire instantiation for:
+[this also catches unwanted instantiations as linker errors]
+
+8< snip -----------------------------------------------------------------------
+#include <ixlib_foo_impl.hh>
+
+template foo_class<int>; // explicit instation for ints
+8< snip -----------------------------------------------------------------------
+
+ixlib currently depends on
+* a good c++ compiler (gcc 2.95 will do)
+* the SGI STL (i.e. an STL implementation containing a "hash")
+  (normally included with your c++ compiler, e.g. gcc)
+* flex
+
+The ixlib webpage is at http://ixlib.sourceforge.net.
+Have fun.
+
+Andreas Kloeckner <ak@ixion.net>
+
+-------------------------------------------------------------------------------
+differences in conventions STL <-> ixlib:
+
+T... = typedef'ed simple type
+methods and functions named java-like
+-------------------------------------------------------------------------------

@@ -543,7 +543,7 @@ fi
 
 
 ix_ixlib_major_version=0
-ix_ixlib_minor_version=93
+ix_ixlib_minor_version=94
 ix_ixlib_micro_version=0
 
 IXLIB_BINARY_IFACE_VERSION=0
@@ -3822,8 +3822,12 @@ fi
 	< $srcdir/po/POTFILES.in > po/POTFILES
   
 
+CFLAGS="-I\$(top_srcdir)/intl"
+CXXFLAGS="-I\$(top_srcdir)/intl -I\$(top_srcdir)/src"
+
+
   echo $ac_n "checking whether c++ compiler ($CXX) supports class templates""... $ac_c" 1>&6
-echo "configure:3827: checking whether c++ compiler ($CXX) supports class templates" >&5
+echo "configure:3831: checking whether c++ compiler ($CXX) supports class templates" >&5
   
   ac_ext=C
 # CXXFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
@@ -3833,14 +3837,14 @@ ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftes
 cross_compiling=$ac_cv_prog_cxx_cross
 
   cat > conftest.$ac_ext <<EOF
-#line 3837 "configure"
+#line 3841 "configure"
 #include "confdefs.h"
 template <class T> class oomph { T x; }; 
 int main() {
 oomph<int> u;
 ; return 0; }
 EOF
-if { (eval echo configure:3844: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:3848: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ix_cxx_supports_class_templates=yes
 else
@@ -3868,7 +3872,7 @@ cross_compiling=$ac_cv_prog_cc_cross
 
 
   echo $ac_n "checking whether c++ compiler ($CXX) supports exceptions""... $ac_c" 1>&6
-echo "configure:3872: checking whether c++ compiler ($CXX) supports exceptions" >&5
+echo "configure:3876: checking whether c++ compiler ($CXX) supports exceptions" >&5
   
   ac_ext=C
 # CXXFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
@@ -3878,14 +3882,14 @@ ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftes
 cross_compiling=$ac_cv_prog_cxx_cross
 
   cat > conftest.$ac_ext <<EOF
-#line 3882 "configure"
+#line 3886 "configure"
 #include "confdefs.h"
 
 int main() {
 try { throw 1; } catch (int a) { return 1; } 
 ; return 0; }
 EOF
-if { (eval echo configure:3889: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:3893: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ix_cxx_supports_exceptions=yes
 else
@@ -3915,7 +3919,7 @@ cross_compiling=$ac_cv_prog_cc_cross
 
 
   echo $ac_n "checking whether c++ compiler ($CXX) supports bool""... $ac_c" 1>&6
-echo "configure:3919: checking whether c++ compiler ($CXX) supports bool" >&5
+echo "configure:3923: checking whether c++ compiler ($CXX) supports bool" >&5
   
   ac_ext=C
 # CXXFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
@@ -3925,14 +3929,14 @@ ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftes
 cross_compiling=$ac_cv_prog_cxx_cross
 
   cat > conftest.$ac_ext <<EOF
-#line 3929 "configure"
+#line 3933 "configure"
 #include "confdefs.h"
 
 int main() {
  bool a = true; 
 ; return 0; }
 EOF
-if { (eval echo configure:3936: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:3940: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ix_cxx_supports_bool=yes
 else
@@ -3982,9 +3986,12 @@ fi
 # Check whether --enable-debug or --disable-debug was given.
 if test "${enable_debug+set}" = set; then
   enableval="$enable_debug"
-  CXXFLAGS=-g
+  CXXFLAGS="$CXXFLAGS -g -Wall"
 fi
   
+
+# preserve timestamps on install
+INSTALL="$INSTALL -p"
 
 # -----------------------------------------------------------------------------
 # Output

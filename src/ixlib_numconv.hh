@@ -54,9 +54,10 @@ namespace ixion {
   
   string bytes2dec(TSize bytes);
   
-  double evalFloat(string const &value);
-  unsigned long evalUnsigned(string const &value);
-  signed long evalSigned(string const &value);
+  unsigned long evalNumeral(string const &numeral,unsigned radix = 10);
+  double evalFloat(string const &numeral);
+  unsigned long evalUnsigned(string const &numeral,unsigned default_base = 10);
+  signed long evalSigned(string const &numeral,unsigned default_base = 10);
   }
 
 

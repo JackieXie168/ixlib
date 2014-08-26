@@ -18,15 +18,11 @@
 
 
 using namespace ixion;
-BEGIN_TEST
-  vector<string>	list;
-  string		s;
-  
-  list.push_back("hallo");
-  cout << list.size() << " " << list.back() << endl;
-  list.push_back("");
-  cout << list.size() << " " << list.back() << endl;
 
+
+
+
+BEGIN_TEST
   ifstream istr("test.xml");
   
   xml_file xml;

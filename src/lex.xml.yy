@@ -1,6 +1,6 @@
 /* -------- definitions ------- */
 
-%option c++ debug yylineno noyywrap prefix="xml"
+%option c++ debug yylineno noyywrap prefix="xml" outfile="lex.xml.cc"
 
 %{
 #include <ixlib_xml.hh>

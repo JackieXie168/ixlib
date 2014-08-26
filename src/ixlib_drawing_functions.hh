@@ -128,9 +128,9 @@ void ixion::drawing_functions::drawLine(Target &target,int x1,int y1,int x2,int 
 template<class Target>
 void ixion::drawing_functions::drawBox(Target &target,int x1,int y1,int x2,int y2) {
   target.drawHLine(x1,y1,x2);
-  target.drawVLine(x1,y1+1,y2-1);
+  target.drawVLine(x1,y1+1,y2);
   target.drawHLine(x1,y2,x2);
-  target.drawVLine(x2-1,y1+1,y2-1);
+  target.drawVLine(x2-1,y1+1,y2);
   }
 
 

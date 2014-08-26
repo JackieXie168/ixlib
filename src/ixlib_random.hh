@@ -35,10 +35,13 @@ namespace ixion {
       { }
   
     void init()
-      { Seed = time(NULL) / Pi; }
+      { Seed = time(NULL); }
     void init(double seed)
-      { Seed = seed; }
+      { Seed = fabs(seed); }
     double operator()(double max = 1) {
+      // normalize
+      while (Seed > 2) Seed = log(Seed)/log(2);
+      Seed -= floor(Seed);
       Seed = pow(Seed+Pi,8);
       Seed -= floor(Seed);
       return Seed*max;

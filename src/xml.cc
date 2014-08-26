@@ -263,9 +263,8 @@ void xml_file::tag::write(ostream &ostr, TSize indent) {
   
   children_list::const_iterator firsttag = Children.begin(),
   				lasttag = Children.end();
-  text_list::const_iterator firsttext = Text.begin(),
-  			    lasttext = Text.end();
-  
+  text_list::const_iterator firsttext = Text.begin();
+    
   while (firsttag != lasttag) {
     if (*firsttext != "") ostr << string(indent+2,' ') << (*firsttext) << endl;
     (*firsttag)->write(ostr, indent+2);
@@ -283,10 +282,10 @@ void xml_file::tag::write(ostream &ostr, TSize indent) {
 // xml_file -------------------------------------------------------------------
 void xml_file::read(istream &istr) {
   clear();
-  xmlFlexLexer		lexer(&istr);
-  scanner		scanner(lexer);
-  scanner::token_list	tokenlist = scanner.scan();
-  tokenlist.swap(tokenlist);
+  xmlFlexLexer lexer(&istr);
+  scanner scanner(lexer);
+  
+  scanner::token_list tokenlist = scanner.scan();
   parse(tokenlist);
   }
 

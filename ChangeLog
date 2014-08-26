@@ -1,4 +1,53 @@
+2001-01-12  Andreas Kloeckner  <ak@ixion.net>
+
+	* released version 0.94.0
+	
+	* src/js_value.cc: added code to allow (x==null) tests for
+	  all variable types
+
+2000-11-20  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/numconv.cc: fixed bug in numeral parsing
+
+	* src/string.cc: added parseCEscapes
+
+	* src/ixlib_numconv.hh (ixion): exposed evalNumeral function
+
+2000-11-19  Andreas Kloeckner  <ak@ixion.net>
+
+	* configure.in : bumped version number to 0.94.0
+
+2000-11-17  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_numconv.hh (ixion): added "default base"
+		parameter to eval* numconv functions
+
+2000-11-06  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_garbage.hh (ixion): reimplemented hashing in
+	  garbage collector for speed gain
+
+2000-11-04  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_garbage.hh: added no_free_ref
+
+	* src/ixlib_garbage.hh: factored out common code into ref_base
+
+2000-09-17  Andreas Kloeckner  <ak@ixion.net>
+
+	* configure.in (ix_ixlib_micro_version): Bumped version to 0.93.1
+
+	* src/ixlib_polygon_impl.hh: Fixed broken Graham's scan
+
+2000-09-16  Andreas Kloeckner  <ak@ixion.net>
+
+	* configure.in: win32 compilation works (-I libintl headers)
+
+	* src/ixlib_drawing_functions.hh: fixed silly drawBox bug
+
 2000-09-15  Andreas Kloeckner  <ak@ixion.net>
+
+	* src/ixlib_geometry.hh: moved getAngle functions to geometry.
 
 	* released version 0.93.0
 	

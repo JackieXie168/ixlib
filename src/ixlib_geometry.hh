@@ -163,6 +163,23 @@ namespace ixion {
 
 
 
+  template<class T,int Dim>
+  inline double getAngle(coord_vector<T,Dim> const &vec1,coord_vector<T,Dim> const &vec2) {
+    double ip = vec1*vec2/(sqrt(vec1*vec1)*sqrt(vec2*vec2));
+    return acos(ip);
+    }
+  
+  
+  
+  
+  template<class T>
+  inline double getAngle(coord_vector<T,2> const &vec) {
+    return atan2(vec[1],vec[0]);
+    }
+  
+  
+  
+  
 // rectangle -----------------------------------------------------------------
   template <class T>
   struct rectangle {
@@ -185,6 +202,7 @@ namespace ixion {
     rectangle &operator=(rectangle<TP> const &src) {
       A = src.A;
       B = src.B;
+      return *this;
       }
   
     T getSizeX() const

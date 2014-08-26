@@ -226,6 +226,25 @@ void ixion::polygon_segment<T>::smooth(polygon_segment &dest) const {
 
 
 template<class T>
+void ixion::polygon_segment<T>::subdivide(polygon_segment &dest) const {
+  dest.clear();
+  
+  const_iterator next = begin(),
+    last = end(),
+    previous = last - 1;
+  while (next != last) {
+    dest.push_back(*previous + (*next-*previous)/2);
+    dest.push_back(*next);
+    
+    previous = next;
+    next++;
+    }
+  }
+
+
+
+
+template<class T>
 void ixion::polygon_segment<T>::makeConvexHull(polygon_segment &dest) const {
   // this is an implementation of graham's scan
   
@@ -242,36 +261,44 @@ void ixion::polygon_segment<T>::makeConvexHull(polygon_segment &dest) const {
   sort(angles.begin(),angles.end());
   
   // obtain point that we know to be in the convex hull: the rightmost one
-  const_iterator rightmost_vertex = begin();
-  FOREACH_CONST(first,*this,polygon_segment<T>)
-    if ((*first)[0] > (*rightmost_vertex)[0])
+  angle_list::const_iterator rightmost_vertex = angles.begin();
+  FOREACH_CONST(first,angles,angle_list)
+    if ((*first->Vertex)[0] > (*rightmost_vertex->Vertex)[0])
       rightmost_vertex = first;
   
   // push rightmost vertex and subsequent vertex into hull.
-  const_iterator first = rightmost_vertex;
-  dest.push_back(*first);
+  angle_list::const_iterator first = rightmost_vertex;
+  dest.push_back(*first->Vertex);
   first++;
-  if (first == end()) first = begin();
-  dest.push_back(*first);
+  if (first == angles.end()) first = angles.begin();
+  dest.push_back(*first->Vertex);
   first++;
-  if (first == end()) first = begin();
+  if (first == angles.end()) first = angles.begin();
   
   // do the scan
-  while (first != rightmost_vertex) {
-    double alpha = getAngle(dest[dest.size()-1]-dest[dest.size()-2]);
-    double beta = getAngle(*first-dest[dest.size()-1]);
-    double inner_angle = alpha-beta;
+  bool quitflag = false;
+  while (!quitflag) {
+    bool removed_one;
+    do {
+      removed_one = false;
+      double alpha = getAngle(dest[dest.size()-2]-dest.back());
+      double beta = getAngle(*first->Vertex-dest.back());
+      double inner_angle = alpha-beta;
+      
+      if ((-Pi <= inner_angle && inner_angle <= 0) || (Pi <= inner_angle)) {
+        // we would create an inner angle above PI ---> remove last vertex
+        dest.pop_back();
+	removed_one = true;
+        }
+    } while (removed_one && dest.size() >= 2);
     
-    if ((-Pi <= inner_angle && inner_angle <= 0) || (Pi <= inner_angle)) {
-      // we would create an inner angle above PI ---> remove last vertex
-      dest.pop_back();
-      }
-    else {
-      dest.push_back(*first);
+    if (first != rightmost_vertex) {
+      dest.push_back(*first->Vertex);
       
       first++;
-      if (first == end()) first = begin();
+      if (first == angles.end()) first = angles.begin();
       }
+    else quitflag = true;
     }
   }
 
@@ -398,6 +425,20 @@ void ixion::polygon<T>::smooth() {
     polygon_segment<T> *copy = new polygon_segment<T>;
     EX_MEMCHECK(copy)
     (*first)->smooth(*copy);
+    delete *first;
+    *first = copy;
+    }
+  }
+
+
+
+
+template<class T>
+void ixion::polygon<T>::subdivide() {
+  FOREACH(first,*this,polygon) {
+    polygon_segment<T> *copy = new polygon_segment<T>;
+    EX_MEMCHECK(copy)
+    (*first)->subdivide(*copy);
     delete *first;
     *first = copy;
     }

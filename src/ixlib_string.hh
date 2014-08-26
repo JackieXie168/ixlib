@@ -45,6 +45,15 @@ namespace ixion {
   string removeLeading(string const &original,char ch = ' ');
   string removeTrailing(string const &original,char ch = ' ');
   string removeLeadingTrailing(string const &original,char ch = ' ');
+  string parseCEscapes(string const &original);
+
+
+
+
+  class string_hash {
+    public:
+      unsigned long operator()(string const &str) const;
+    };
   }
 
 

@@ -23,23 +23,6 @@
 
 
 namespace ixion {
-  template<class T,int Dim>
-  inline double getAngle(coord_vector<T,Dim> const &vec1,coord_vector<T,Dim> const &vec2) {
-    double ip = vec1*vec2/(sqrt(vec1*vec1)*sqrt(vec2*vec2));
-    return acos(ip);
-    }
-  
-  
-  
-  
-  template<class T>
-  inline double getAngle(coord_vector<T,2> const &vec) {
-    return atan2(vec[1],vec[0]);
-    }
-  
-  
-  
-  
   template<class T>
   class polygon_segment : public vector<coord_vector<T,2> > {
       // vertices are enumerated in counter-clockwise 
@@ -67,6 +50,7 @@ namespace ixion {
       void removeCrossings();
       void makeConvexHull(polygon_segment &dest) const;
       void smooth(polygon_segment &dest) const;
+      void subdivide(polygon_segment &dest) const;
       void translate(T x,T y);
   
       rectangle<T> getBoundingBox() const;
@@ -97,6 +81,7 @@ namespace ixion {
       bool isPointInside(T x,T y);
 
       void smooth();
+      void subdivide();
       void translate(T x,T y);
   
       void unite(polygon &dest,polygon const &src) const;

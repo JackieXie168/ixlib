@@ -5,12 +5,13 @@
 # -----------------------------------------------------------------------------
 
 LDADD=../src/libixion.la
-CXXFLAGS=-I../src -g
 
 check_PROGRAMS=teststring testnumconv testre testcmdline testtextfile \
-  testgeo testxml testmat
+  testgeo testxml testmat testjs
 
-EXTRA_DIST=test.xml src.txt frobnitz.par runem
+noinst_PROGRAMS=javascript
+
+EXTRA_DIST=test.xml src.txt frobnitz.par runem test.js
 
 noinst_SCRIPTS=runem
 
@@ -23,6 +24,9 @@ testtextfile_SOURCES=testtextfile.cc test.hh
 testgeo_SOURCES=testgeo.cc test.hh
 testxml_SOURCES=testxml.cc test.hh
 testmat_SOURCES=testmat.cc test.hh
+testjs_SOURCES=testjs.cc test.hh
+
+javascript_SOURCES=javascript.cc
 
 check-local:
 	./runem $(check_PROGRAMS)

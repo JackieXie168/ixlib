@@ -19,13 +19,13 @@ using namespace ixion;
 
 
 
-// Data objects --------------------------------------------------------------
+// data objects --------------------------------------------------------------
 static string numChars = IXLIB_NUMCHARS;
 
 
 
 
-// Helper ---------------------------------------------------------------------
+// exported subroutines -------------------------------------------------------
 string ixion::float2dec(double value, unsigned int precision) {
   char buf[precision+10];
   string cmd("%.");
@@ -37,28 +37,6 @@ string ixion::float2dec(double value, unsigned int precision) {
 
 
 
-static unsigned long evaluate(string const &numstr,char radix = 10) {
-  if (numstr.size() == 0) return 0;
-  unsigned long value = 0, mulvalue = 1;
-  TIndex index = numstr.size()-1;
-
-  do {
-    unsigned long digvalue;
-    try {
-      digvalue = numChars.find(numstr[index]);
-      }
-    catch (...) { EXGEN_THROWINFO(EC_CANNOTEVALUATE,numstr.c_str()) }
-    value += mulvalue * digvalue;
-    mulvalue *= radix;
-  } while (index--);
-
-  return value;
-  }
-
-
-
-
-// Exported subroutines -------------------------------------------------------
 string ixion::unsigned2base(unsigned long value,char digits,char radix) {
   string temp;
   do {
@@ -91,45 +69,65 @@ string ixion::bytes2dec(TSize bytes) {
 
 
 
-double ixion::evalFloat(string const &value) {
+unsigned long ixion::evalNumeral(string const &numeral,unsigned radix) {
+  string numstr = upper(numeral);
+  
+  if (numstr.size() == 0) return 0;
+  unsigned long value = 0, mulvalue = 1;
+  TIndex index = numstr.size()-1;
+
+  do {
+    string::size_type digvalue = numChars.find(numstr[index]);
+    if (digvalue == string::npos)
+      EXGEN_THROWINFO(EC_CANNOTEVALUATE,numstr.c_str())
+    value += mulvalue * digvalue;
+    mulvalue *= radix;
+  } while (index--);
+
+  return value;
+  }
+
+
+
+
+double ixion::evalFloat(string const &numeral) {
   double result;
-  int count = sscanf(value.c_str(), "%le", &result);
-  if (count==0) EXGEN_THROWINFO(EC_CANNOTEVALUATE,value.c_str())
+  int count = sscanf(numeral.c_str(), "%le", &result);
+  if (count == 0) EXGEN_THROWINFO(EC_CANNOTEVALUATE,numeral.c_str())
   else return result;
   }
 
 
 
 
-unsigned long ixion::evalUnsigned(string const &value) {
-  if (value.size() == 0) return 0;
-  string numstr = upper(value);
+unsigned long ixion::evalUnsigned(string const &numeral,unsigned default_base) {
+  if (numeral.size() == 0) return 0;
 
-  if (numstr.substr(0,2) == "0X")
-    return evaluate(numstr.substr(2),0x10);
-  if (numstr.substr(0,1) == "$")
-    return evaluate(numstr.substr(1),0x10);
+  if (numeral.substr(0,2) == "0X" || numeral.substr(0,2) == "0x")
+    return evalNumeral(numeral.substr(2),0x10);
+  if (numeral.substr(0,1) == "$")
+    return evalNumeral(numeral.substr(1),0x10);
 
-  char lastchar = numstr[numstr.size()-1];
-  if (lastchar == 'H') return evaluate(numstr.substr(0,numstr.size()-1),0x10);
-  if (lastchar == 'B') return evaluate(numstr.substr(0,numstr.size()-1),2);
-  if (lastchar == 'D') return evaluate(numstr.substr(0,numstr.size()-1),10);
-  if (lastchar == 'O') return evaluate(numstr.substr(0,numstr.size()-1),8);
+  char lastchar = numeral[numeral.size()-1];
+  if (lastchar == 'H' || lastchar == 'h') return evalNumeral(numeral.substr(0,numeral.size()-1),0x10);
+  if (lastchar == 'B' || lastchar == 'b') return evalNumeral(numeral.substr(0,numeral.size()-1),2);
+  if (lastchar == 'D' || lastchar == 'd') return evalNumeral(numeral.substr(0,numeral.size()-1),10);
+  if (lastchar == 'O' || lastchar == 'o') return evalNumeral(numeral.substr(0,numeral.size()-1),8);
 
-  return evaluate(numstr);
+  return evalNumeral(numeral,default_base);
   }
 
 
 
 
-signed long ixion::evalSigned(string const &value) {
-  if (value.size() == 0) return 0;
-  if (value[0] == '-')
-    return -evalUnsigned(value.substr(1));
+signed long ixion::evalSigned(string const &numeral,unsigned default_base) {
+  if (numeral.size() == 0) return 0;
+  if (numeral[0] == '-')
+    return - (signed long) evalUnsigned(numeral.substr(1),default_base);
   else {
-    if (value[0] == '+')
-      return evalUnsigned(value.substr(1));
+    if (numeral[0] == '+')
+      return evalUnsigned(numeral.substr(1),default_base);
     else
-      return evalUnsigned(value);
+      return evalUnsigned(numeral,default_base);
     }
   }

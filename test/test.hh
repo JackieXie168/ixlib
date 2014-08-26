@@ -32,13 +32,14 @@ int main() {\
     cout << "all " << testcount << " tests passed." << endl; \
   return errcount; \
   } \
-  catch (exception &ex) { \
-    cout << ex.what() << endl; \
+  catch (exception &e) { \
+    cerr << "*** exception exit. bad." << endl; \
+    cerr << "*** " << e.what() << endl; \
     return 1; \
     } \
-  catch (exception &e) { \
-    cerr << "*** exception exit. bad." << endl; return 1; \
-    cerr << "*** " << e.what() << endl; \
+  catch (...) { \
+    cerr << "*** exception exit. bad." << endl; \
+    return 1; \
     } \
 }
 

@@ -150,13 +150,13 @@
 #define PACKAGE "ixlib"
 
 /* Version number of package */
-#define VERSION "0.93.0"
+#define VERSION "0.94.0"
 
 /* The major version of the library. */
 #define IXLIB_MAJOR_VERSION 0
 
 /* The minor version of the library. */
-#define IXLIB_MINOR_VERSION 93
+#define IXLIB_MINOR_VERSION 94
 
 /* The micro version of the library. */
 #define IXLIB_MICRO_VERSION 0

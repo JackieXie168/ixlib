@@ -5,7 +5,7 @@
 AC_INIT(src/ixlib_base.hh)
 
 ix_ixlib_major_version=0
-ix_ixlib_minor_version=93
+ix_ixlib_minor_version=94
 ix_ixlib_micro_version=0
 
 IXLIB_BINARY_IFACE_VERSION=0
@@ -35,6 +35,10 @@ AC_PROG_CXX
 AM_PROG_LEX
 AM_PROG_LIBTOOL
 AM_GNU_GETTEXT
+
+CFLAGS="-I\$(top_srcdir)/intl"
+CXXFLAGS="-I\$(top_srcdir)/intl -I\$(top_srcdir)/src"
+
 IX_CXX_SUPPORTS_CLASS_TEMPLATES
 IX_CXX_SUPPORTS_EXCEPTIONS
 IX_CXX_SUPPORTS_BOOL
@@ -46,7 +50,10 @@ AC_ARG_ENABLE(dosline,
 
 AC_ARG_ENABLE(debug,
   [  --enable-debug          have debug info compiled in],
-CXXFLAGS=-g)  
+CXXFLAGS="$CXXFLAGS -g -Wall")  
+
+# preserve timestamps on install
+INSTALL="$INSTALL -p"
 
 # -----------------------------------------------------------------------------
 # Output

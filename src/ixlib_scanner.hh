@@ -51,8 +51,10 @@ namespace ixion {
 // scanner --------------------------------------------------------------------
   class scanner {
     public:
+      typedef unsigned 	token_type;
+      
       struct token {
-        TIndex        	Type;
+        token_type    	Type;
         TIndex        	Line;
         string       	Text;
         };

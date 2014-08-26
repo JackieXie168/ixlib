@@ -53,15 +53,15 @@ namespace ixion {
   
   struct base_exception : public std::exception {
     TErrorCode          Error;
-    char const          *Module;
+    char                *Module;
     TIndex             	Line;
-    char const          *Category;
+    char                *Category;
     bool		HasInfo;
     char 		Info[EX_INFOMAX+1];
     static char		RenderBuffer[EX_INFOMAX+1+100];
   
-    base_exception(TErrorCode error,char const *info = NULL,char const *module = NULL,
-      TIndex line = 0,char const *category = NULL);
+    base_exception(TErrorCode error,char const *info = NULL,char *module = NULL,
+      TIndex line = 0,char *category = NULL);
     char const *what() const throw ();
     virtual const char *getText() const = 0;
     };

@@ -59,7 +59,7 @@ namespace ixion {
       inline TSize pop(T *data,TSize maxcount = 1);
       
       /// Place count entries starting at data in the ring queue.
-      inline TSize push(T *data,TSize count = 1);
+      inline void push(T *data,TSize count = 1);
       
       /// Get a pointer where data may be read directly out of the ring_queue buffer.
       /**
@@ -94,20 +94,18 @@ namespace ixion {
 
 template<class T,class Allocator>
 ixion::TSize ixion::ring_queue<T,Allocator>::pop(T *data,TSize maxcount) {
-  TSize result = 0;
-  while (maxcount) {
+  while (count) {
     TSize loopmax;
     T *buffer = popPointer(loopmax);
     if (loopmax == 0)
-      return result;
+      EXGEN_THROW(EC_BUFFERUNDERFLOW)
     
     TSize countdown = loopmax;
     while (countdown--)
       *data++ = *buffer++;
-    result += loopmax;
 
     popPointerCommit(loopmax);
-    maxcount -= loopmax;
+    count -= loopmax;
     }
   }
 
@@ -115,13 +113,12 @@ ixion::TSize ixion::ring_queue<T,Allocator>::pop(T *data,TSize maxcount) {
 
 
 template<class T,class Allocator>
-ixion::TSize ixion::ring_queue<T,Allocator>::push(T *data,TSize count) {
+void ixion::ring_queue<T,Allocator>::push(T *data,TSize count) {
   TSize result = 0;
   while (count) {
     TSize loopmax;
     T *buffer = pushPointer(loopmax);
-    if (loopmax == 0)
-      return result;
+    if (loopmax == 0) break;
     
     TSize countdown = loopmax;
     while (countdown--)

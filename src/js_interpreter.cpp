@@ -34,7 +34,7 @@
 
 
 
-static char const *dummy_i18n_referencer = N_("instead of ");
+static char *dummy_i18n_referencer = N_("instead of ");
 
 
 
@@ -63,7 +63,7 @@ IXLIB_GARBAGE_DECLARE_MANAGER(expression)
 
 
 // exception texts ------------------------------------------------------------
-static const char *(PlainText[]) ={
+static char *(PlainText[]) ={
   N_("Unterminated comment"),
   N_("Cannot convert"),
   N_("Invalid operation"),
@@ -85,7 +85,7 @@ static const char *(PlainText[]) ={
 
 
 // no_location_javascript_exception -------------------------------------------
-char const *no_location_javascript_exception::getText() const {
+char *no_location_javascript_exception::getText() const {
   return _(PlainText[Error]);
   }
 
@@ -93,7 +93,7 @@ char const *no_location_javascript_exception::getText() const {
 
 
 // javascript_exception -------------------------------------------------------
-javascript_exception::javascript_exception(TErrorCode error,code_location const &loc,char const *info,char const *module,
+javascript_exception::javascript_exception(TErrorCode error,code_location const &loc,char const *info,char *module,
   TIndex line)
 : base_exception(error, NULL, module, line, "JS") {
   HasInfo = true;
@@ -123,7 +123,7 @@ javascript_exception::javascript_exception(no_location_javascript_exception cons
 
 
 
-char const *javascript_exception::getText() const {
+char *javascript_exception::getText() const {
   return _(PlainText[Error]);
   }
 

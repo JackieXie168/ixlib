@@ -13,7 +13,6 @@
 
 
 
-#include <cmath>
 #include <vector>
 #include <ixlib_base.hpp>
 #include <ixlib_exgen.hpp>

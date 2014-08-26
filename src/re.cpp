@@ -26,13 +26,13 @@ using namespace ixion;
 
 
 // Template instantiations ----------------------------------------------------
-template class regex<string>;
+template regex<string>;
 
 
 
 
 // Error texts ----------------------------------------------------------------
-static const char *RegexPlainText[] = {
+static char *RegexPlainText[] = {
   N_("Invalid quantifier"),
   N_("Unbalanced backreference"),
   N_("Invalid escape sequence"),
@@ -46,14 +46,14 @@ static const char *RegexPlainText[] = {
 
 // regex_exception ------------------------------------------------------------
 regex_exception::regex_exception(TErrorCode error,
-  char const *info,const char *module,TIndex line)
+  char const *info,char *module,TIndex line)
 : base_exception(error,info,module,line,"RE") {
   }
 
 
 
 
-char const *regex_exception::getText() const {
+char *regex_exception::getText() const {
   return _(RegexPlainText[Error]);
   }
 

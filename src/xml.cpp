@@ -38,7 +38,7 @@ using namespace ixion;
 
 
 // Plain text rendering table -------------------------------------------------
-static const char *(PlainText[]) ={
+static char *(PlainText[]) ={
   N_("Syntax error"),
   N_("No text expected in this context"),
   N_("No literal expected in this context"),
@@ -70,7 +70,7 @@ xml_exception::xml_exception(TErrorCode error, TIndex line, char const *info)
 
 
 
-char const *xml_exception::getText() const {
+char *xml_exception::getText() const {
   return _(PlainText[Error]);
   }
 

@@ -103,13 +103,6 @@ namespace ixion {
 
 
 
-  template<class T_Managed>
-  reference_manager<T_Managed> 
-  reference_manager_keeper<T_Managed>::Manager;
-
-
-
-
 
   /**
   An object that acts like a reference-counted pointer to an object.
@@ -137,24 +130,24 @@ namespace ixion {
       // compiler generates one, which is *ahem* - fatal
       ref(ref const &src)
         : ref_base<T>(src) {
-	reference_manager_keeper<T_Managed>::Manager.addReference(this->Instance);
+	reference_manager_keeper<T_Managed>::Manager.addReference(Instance);
 	}
       template<class T2>
       ref(ref<T2,T_Managed> const &src)
         : ref_base<T>(src.get()) {
-	reference_manager_keeper<T_Managed>::Manager.addReference(this->Instance);
+	reference_manager_keeper<T_Managed>::Manager.addReference(Instance);
 	}
       template<class T2>
       ref(no_free_ref<T2,T_Managed> const &src)
         : ref_base<T>(src.get()) {
-	reference_manager_keeper<T_Managed>::Manager.addReference(this->Instance);
+	reference_manager_keeper<T_Managed>::Manager.addReference(Instance);
 	}
       ref(T *instance = NULL)
         : ref_base<T>(instance) {
-	reference_manager_keeper<T_Managed>::Manager.addReference(this->Instance);
+	reference_manager_keeper<T_Managed>::Manager.addReference(Instance);
 	}
       ~ref() {
-        reference_manager_keeper<T_Managed>::Manager.freeReference(this->Instance);
+        reference_manager_keeper<T_Managed>::Manager.freeReference(Instance);
 	}
 	
       ref &operator=(ref const &src) {
@@ -168,20 +161,20 @@ namespace ixion {
       
       // methods
       void release() {
-	reference_manager_keeper<T_Managed>::Manager.freeReference(this->Instance);
-	this->Instance = NULL;
+	reference_manager_keeper<T_Managed>::Manager.freeReference(Instance);
+	Instance = NULL;
 	}
       void set(T *instance) {
-        if (instance == this->Instance) return;
+        if (instance == Instance) return;
 	
-	reference_manager_keeper<T_Managed>::Manager.freeReference(this->Instance);
-	this->Instance = instance;
-	reference_manager_keeper<T_Managed>::Manager.addReference(this->Instance);
+	reference_manager_keeper<T_Managed>::Manager.freeReference(Instance);
+	Instance = instance;
+	reference_manager_keeper<T_Managed>::Manager.addReference(Instance);
         }
       T *releaseFromGCArena() {
-        T *oldinst = this->Instance;
-	reference_manager_keeper<T_Managed>::Manager.forgetReference(this->Instance);
-	this->Instance = NULL;
+        T *oldinst = Instance;
+	reference_manager_keeper<T_Managed>::Manager.forgetReference(Instance);
+	Instance = NULL;
 	return oldinst;
         }
     };
@@ -211,24 +204,24 @@ namespace ixion {
       // compiler generates one, which is *ahem* - fatal
       no_free_ref(no_free_ref const &src)
         : ref_base<T>(src) {
-	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(this->Instance);
+	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(Instance);
 	}
       template<class T2>
       no_free_ref(ref<T2,T_Managed> const &src)
         : ref_base<T>(src.get()) {
-	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(this->Instance);
+	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(Instance);
 	}
       template<class T2>
       no_free_ref(no_free_ref<T2,T_Managed> const &src)
         : ref_base<T>(src.get()) {
-	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(this->Instance);
+	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(Instance);
 	}
       no_free_ref(T *instance = NULL)
         : ref_base<T>(instance) {
-	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(this->Instance);
+	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(Instance);
 	}
       ~no_free_ref() {
-        reference_manager_keeper<T_Managed>::Manager.removeNoFreeReference(this->Instance);
+        reference_manager_keeper<T_Managed>::Manager.removeNoFreeReference(Instance);
 	}
 	
       // assignment
@@ -243,20 +236,20 @@ namespace ixion {
       
       // methods
       void release() {
-	reference_manager_keeper<T_Managed>::Manager.removeNoFreeReference(this->Instance);
-	this->Instance = NULL;
+	reference_manager_keeper<T_Managed>::Manager.removeNoFreeReference(Instance);
+	Instance = NULL;
 	}
       void set(T *instance) {
-        if (instance == this->Instance) return;
+        if (instance == Instance) return;
 	
-	reference_manager_keeper<T_Managed>::Manager.removeNoFreeReference(this->Instance);
-	this->Instance = instance;
-	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(this->Instance);
+	reference_manager_keeper<T_Managed>::Manager.removeNoFreeReference(Instance);
+	Instance = instance;
+	reference_manager_keeper<T_Managed>::Manager.addNoFreeReference(Instance);
         }
       T *releaseFromGCArena() {
-        T *oldinst = this->Instance;
-	reference_manager_keeper<T_Managed>::Manager.forgetReference(this->Instance);
-	this->Instance = NULL;
+        T *oldinst = Instance;
+	reference_manager_keeper<T_Managed>::Manager.forgetReference(Instance);
+	Instance = NULL;
 	return oldinst;
         }
     };
@@ -276,14 +269,14 @@ namespace ixion {
     public:
       dynamic_ref(dynamic_ref const &src)
         : ref_base<T>(src),Manager(src.Manager) {
-	Manager.addReference(this->Instance);
+	Manager.addReference(Instance);
 	}
       dynamic_ref(reference_manager<T> &mgr,T *instance = NULL)
         : ref_base<T>(instance),Manager(mgr) {
-	Manager.addReference(this->Instance);
+	Manager.addReference(Instance);
 	}
       ~dynamic_ref() {
-        Manager.freeReference(this->Instance);
+        Manager.freeReference(Instance);
 	}
       
       // assignment
@@ -298,20 +291,20 @@ namespace ixion {
 
       // methods
       void release() {
-	Manager.freeReference(this->Instance);
-	this->Instance = NULL;
+	Manager.freeReference(Instance);
+	Instance = NULL;
 	}
       void set(T *instance) {
-        if (instance == this->Instance) return;
+        if (instance == Instance) return;
 	
-	Manager.freeReference(this->Instance);
-	this->Instance = instance;
-	Manager.addReference(this->Instance);
+	Manager.freeReference(Instance);
+	Instance = instance;
+	Manager.addReference(Instance);
         }
       T *releaseFromGCArena() {
-        T *oldinst = this->Instance;
-	Manager.forgetReference(this->Instance);
-	this->Instance = NULL;
+        T *oldinst = Instance;
+	Manager.forgetReference(Instance);
+	Instance = NULL;
 	return oldinst;
         }
     };
@@ -341,14 +334,14 @@ namespace ixion {
     public:
       no_free_dynamic_ref(no_free_dynamic_ref const &src)
         : ref_base<T>(src),Manager(src.Manager) {
-	Manager.addNoFreeReference(this->Instance);
+	Manager.addNoFreeReference(Instance);
 	}
       no_free_dynamic_ref(reference_manager<T> &mgr,T *instance = NULL)
         : ref_base<T>(instance),Manager(mgr) {
-	Manager.addNoFreeReference(this->Instance);
+	Manager.addNoFreeReference(Instance);
 	}
       ~no_free_dynamic_ref() {
-        Manager.removeNoFreeReference(this->Instance);
+        Manager.removeNoFreeReference(Instance);
 	}
       
       // assignment
@@ -363,20 +356,20 @@ namespace ixion {
 
       // methods
       void release() {
-	Manager.removeNoFreeReference(this->Instance);
-	this->Instance = NULL;
+	Manager.removeNoFreeReference(Instance);
+	Instance = NULL;
 	}
       void set(T *instance) {
-        if (instance == this->Instance) return;
+        if (instance == Instance) return;
 	
-	Manager.removeNoFreeReference(this->Instance);
-	this->Instance = instance;
-	Manager.addNoFreeReference(this->Instance);
+	Manager.removeNoFreeReference(Instance);
+	Instance = instance;
+	Manager.addNoFreeReference(Instance);
         }
       T *releaseFromGCArena() {
-        T *oldinst = this->Instance;
-	Manager.forgetReference(this->Instance);
-	this->Instance = NULL;
+        T *oldinst = Instance;
+	Manager.forgetReference(Instance);
+	Instance = NULL;
 	return oldinst;
         }
     };
@@ -492,7 +485,8 @@ namespace ixion {
 
 
 
-  #define IXLIB_GARBAGE_DECLARE_MANAGER(TYPE) 
+  #define IXLIB_GARBAGE_DECLARE_MANAGER(TYPE) \
+    ixion::reference_manager<TYPE> ixion::reference_manager_keeper<TYPE>::Manager;
   }
 
 

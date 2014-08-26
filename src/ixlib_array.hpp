@@ -231,17 +231,17 @@ namespace ixion {
         : super(source)
         { source.invalidate(); }
       virtual ~auto_array()
-        { this->internal_deallocate(); }
+        { internal_deallocate(); }
     
       auto_array &operator=(auto_array &source) {
-        this->internal_deallocate();
+        internal_deallocate();
         super::operator=(source);
         source.invalidate();
         return *this;
         }
     
       virtual void allocate(typename super::size_type cap) {
-        this->internal_deallocate();
+        internal_deallocate();
         super::allocate(cap);
         }
   };
@@ -269,25 +269,25 @@ namespace ixion {
       : super(source)
       { source.invalidate(); }
     virtual ~auto_destroy_array() { 
-      this->internal_destroy();
-      this->internal_deallocate(); 
+      internal_destroy();
+      internal_deallocate(); 
       }
   
     auto_destroy_array &operator=(auto_destroy_array &source) {
-      this->internal_destroy();
-      this->internal_deallocate();
+      internal_destroy();
+      internal_deallocate();
       super::operator=(source);
       source.invalidate();
       return *this;
       }
   
     virtual void allocate(typename super::size_type cap) {
-      this->internal_destroy();
-      this->internal_deallocate();
+      internal_destroy();
+      internal_deallocate();
       super::allocate(cap);
       }
     virtual void deallocate() {
-      this->internal_destroy();
+      internal_destroy();
       super::deallocate();
       }
     };
